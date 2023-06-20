@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cudo.pixelviewer.bo.mapper.LedconMapper">
+
+    <select id="getLedconList" resultType="com.cudo.pixelviewer.vo.LedconVo">
+        SELECT *
+        FROM LED_Controls
+    </select>
+
+    <select id="postLedconValid" resultType="int">
+        SELECT count(led_controller_id)
+        FROM LED_Controls
+    </select>
+    <insert id="postLedcon" parameterType="Map" useGeneratedKeys="true" keyColumn="led_controller_id"
+            keyProperty="ledControllerId">
+        INSERT INTO LED_Controls
+        (
+            ip, port
+            , model_nm, version, serial_no, firmware_ver
+            , state, spec_1, spec_2, spec_3
+            , connect_fl
+            , use_dt, reg_dt, chg_dt, upd_dt
+            , videoinput_mode, input_resolution_windth, input_resolution_height
+            , frame, color_depth, color_mode
+            , hdr_en, preset, brightness, color_temp
+        )
+        VALUES
+        (
+            #{ip}, #{port}
+            , #{modelNm}, #{version}, #{serialNo}, #{firmwareVer}
+            , #{state}, #{spec1}, #{spec2}, #{spec3}
+            , #{connectFl}
+            , NOW(), NOW(), NOW(), NOW()
+            , #{videoinputMode}, #{inputResolutionWidth}, #{inputResolutionHeight}
+            , #{frame}, #{colorDepth}, #{colorMode}
+            , #{hdrEn}, #{preset}, #{brightness}, #{colorTemp}
+        )
+    </insert>
+
+    <select id="deleteLedconValid" resultType="int">
+        SELECT COUNT(led_controller_id)
+        FROM LED_Controls
+        WHERE LED_Controls.led_controller_id = #{ledControllerId}
+    </select>
+    <update id="deleteLedcon">
+        DELETE S
+        FROM LED_Controls AS S
+        WHERE S.led_controller_id = #{ledControllerId}
+    </update>
+
+    <select id="putLedconValid" resultType="int">
+        SELECT COUNT(led_controller_id)
+        FROM LED_Controls
+        WHERE LED_Controls.led_controller_id = #{ledControllerId}
+    </select>
+    <update id="putLedcon" parameterType="Map">
+        UPDATE LED_Controls AS L
+        SET
+            ip = #{ip},
+            port = #{port},
+            model_nm = #{modelNm},
+            version = #{version},
+            serial_no = #{serialNo},
+            firmware_ver = #{firmwareVer},
+            L.state = #{state},
+            spec_1 = #{spec1},
+            spec_2 = #{spec2},
+            spec_3 = #{spec3},
+            connect_fl = #{connectFl},
+            chg_dt = NOW(),
+            upd_dt = NOW(),
+            videoinput_mode = #{videoinputMode},
+            input_resolution_width = #{inputResolutionWidth},
+            input_resolution_height = #{inputResolutionHeight},
+            frame = #{frame},
+            color_depth = #{colorDepth},
+            color_mode = #{colorMode},
+            hdr_en = #{hdrEn},
+            preset = #{preset},
+            brightness = #{brightness},
+            color_temp = #{colorTemp}
+        WHERE led_controller_id = #{ledControllerId}
+    </update>
+
+</mapper>

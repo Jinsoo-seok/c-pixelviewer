@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cudo.pixelviewer.operate.mapper.DisplayMapper">
+
+    <select id="getDisplayList" resultType="com.cudo.pixelviewer.vo.DisplayVo">
+        SELECT *
+        FROM Displays
+    </select>
+
+    <select id="getDisplay" resultType="com.cudo.pixelviewer.vo.DisplayVo">
+        SELECT *
+        FROM Displays
+        WHERE Displays.display_id = #{displayId}
+    </select>
+
+    <select id="getDisplayPortlist" resultType="Map">
+        SELECT display_id, display_nm
+        FROM Displays
+    </select>
+
+    <select id="patchDisplayTestpatternValid" resultType="int">
+        SELECT COUNT(display_id)
+        FROM Displays
+        WHERE Displays.display_id = #{displayId}
+    </select>
+    <update id="patchDisplayTestpattern">
+        UPDATE Displays
+        SET pattern_fl = 1
+        WHERE Displays.display_id = #{displayId}
+    </update>
+
+</mapper>

@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cudo.pixelviewer.operate.mapper.PlaylistMapper">
+
+    <select id="getPlaylistList" resultType="com.cudo.pixelviewer.vo.PlaylistVo">
+        SELECT *
+        FROM Playlists
+    </select>
+
+    <select id="getPlaylist" resultType="com.cudo.pixelviewer.vo.PlaylistVo">
+        SELECT *
+        FROM Playlists
+        WHERE Playlists.playlist_id = #{playlistId}
+    </select>
+
+    <select id="postPlaylistValid" resultType="int">
+        SELECT count(playlist_id)
+        FROM Playlists
+        WHERE playlist_nm = #{playlistNm}
+            AND rowsize = #{rowsize}
+            AND columnsize = #{columnsize}
+    </select>
+    <insert id="postPlaylist" parameterType="Map" useGeneratedKeys="true" keyColumn="playlist_id"
+            keyProperty="playlistId">
+        INSERT INTO Playlists
+        (
+            playlist_nm, layer_id, preset_id, screen_id
+        )
+        VALUES
+        (
+            #{playlistNm}, #{layerId}, #{presetId}, #{screenId}
+        )
+    </insert>
+
+    <select id="deletePlaylistValid" resultType="int">
+        SELECT COUNT(playlist_id)
+        FROM Playlists
+        WHERE Playlists.playlist_id = #{playlistId}
+    </select>
+    <update id="deletePlaylist">
+        DELETE S
+        FROM Playlists AS S
+        WHERE S.playlist_id = #{playlistId}
+    </update>
+
+    <select id="patchPlaylistNameValid" resultType="int">
+        SELECT COUNT(playlist_id)
+        FROM Playlists
+        WHERE Playlists.playlist_id = #{playlistId}
+    </select>
+    <update id="patchPlaylistName">
+        UPDATE Playlists
+        SET playlist_nm = #{playlistNm}
+        WHERE Playlists.playlist_id = #{playlistId}
+    </update>
+
+    <select id="putPlaylistValid" resultType="int">
+        SELECT COUNT(playlist_id)
+        FROM Playlists
+        WHERE Playlists.playlist_id = #{playlistId}
+    </select>
+    <update id="putPlaylist">
+        UPDATE Playlists
+        SET playlist_nm = #{playlistNm}, rowsize = #{rowsize}, columnsize = #{columnsize}
+        WHERE Playlists.playlist_id = #{playlistId}
+    </update>
+
+
+    <select id="getPlaylistContentsList" resultType="com.cudo.pixelviewer.vo.PlaylistContentsVo">
+        SELECT *
+        FROM Playlist_Items
+    </select>
+
+    <select id="getPlaylistContents" resultType="com.cudo.pixelviewer.vo.PlaylistContentsVo">
+        SELECT *
+        FROM Playlist_Items
+        WHERE item_id = #{itemId}
+    </select>
+
+    <select id="postPlaylistContentsValid" resultType="int">
+        SELECT count(item_id)
+        FROM Playlist_Items
+    </select>
+    <insert id="postPlaylistContents" parameterType="Map" useGeneratedKeys="true" keyColumn="item_id"
+            keyProperty="itemId">
+        INSERT INTO Playlist_Items
+        (
+            ord_no, playlist_id, type
+            , cts_nm, cts_path, playtime
+            , weather_fl, air_info_fl
+        )
+        VALUES
+        (
+            #{ordNo}, #{playlistId}, #{type}
+            , #{ctsNm}, #{ctsPath}, #{playtime}
+            , #{weatherFl}, #{airInfoFl}
+        )
+    </insert>
+
+    <select id="deletePlaylistContentsValid" resultType="int">
+        SELECT count(item_id)
+        FROM Playlist_Items
+        WHERE item_id = #{itemId}
+    </select>
+    <update id="deletePlaylistContents">
+        DELETE I
+        FROM Playlist_Items AS I
+        WHERE item_id = #{itemId}
+    </update>
+
+    <select id="patchContentsNameValid" resultType="int">
+        SELECT count(item_id)
+        FROM Playlist_Items
+        WHERE item_id = #{itemId}
+    </select>
+    <update id="patchContentsName">
+        UPDATE Playlist_Items
+        SET cts_nm = #{ctsNm}
+        WHERE item_id = #{itemId}
+    </update>
+
+    <select id="patchContentsPlaytimeValid" resultType="int">
+        SELECT count(item_id)
+        FROM Playlist_Items
+        WHERE item_id = #{itemId}
+    </select>
+    <update id="patchContentsPlaytime">
+        UPDATE Playlist_Items
+        SET playtime = #{playtime}
+        WHERE item_id = #{itemId}
+    </update>
+</mapper>

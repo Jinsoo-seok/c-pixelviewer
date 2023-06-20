@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cudo.pixelviewer.operate.mapper.ExternalMapper">
+
+    <select id="getExternalVideo" resultType="com.cudo.pixelviewer.vo.ExternalVideoVo">
+        SELECT ExV.*
+
+        FROM Layers AS L
+            LEFT JOIN LayerObjects AS O ON L.layer_id = O.layer_id
+            RIGHT JOIN ExternalVideo AS ExV ON O.object_id = ExV.object_id
+
+        WHERE L.layer_id = #{layerId};
+    </select>
+
+    <select id="postExternalVideoValid" resultType="Integer">
+        SELECT object_id
+        FROM LayerObjects AS O
+        WHERE O.layer_id = #{layerId}
+            AND type = #{type}
+    </select>
+    <insert id="postExternalVideo" parameterType="Map">
+        <selectKey keyProperty="externalId" resultType="int" order="AFTER">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+
+        INSERT INTO LayerObjects (layer_id, preset_id, screen_id, type, object_nm)
+        VALUES (#{layerId}, #{presetId}, #{screenId}, #{type}, #{objectNm});
+
+        INSERT INTO ExternalVideo (object_id, type, pos_x, pos_y, width, height, ord, rtsp_url, video_nm, video_format)
+        VALUES (LAST_INSERT_ID(), #{type}, #{posX}, #{posY}, #{width}, #{height}, #{ord}, #{rtspUrl}, #{videoNm}, #{videoFormat});
+    </insert>
+    <update id="putExternalVideo" parameterType="Map">
+        <selectKey keyProperty="externalId" resultType="int" order="AFTER">
+            SELECT ex_video_id
+            FROM ExternalVideo
+            WHERE object_id = #{objectId}
+            AND type = #{type}
+        </selectKey>
+        UPDATE ExternalVideo
+        SET
+            pos_x = #{posX},
+            pos_y = #{posY},
+            width = #{width},
+            height = #{height},
+            ord = #{ord},
+            rtsp_url = #{rtspUrl},
+            video_nm = #{videoNm},
+            video_format = #{videoFormat}
+        WHERE object_id = #{objectId}
+            AND type = #{type}
+    </update>
+
+    <select id="postExternalInfoValid" resultType="Integer">
+        SELECT object_id
+        FROM LayerObjects AS O
+        WHERE O.layer_id = #{layerId}
+          AND type = #{type}
+    </select>
+
+    <insert id="postExternalInfo" parameterType="Map">
+        <selectKey keyProperty="externalId" resultType="int" order="AFTER">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+
+        INSERT INTO LayerObjects (layer_id, preset_id, screen_id, type, object_nm)
+        VALUES (#{layerId}, #{presetId}, #{screenId}, #{type}, #{objectNm});
+
+        INSERT INTO External_Info (object_id, type, pos_x, pos_y, width, height, ord
+        , image_list, font_nm, font_size, bold, italic, underline, forecolor, image_layout)
+        VALUES (LAST_INSERT_ID(), #{type}, #{posX}, #{posY}, #{width}, #{height}, #{ord}
+        , #{imageList}, #{fontNm}, #{fontSize}, #{bold}, #{italic}, #{underline}, #{forecolor}, #{imageLayout});
+    </insert>
+    <update id="putExternalInfo" parameterType="Map">
+        <selectKey keyProperty="externalId" resultType="int" order="AFTER">
+            SELECT ex_info_id
+            FROM External_Info
+            WHERE object_id = #{objectId}
+            AND type = #{type}
+        </selectKey>
+        UPDATE External_Info
+        SET
+            pos_x = #{posX},
+            pos_y = #{posY},
+            width = #{width},
+            height = #{height},
+            ord = #{ord},
+            image_list = #{imageList},
+            font_nm = #{fontNm},
+            font_size = #{fontSize},
+            bold = #{bold},
+            italic = #{italic},
+            underline = #{underline},
+            forecolor = #{forecolor},
+            image_layout = #{imageLayout}
+
+        WHERE object_id = #{objectId}
+            AND type = #{type}
+    </update>
+</mapper>

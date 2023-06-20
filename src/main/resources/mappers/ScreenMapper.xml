@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cudo.pixelviewer.operate.mapper.ScreenMapper">
+
+    <select id="getScreenList" resultType="com.cudo.pixelviewer.vo.ScreenVo">
+        SELECT *
+        FROM Screens
+    </select>
+
+    <select id="getScreen" resultType="com.cudo.pixelviewer.vo.ScreenVo">
+        SELECT *
+        FROM Screens
+        WHERE Screens.screen_id = #{screenId}
+    </select>
+
+    <select id="postScreenValid" resultType="int">
+        SELECT count(screen_id)
+        FROM Screens
+        WHERE screen_nm = #{screenNm}
+            AND rowsize = #{rowsize}
+            AND columnsize = #{columnsize}
+    </select>
+    <insert id="postScreen" parameterType="Map" useGeneratedKeys="true" keyColumn="screen_id"
+            keyProperty="screenId">
+        INSERT INTO Screens
+        (
+            screen_nm, rowsize, columnsize
+        )
+        VALUES
+        (
+            "NULL", 0, 0
+        )
+    </insert>
+
+    <select id="deleteScreenValid" resultType="int">
+        SELECT COUNT(screen_id)
+        FROM Screens
+        WHERE Screens.screen_id = #{screenId}
+    </select>
+    <update id="deleteScreen">
+        DELETE S
+        FROM Screens AS S
+        WHERE S.screen_id = #{screenId}
+    </update>
+
+    <select id="patchScreenNameValid" resultType="int">
+        SELECT COUNT(screen_id)
+        FROM Screens
+        WHERE Screens.screen_id = #{screenId}
+    </select>
+    <update id="patchScreenName">
+        UPDATE Screens
+        SET screen_nm = #{screenNm}
+        WHERE Screens.screen_id = #{screenId}
+    </update>
+
+    <select id="putScreenValid" resultType="int">
+        SELECT COUNT(screen_id)
+        FROM Screens
+        WHERE Screens.screen_id = #{screenId}
+    </select>
+    <update id="putScreen">
+        UPDATE Screens
+        SET screen_nm = #{screenNm}, rowsize = #{rowsize}, columnsize = #{columnsize}
+        WHERE Screens.screen_id = #{screenId}
+    </update>
+
+</mapper>
+

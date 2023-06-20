@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cudo.pixelviewer.operate.mapper.PresetMapper">
+
+    <select id="getPresetList" resultType="com.cudo.pixelviewer.vo.PresetVo">
+        SELECT *
+        FROM Presets
+    </select>
+
+    <select id="getPreset" resultType="com.cudo.pixelviewer.vo.PresetVo">
+        SELECT *
+        FROM Presets
+        WHERE Presets.preset_id = #{presetId}
+    </select>
+
+    <select id="postPresetValid" resultType="int">
+        SELECT count(preset_id)
+        FROM Presets
+        WHERE preset_nm = #{presetNm}
+            AND rowsize = #{rowsize}
+            AND columnsize = #{columnsize}
+    </select>
+    <insert id="postPreset" parameterType="Map" useGeneratedKeys="true" keyColumn="preset_id"
+            keyProperty="presetId">
+        INSERT INTO Presets
+        (
+            screen_id, preset_nm, rowsize, columnsize
+        )
+        VALUES
+        (
+            0, "NULL", 0, 0
+        )
+    </insert>
+
+    <select id="deletePresetValid" resultType="int">
+        SELECT COUNT(preset_id)
+        FROM Presets
+        WHERE Presets.preset_id = #{presetId}
+    </select>
+    <update id="deletePreset">
+        DELETE P
+        FROM Presets AS P
+        WHERE P.preset_id = #{presetId}
+    </update>
+
+    <select id="patchPresetNameValid" resultType="int">
+        SELECT COUNT(preset_id)
+        FROM Presets
+        WHERE Presets.preset_id = #{presetId}
+    </select>
+    <update id="patchPresetName">
+        UPDATE Presets
+        SET preset_nm = #{presetNm}
+        WHERE Presets.preset_id = #{presetId}
+    </update>
+
+    <select id="putPresetValid" resultType="int">
+        SELECT COUNT(preset_id)
+        FROM Presets
+        WHERE Presets.preset_id = #{presetId}
+    </select>
+    <update id="putPreset">
+        UPDATE Presets
+        SET preset_nm = #{presetNm}
+        WHERE Presets.preset_id = #{presetId}
+    </update>
+
+</mapper>

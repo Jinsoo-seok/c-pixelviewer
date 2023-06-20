@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cudo.pixelviewer.operate.mapper.SubtitleMapper">
+
+    <select id="postSubtitleValid" resultType="Integer">
+        SELECT object_id
+        FROM LayerObjects AS O
+        WHERE O.layer_id = #{layerId}
+            AND type = #{type}
+    </select>
+    <insert id="postSubtitle" parameterType="Map">
+        <selectKey keyProperty="subtitleId" resultType="int" order="AFTER">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+
+        INSERT INTO LayerObjects (layer_id, preset_id, screen_id, type, object_nm)
+        VALUES (#{layerId}, #{presetId}, #{screenId}, #{type}, #{objectNm});
+
+        INSERT INTO Subtitles (object_id, pos_x, pos_y, width, height, ord, scroll_way, scroll_speed, subtitle_style)
+        VALUES (LAST_INSERT_ID(), #{posX}, #{posY}, #{width}, #{height}, #{ord}, #{scrollWay}, #{scrollSpeed}, #{subtitleStyle});
+    </insert>
+    <update id="putSubtitle" parameterType="Map">
+        <selectKey keyProperty="subtitleId" resultType="int" order="AFTER">
+            SELECT subtitle_id
+            FROM Subtitles
+            WHERE object_id = #{objectId}
+        </selectKey>
+        UPDATE Subtitles
+        SET
+            pos_x = #{posX},
+            pos_y = #{posY},
+            width = #{width},
+            height = #{height},
+            ord = #{ord},
+            scroll_way = #{scrollWay},
+            scroll_speed = #{scrollSpeed},
+            subtitle_style = #{subtitleStyle}
+        WHERE object_id = #{objectId}
+    </update>
+
+</mapper>

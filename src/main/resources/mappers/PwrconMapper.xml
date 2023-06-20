@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cudo.pixelviewer.bo.mapper.PwrconMapper">
+
+    <select id="getPwrconList" resultType="com.cudo.pixelviewer.vo.PwrconVo">
+        SELECT *
+        FROM Device_Controls
+    </select>
+
+
+    <select id="postPwrconValid" resultType="int">
+        SELECT count(condevice_id)
+        FROM Device_Controls
+    </select>
+    <insert id="postPwrcon" parameterType="Map" useGeneratedKeys="true" keyColumn="condevice_id"
+            keyProperty="condeviceId">
+        INSERT INTO Device_Controls
+        (
+            ip, port, model_nm
+            , serial_no, mpcmu_cnt, dpcmu_cnt
+            , state, spec_1, spec_2, spec_3
+            , reg_dt, chg_dt, update_dt
+            , led_pwr, temp, humi
+            , led_key
+        )
+        VALUES
+        (
+            #{ip}, #{port}, #{modelNm}
+            , #{serialNo}, #{mpcmuCnt}, #{dpcmuCnt}
+            , #{state}, #{spec1}, #{spec2}, #{spec3}
+            , NOW(), NOW(), NOW()
+            , #{ledPwr}, #{temp}, #{humi}
+            , #{ledKey}
+        )
+    </insert>
+
+    <select id="deletePwrconValid" resultType="int">
+        SELECT COUNT(condevice_id)
+        FROM Device_Controls
+        WHERE Device_Controls.condevice_id = #{condeviceId}
+    </select>
+    <update id="deletePwrcon">
+        DELETE S
+        FROM Device_Controls AS S
+        WHERE S.condevice_id = #{condeviceId}
+    </update>
+
+    <select id="putPwrconValid" resultType="int">
+        SELECT COUNT(condevice_id)
+        FROM Device_Controls
+        WHERE condevice_id = #{condeviceId}
+    </select>
+    <update id="putPwrcon">
+        UPDATE Device_Controls AS D
+        SET
+            ip = #{ip},
+            port = #{port},
+            model_nm = #{modelNm},
+            serial_no = #{serialNo},
+            mpcmu_cnt = #{mpcmuCnt},
+            dpcmu_cnt = #{dpcmuCnt},
+            D.state = #{state},
+            spec_1 = #{spec1},
+            spec_2 = #{spec2},
+            spec_3 = #{spec3},
+            chg_dt = NOW(),
+            update_dt = NOW(),
+            led_pwr = #{ledPwr},
+            temp = #{temp},
+            humi = #{humi},
+            led_key = #{ledKey}
+        WHERE D.condevice_id = #{condeviceId}
+    </update>
+
+</mapper>
