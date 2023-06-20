@@ -34,24 +34,30 @@ public class SubtitleController {
         responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
 
         String[] keyList = {
-                "layerId", "type"
-                , "posX", "posY", "width", "height", "ord"
-                , "scrollWay", "scrollSpeed", "scrollStartLocation"
+                "presetId", "screenId"
+                , "layerId", "type"
+                , "subtitleFirstYn", "subtitleSecondYn"
+//                , "posX", "posY", "width", "height", "ord"
+//                , "scrollWay", "scrollSpeed", "scrollStartLocation"
                 , "subtitleStyleArray"};
 
         try {
             parameterValidation(param, keyList);
+            parameterInt("presetId", param.get("presetId"), true);
+            parameterInt("screenId", param.get("screenId"), true);
             parameterInt("layerId", param.get("layerId"), true);
             parameterInt("type", param.get("type"), true);
-            parameterInt("posX", param.get("posX"), true);
-            parameterInt("posY", param.get("posY"), true);
-            parameterInt("width", param.get("width"), true);
-            parameterInt("height", param.get("height"), true);
-            parameterInt("ord", param.get("ord"), true);
-
-            parameterInt("scrollWay", param.get("scrollWay"), true);
-            parameterInt("scrollSpeed", param.get("scrollSpeed"), true);
-            parameterInt("scrollStartLocation", param.get("scrollStartLocation"), true);
+            parameterBoolean("subtitleFirstYn", param.get("subtitleFirstYn"), true);
+            parameterBoolean("subtitleSecondYn", param.get("subtitleSecondYn"), true);
+//            parameterInt("posX", param.get("posX"), true);
+//            parameterInt("posY", param.get("posY"), true);
+//            parameterInt("width", param.get("width"), true);
+//            parameterInt("height", param.get("height"), true);
+//            parameterInt("ord", param.get("ord"), true);
+//
+//            parameterInt("scrollWay", param.get("scrollWay"), true);
+//            parameterInt("scrollSpeed", param.get("scrollSpeed"), true);
+//            parameterInt("scrollStartLocation", param.get("scrollStartLocation"), true);
 
             parameterArray("subtitleStyleArray", param.get("subtitleStyleArray"), true);
 

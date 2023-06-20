@@ -17,8 +17,8 @@
         INSERT INTO LayerObjects (layer_id, preset_id, screen_id, type, object_nm)
         VALUES (#{layerId}, #{presetId}, #{screenId}, #{type}, #{objectNm});
 
-        INSERT INTO Subtitles (object_id, pos_x, pos_y, width, height, ord, scroll_way, scroll_speed, scroll_start_location, subtitle_style)
-        VALUES (LAST_INSERT_ID(), #{posX}, #{posY}, #{width}, #{height}, #{ord}, #{scrollWay}, #{scrollSpeed}, #{scrollStartLocation}, #{subtitleStyle});
+        INSERT INTO Subtitles (object_id, subtitle_style)
+        VALUES (LAST_INSERT_ID(), #{subtitleStyle});
     </insert>
     <update id="putSubtitle" parameterType="Map">
         <selectKey keyProperty="subtitleId" resultType="int" order="AFTER">
@@ -28,16 +28,15 @@
         </selectKey>
         UPDATE Subtitles
         SET
-            pos_x = #{posX},
-            pos_y = #{posY},
-            width = #{width},
-            height = #{height},
-            ord = #{ord},
-            scroll_way = #{scrollWay},
-            scroll_speed = #{scrollSpeed},
-            scroll_start_location = #{scrollStartLocation},
             subtitle_style = #{subtitleStyle}
         WHERE object_id = #{objectId}
+    </update>
+    <update id="postSubtitleLayer" parameterType="Map">
+        UPDATE Layers
+        SET
+            subtitle_first_yn = #{subtitleFirstYn},
+            subtitle_second_yn = #{subtitleSecondYn}
+        WHERE layer_id = #{layerId}
     </update>
 
     <select id="patchSubtitleLocationValid" resultType="Integer">

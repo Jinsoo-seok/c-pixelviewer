@@ -10,6 +10,7 @@ public interface SubtitleMapper {
     Integer postSubtitleValid(Map<String, Object> param);
     int postSubtitle(Map<String, Object> param);
     int putSubtitle(Map<String, Object> param);
+    int postSubtitleLayer(Map<String, Object> param);
 
     int deleteSubtitleValid(Map<String, Object> param);
     int deleteSubtitle(Map<String, Object> param);

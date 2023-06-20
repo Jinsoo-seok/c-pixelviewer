@@ -24,6 +24,8 @@ public class SubtitleServiceImpl implements SubtitleService {
         Map<String, Object> resultMap = new HashMap<>();
         Map<String, Object> dataMap = new HashMap<>();
 
+        Boolean YN = false;
+
         if(param.get("type").equals(30)) {
             Integer subtitleCheck = subtitleMapper.postSubtitleValid(param);
 
@@ -37,12 +39,11 @@ public class SubtitleServiceImpl implements SubtitleService {
 
             // 없으면 insert (LayerObjects, Subtitles)
             if (subtitleCheck == null) {
-                int postExternalResult = subtitleMapper.postSubtitle(param);
+                int postSubtitleResult = subtitleMapper.postSubtitle(param);
 
-                if (postExternalResult == 1) { // Success : 1
-                    dataMap.put("subtitleId", param.get("subtitleId"));
+                if (postSubtitleResult == 1) { // Success : 1
+                    YN = true;
                     resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
-                    resultMap.put("data", dataMap);
                 } else {
                     resultMap.put("code", ResponseCode.FAIL_INSERT_SUBTITLE.getCode());
                     resultMap.put("message", ResponseCode.FAIL_INSERT_SUBTITLE.getMessage());
@@ -51,15 +52,25 @@ public class SubtitleServiceImpl implements SubtitleService {
             // 있으면 update
             else {
                 param.put("objectId", subtitleCheck);
-                int putExternalResult = subtitleMapper.putSubtitle(param);
+                int putSubtitleResult = subtitleMapper.putSubtitle(param);
 
-                if (putExternalResult == 1) { // Success : 1
-                    dataMap.put("subtitleId", param.get("subtitleId"));
+                if (putSubtitleResult == 1) { // Success : 1
+                    YN = true;
                     resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
-                    resultMap.put("data", dataMap);
                 } else {
                     resultMap.put("code", ResponseCode.FAIL_UPDATE_SUBTITLE.getCode());
                     resultMap.put("message", ResponseCode.FAIL_UPDATE_SUBTITLE.getMessage());
+                }
+            }
+            if(YN){
+                int postSubtitleLayerResult = subtitleMapper.postSubtitleLayer(param);
+                if (postSubtitleLayerResult == 1) { // Success : 1
+                    dataMap.put("subtitleId", param.get("subtitleId"));
+                    resultMap.put("data", dataMap);
+                    resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
+                } else {
+                    resultMap.put("code", ResponseCode.FAIL_UPDATE_SUBTITLE_LAYER.getCode());
+                    resultMap.put("message", ResponseCode.FAIL_UPDATE_SUBTITLE_LAYER.getMessage());
                 }
             }
         }

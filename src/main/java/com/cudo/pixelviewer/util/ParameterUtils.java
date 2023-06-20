@@ -137,6 +137,25 @@ public class ParameterUtils {
         }
     }
 
+    public static Boolean parameterBoolean(String parameterKey, Object parameterValue, boolean required) throws ParamException {
+        if (required) {
+            validationRequired(parameterKey, parameterValue);
+        }
+
+        if (parameterValue instanceof Boolean) {
+            Boolean result = (Boolean) parameterValue;
+
+            return result;
+        } else if (parameterValue instanceof String) {
+            String stringValue = (String) parameterValue;
+            Boolean result = Boolean.parseBoolean(stringValue);
+
+            return result;
+        } else {
+            throw new ParamException(ResponseCode.INVALID_PARAM_TYPE, parameterKey);
+        }
+    }
+
     public static void parameterIntCompareToTrue(String parameterKey, int parameterValue1, int parameterValue2, int operator) throws ParamException {
         int result = Integer.compare(parameterValue1, parameterValue2);
 

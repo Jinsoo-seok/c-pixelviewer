@@ -87,6 +87,7 @@ public enum ResponseCode {
     FAIL_DUPLICATE_SUBTITLE(3702, "FailedDuplicateSubtitle", "Failed Duplicate Subtitle"),
     FAIL_NOT_EXIST_SUBTITLE(3703, "FailedNotExistSubtitle", "Failed Not Exist Subtitle"),
     FAIL_UNSUPPORTED_TYPE_SUBTITLE(3704, "FailedUnsupportedTypeSubtitle", "Failed Unsupported Type Subtitle"),
+    FAIL_UPDATE_SUBTITLE_LAYER(3705, "FailedUpdateSubtitleLayer", "Failed Unsupported Type Subtitle Layer"),
 
     // BO : 4000
     // Pwrcon : 4100
