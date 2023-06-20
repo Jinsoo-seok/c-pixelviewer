@@ -43,11 +43,10 @@ public class SettingServiceImpl implements SettingService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Map<String, Object> putSettingImageDefaultPlaytime(Map<String, Object> param) {
+    public Map<String, Object> patchSettingImageDefaultPlaytime(Map<String, Object> param) {
         Map<String, Object> resultMap = new HashMap<>();
 
-
-        int patchSettingNameResult = settingMapper.putSettingImageDefaultPlaytime(param);
+        int patchSettingNameResult = settingMapper.patchSettingImageDefaultPlaytime(param);
 
         if(patchSettingNameResult == 1){ // Success : 1
             resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
@@ -56,8 +55,6 @@ public class SettingServiceImpl implements SettingService {
             resultMap.put("code", ResponseCode.FAIL_UPDATE_SETTING_IMAGE_DEFAULT_PLAYTIME.getCode());
             resultMap.put("message", ResponseCode.FAIL_UPDATE_SETTING_IMAGE_DEFAULT_PLAYTIME.getMessage());
         }
-
         return resultMap;
     }
-
 }

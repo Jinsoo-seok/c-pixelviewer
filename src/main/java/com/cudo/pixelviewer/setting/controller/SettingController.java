@@ -60,10 +60,8 @@ public class SettingController {
         return responseMap;
     }
 
-    // TODO : 이미지 재생시간 관련 테이블이 어디?
-    // TODO : 전체를 바꾼다고해도 기존에 이미지별로 재생시간 바꾼게 있으면 어떻게 체크?
-    @PutMapping("/api-manager/operate/setting/image-defaultplaytime")
-    public Map<String, Object> putSettingImageDefaultPlaytime(HttpServletRequest request
+    @PatchMapping("/api-manager/operate/setting/image-defaultplaytime")
+    public Map<String, Object> patchSettingImageDefaultPlaytime(HttpServletRequest request
             , @RequestBody Map<String, Object> param) {
         long startTime = System.currentTimeMillis();
         String apiInfo = "["+ request.getRequestURI() + "] [" + request.getMethod() + "]";
@@ -78,15 +76,15 @@ public class SettingController {
             parameterValidation(param, keyList);
             parameterString("playtime", param.get("playtime"), true, 0, null);
 
-            responseMap = settingService.putSettingImageDefaultPlaytime(param);
+            responseMap = settingService.patchSettingImageDefaultPlaytime(param);
         }
         catch (ParamException paramException){
-            log.error("[paramException][putSettingSet] - {}", paramException.getMessage());
+            log.error("[paramException][patchSettingImageDefaultPlaytime] - {}", paramException.getMessage());
             responseMap.put("code", paramException.getCode());
             responseMap.put("message", paramException.getMessage());
         }
         catch (Exception exception) {
-            log.error("[Exception][putSettingSet] - {}", exception.getMessage());
+            log.error("[Exception][patchSettingImageDefaultPlaytime] - {}", exception.getMessage());
             responseMap.put("exceptionMessage", exception.getMessage());
         }
 

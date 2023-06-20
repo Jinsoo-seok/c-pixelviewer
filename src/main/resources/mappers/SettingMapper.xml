@@ -9,11 +9,12 @@
         WHERE display_id = 1
     </select>
 
-    <select id="putSettingImageDefaultPlaytime" resultType="Map">
-        SELECT *
-        FROM Displays
-        WHERE display_id = 1
-    </select>
+    <update id="patchSettingImageDefaultPlaytime" parameterType="Map">
+        UPDATE Setting
+        SET
+            img_default_playtime = #{playtime}
+        WHERE program_id = 1
+    </update>
 
 </mapper>
 

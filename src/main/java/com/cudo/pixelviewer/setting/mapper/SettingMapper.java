@@ -9,6 +9,6 @@ public interface SettingMapper {
 
     Map<String, Object> getSetting ();
 
-    int putSettingImageDefaultPlaytime(Map<String, Object> param);
+    int patchSettingImageDefaultPlaytime(Map<String, Object> param);
 
 }
