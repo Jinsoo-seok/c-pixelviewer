@@ -17,8 +17,8 @@
         INSERT INTO LayerObjects (layer_id, preset_id, screen_id, type, object_nm)
         VALUES (#{layerId}, #{presetId}, #{screenId}, #{type}, #{objectNm});
 
-        INSERT INTO Subtitles (object_id, pos_x, pos_y, width, height, ord, scroll_way, scroll_speed, subtitle_style)
-        VALUES (LAST_INSERT_ID(), #{posX}, #{posY}, #{width}, #{height}, #{ord}, #{scrollWay}, #{scrollSpeed}, #{subtitleStyle});
+        INSERT INTO Subtitles (object_id, pos_x, pos_y, width, height, ord, scroll_way, scroll_speed, scroll_start_location, subtitle_style)
+        VALUES (LAST_INSERT_ID(), #{posX}, #{posY}, #{width}, #{height}, #{ord}, #{scrollWay}, #{scrollSpeed}, #{scrollStartLocation}, #{subtitleStyle});
     </insert>
     <update id="putSubtitle" parameterType="Map">
         <selectKey keyProperty="subtitleId" resultType="int" order="AFTER">
@@ -35,8 +35,80 @@
             ord = #{ord},
             scroll_way = #{scrollWay},
             scroll_speed = #{scrollSpeed},
+            scroll_start_location = #{scrollStartLocation},
             subtitle_style = #{subtitleStyle}
         WHERE object_id = #{objectId}
+    </update>
+
+    <select id="patchSubtitleLocationValid" resultType="Integer">
+        SELECT subtitle_id
+        FROM Subtitles
+        WHERE object_id = (
+            SELECT object_id
+            FROM LayerObjects AS O
+            WHERE O.layer_id = #{layerId}
+              AND type = 30
+        )
+    </select>
+    <update id="patchSubtitleLocation">
+        UPDATE Subtitles
+        SET
+            pos_x = #{posX},
+            pos_y = #{posY}
+        WHERE subtitle_id = #{subtitleId}
+    </update>
+
+    <select id="patchSubtitleSizeValid" resultType="Integer">
+        SELECT subtitle_id
+        FROM Subtitles
+        WHERE object_id = (
+            SELECT object_id
+            FROM LayerObjects AS O
+            WHERE O.layer_id = #{layerId}
+              AND type = 30
+        )
+    </select>
+    <update id="patchSubtitleSize">
+        UPDATE Subtitles
+        SET
+            width = #{width},
+            height = #{height}
+        WHERE subtitle_id = #{subtitleId}
+    </update>
+
+    <select id="patchSubtitleStyleValid" resultType="Integer">
+        SELECT subtitle_id
+        FROM Subtitles
+        WHERE object_id = (
+            SELECT object_id
+            FROM LayerObjects AS O
+            WHERE O.layer_id = #{layerId}
+              AND type = 30
+        )
+    </select>
+    <update id="patchSubtitleStyle">
+        UPDATE Subtitles
+        SET subtitle_style = #{subtitleStyle}
+        WHERE subtitle_id = #{subtitleId}
+    </update>
+
+    <select id="patchSubtitleScrollValid" resultType="Integer">
+        SELECT subtitle_id
+        FROM Subtitles
+        WHERE object_id = (
+            SELECT object_id
+            FROM LayerObjects AS O
+            WHERE O.layer_id = #{layerId}
+              AND type = 30
+        )
+    </select>
+    <update id="patchSubtitleScroll">
+        UPDATE Subtitles
+        SET
+            scroll_way = #{scrollWay},
+            scroll_speed = #{scrollSpeed},
+            scroll_start_location = #{scrollStartLocation}
+        WHERE subtitle_id = #{subtitleId}
     </update>
 
 </mapper>

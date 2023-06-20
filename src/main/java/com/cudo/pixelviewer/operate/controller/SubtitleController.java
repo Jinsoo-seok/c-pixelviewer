@@ -25,7 +25,7 @@ public class SubtitleController {
 
     @PostMapping
     public Map<String, Object> postSubtitle(HttpServletRequest request
-                                        , @RequestBody Map<String, Object> param) {
+                                            , @RequestBody Map<String, Object> param) {
         long startTime = System.currentTimeMillis();
         String apiInfo = "["+ request.getRequestURI() + "] [" + request.getMethod() + "]";
         log.info("{} [START] [{}] - {}", apiInfo, startTime, param);
@@ -36,7 +36,8 @@ public class SubtitleController {
         String[] keyList = {
                 "layerId", "type"
                 , "posX", "posY", "width", "height", "ord"
-                , "scrollWay", "scrollSpeed", "subtitleStyleArray"};
+                , "scrollWay", "scrollSpeed", "scrollStartLocation"
+                , "subtitleStyleArray"};
 
         try {
             parameterValidation(param, keyList);
@@ -50,6 +51,8 @@ public class SubtitleController {
 
             parameterInt("scrollWay", param.get("scrollWay"), true);
             parameterInt("scrollSpeed", param.get("scrollSpeed"), true);
+            parameterInt("scrollStartLocation", param.get("scrollStartLocation"), true);
+
             parameterArray("subtitleStyleArray", param.get("subtitleStyleArray"), true);
 
             responseMap = subtitleService.postSubtitle(param);
@@ -71,9 +74,10 @@ public class SubtitleController {
         return responseMap;
     }
 
-    @PatchMapping("/name")
-    public Map<String, Object> patchSubtitleName(HttpServletRequest request
-                                        , @RequestBody Map<String, Object> param) {
+    // TODO : 테이블 필드 어디?
+    @PatchMapping("/text")
+    public Map<String, Object> patchSubtitleText(HttpServletRequest request
+                                                 , @RequestBody Map<String, Object> param) {
         long startTime = System.currentTimeMillis();
         String apiInfo = "["+ request.getRequestURI() + "] [" + request.getMethod() + "]";
         log.info("{} [START] [{}] - {}", apiInfo, startTime, param);
@@ -81,22 +85,170 @@ public class SubtitleController {
         Map<String, Object> responseMap = new HashMap<>();
         responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
 
-        String[] keyList = {"subtitleId", "subtitleNm"};
+        String[] keyList = {"layerId", "subtitleText"};
 
         try {
             parameterValidation(param, keyList);
-            parameterInt("subtitleId", param.get("subtitleId"), true);
-            parameterString("subtitleNm", param.get("subtitleNm"), true, 0, null);
+            parameterInt("layerId", param.get("layerId"), true);
+            parameterString("subtitleText", param.get("subtitleText"), true, 0, null);
 
-            responseMap = subtitleService.patchSubtitleName(param);
+            responseMap = subtitleService.patchSubtitleText(param);
         }
         catch (ParamException paramException){
-            log.error("[paramException][patchSubtitleName] - {}", paramException.getMessage());
+            log.error("[paramException][patchSubtitleText] - {}", paramException.getMessage());
             responseMap.put("code", paramException.getCode());
             responseMap.put("message", paramException.getMessage());
         }
         catch (Exception exception) {
-            log.error("[Exception][patchSubtitleName] - {}", exception.getMessage());
+            log.error("[Exception][patchSubtitleText] - {}", exception.getMessage());
+            responseMap.put("exceptionMessage", exception.getMessage());
+        }
+
+        long endTime = System.currentTimeMillis();
+        long procTime = endTime-startTime;
+        log.info("{} [END] [{}] - {}", apiInfo, procTime, responseMap.get("code"));
+
+        return responseMap;
+    }
+
+    @PatchMapping("/location")
+    public Map<String, Object> patchSubtitleLocation(HttpServletRequest request
+                                                     , @RequestBody Map<String, Object> param) {
+        long startTime = System.currentTimeMillis();
+        String apiInfo = "["+ request.getRequestURI() + "] [" + request.getMethod() + "]";
+        log.info("{} [START] [{}] - {}", apiInfo, startTime, param);
+
+        Map<String, Object> responseMap = new HashMap<>();
+        responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
+
+        String[] keyList = {"layerId", "posX", "posY"};
+
+        try {
+            parameterValidation(param, keyList);
+            parameterInt("layerId", param.get("layerId"), true);
+            parameterInt("posX", param.get("posX"), true);
+            parameterInt("posY", param.get("posY"), true);
+
+            responseMap = subtitleService.patchSubtitleLocation(param);
+        }
+        catch (ParamException paramException){
+            log.error("[paramException][patchSubtitleLocation] - {}", paramException.getMessage());
+            responseMap.put("code", paramException.getCode());
+            responseMap.put("message", paramException.getMessage());
+        }
+        catch (Exception exception) {
+            log.error("[Exception][patchSubtitleLocation] - {}", exception.getMessage());
+            responseMap.put("exceptionMessage", exception.getMessage());
+        }
+
+        long endTime = System.currentTimeMillis();
+        long procTime = endTime-startTime;
+        log.info("{} [END] [{}] - {}", apiInfo, procTime, responseMap.get("code"));
+
+        return responseMap;
+    }
+
+    @PatchMapping("/size")
+    public Map<String, Object> patchSubtitleSize(HttpServletRequest request
+                                                 , @RequestBody Map<String, Object> param) {
+        long startTime = System.currentTimeMillis();
+        String apiInfo = "["+ request.getRequestURI() + "] [" + request.getMethod() + "]";
+        log.info("{} [START] [{}] - {}", apiInfo, startTime, param);
+
+        Map<String, Object> responseMap = new HashMap<>();
+        responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
+
+        String[] keyList = {"layerId", "width", "height"};
+
+        try {
+            parameterValidation(param, keyList);
+            parameterInt("layerId", param.get("layerId"), true);
+            parameterInt("width", param.get("width"), true);
+            parameterInt("height", param.get("height"), true);
+
+            responseMap = subtitleService.patchSubtitleSize(param);
+        }
+        catch (ParamException paramException){
+            log.error("[paramException][patchSubtitleSize] - {}", paramException.getMessage());
+            responseMap.put("code", paramException.getCode());
+            responseMap.put("message", paramException.getMessage());
+        }
+        catch (Exception exception) {
+            log.error("[Exception][patchSubtitleSize] - {}", exception.getMessage());
+            responseMap.put("exceptionMessage", exception.getMessage());
+        }
+
+        long endTime = System.currentTimeMillis();
+        long procTime = endTime-startTime;
+        log.info("{} [END] [{}] - {}", apiInfo, procTime, responseMap.get("code"));
+
+        return responseMap;
+    }
+
+    @PatchMapping("/style")
+    public Map<String, Object> patchSubtitleStyle(HttpServletRequest request
+                                                  , @RequestBody Map<String, Object> param) {
+        long startTime = System.currentTimeMillis();
+        String apiInfo = "["+ request.getRequestURI() + "] [" + request.getMethod() + "]";
+        log.info("{} [START] [{}] - {}", apiInfo, startTime, param);
+
+        Map<String, Object> responseMap = new HashMap<>();
+        responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
+
+        String[] keyList = {"layerId", "subtitleStyleArray"};
+
+        try {
+            parameterValidation(param, keyList);
+            parameterInt("layerId", param.get("layerId"), true);
+            parameterArray("subtitleStyleArray", param.get("subtitleStyleArray"), true);
+
+            responseMap = subtitleService.patchSubtitleStyle(param);
+        }
+        catch (ParamException paramException){
+            log.error("[paramException][patchSubtitleStyle] - {}", paramException.getMessage());
+            responseMap.put("code", paramException.getCode());
+            responseMap.put("message", paramException.getMessage());
+        }
+        catch (Exception exception) {
+            log.error("[Exception][patchSubtitleStyle] - {}", exception.getMessage());
+            responseMap.put("exceptionMessage", exception.getMessage());
+        }
+
+        long endTime = System.currentTimeMillis();
+        long procTime = endTime-startTime;
+        log.info("{} [END] [{}] - {}", apiInfo, procTime, responseMap.get("code"));
+
+        return responseMap;
+    }
+
+    @PatchMapping("/scroll")
+    public Map<String, Object> patchSubtitleScroll(HttpServletRequest request
+                                                   , @RequestBody Map<String, Object> param) {
+        long startTime = System.currentTimeMillis();
+        String apiInfo = "["+ request.getRequestURI() + "] [" + request.getMethod() + "]";
+        log.info("{} [START] [{}] - {}", apiInfo, startTime, param);
+
+        Map<String, Object> responseMap = new HashMap<>();
+        responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
+
+        String[] keyList = {"layerId", "scrollWay", "scrollSpeed", "scrollStartLocation"};
+
+        try {
+            parameterValidation(param, keyList);
+            parameterInt("layerId", param.get("layerId"), true);
+            parameterInt("scrollWay", param.get("scrollWay"), true);
+            parameterInt("scrollSpeed", param.get("scrollSpeed"), true);
+            parameterInt("scrollStartLocation", param.get("scrollStartLocation"), true);
+
+            responseMap = subtitleService.patchSubtitleScroll(param);
+        }
+        catch (ParamException paramException){
+            log.error("[paramException][patchSubtitleScroll] - {}", paramException.getMessage());
+            responseMap.put("code", paramException.getCode());
+            responseMap.put("message", paramException.getMessage());
+        }
+        catch (Exception exception) {
+            log.error("[Exception][patchSubtitleScroll] - {}", exception.getMessage());
             responseMap.put("exceptionMessage", exception.getMessage());
         }
 
