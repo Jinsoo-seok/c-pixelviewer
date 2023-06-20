@@ -101,7 +101,25 @@ public enum ResponseCode {
     FAIL_UPDATE_LEDCON(4201, "FailedUpdateLedcon", "Failed Update Ledcon"),
     FAIL_DUPLICATE_LEDCON(4202, "FailedDuplicateLedcon", "Failed Duplicate Ledcon"),
     FAIL_DELETE_LEDCON(4203, "FailedDeleteLedcon", "Failed Delete Ledcon"),
-    FAIL_NOT_EXIST_LEDCON(4204, "FailedNotExistLedcon", "Failed Not Exist Ledcon");
+    FAIL_NOT_EXIST_LEDCON(4204, "FailedNotExistLedcon", "Failed Not Exist Ledcon"),
+
+    // Setting : 4300
+    FAIL_UPDATE_SETTING_VIEW_TOP_MOST_EN(4301, "FailedUpdateSettingViewTopMostEn", "Failed to Update Setting View Top Most En"),
+    FAIL_UPDATE_SETTING_VIEW_TEMP_HUMI_EN(4302, "FailedUpdateSettingViewTempHumiEn", "Failed to Update Setting View Temp Humi En"),
+
+    FAIL_UPDATE_SETTING_LED_COMM_TYPE(4303, "FailedUpdateSettingLedCommType", "Failed to Update Setting LED Comm Type"),
+    FAIL_UPDATE_SETTING_LED_PRESET_EN(4304, "FailedUpdateSettingLedPresetEn", "Failed to Update Setting LED Preset En"),
+    FAIL_UPDATE_SETTING_LED_INPUT_SELECT_EN(4305, "FailedUpdateSettingLedInputSelectEn", "Failed to Update Setting LED Input Select En"),
+    FAIL_UPDATE_SETTING_LED_BRIGHTNESS_CONTROL_EN(4306, "FailedUpdateSettingLedBrightnessControlEn", "Failed to Update Setting LED Brightness Control En"),
+    FAIL_UPDATE_SETTING_LED_PRESET_COUNT(4307, "FailedUpdateSettingLedPresetCount", "Failed to Update Setting LED Preset Count"),
+
+    FAIL_UPDATE_SETTING_PWR_CONTROL_EN(4308, "FailedUpdateSettingPwrControlEn", "Failed to Update Setting Pwr Control En"),
+
+    FAIL_UPDATE_SETTING_LOGIN_EN(4309, "FailedUpdateSettingLoginEn", "Failed to Update Setting Login En"),
+    FAIL_UPDATE_SETTING_IMG_DEFAULT_PLAYTIME(4310, "FailedUpdateSettingImgDefaultPlaytime", "Failed to Update Setting Img Default Playtime"),
+    FAIL_UPDATE_SETTING_EXTERNALINFO_AREA(4311, "FailedUpdateSettingExternalinfoArea", "Failed to Update Setting Externalinfo Area"),
+
+    FAIL_UNSUPPORTED_TYPE_SETTING(4300, "FailedUnsupportedTypeSetting", "Failed Unsupported Type Setting");
 
 
 

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cudo.pixelviewer.bo.mapper.AdminSettingMapper">
+
+    <select id="getAdminSettingList" resultType="com.cudo.pixelviewer.vo.AdminSettingVo">
+        SELECT *
+        FROM Setting
+        WHERE program_id = 1
+    </select>
+
+
+    <update id="patchLayerTopMost">
+        UPDATE Setting AS S
+        SET view_topmost_en = #{type}
+        WHERE S.program_id = 1
+    </update>
+
+    <update id="patchTempHumi">
+        UPDATE Setting AS S
+        SET view_temphumi_en = #{type}
+        WHERE S.program_id = 1
+    </update>
+
+    <update id="patchControlType">
+        UPDATE Setting AS S
+        SET led_comm_type = #{type}
+        WHERE S.program_id = 1
+    </update>
+
+    <update id="patchLedPresetEnable">
+        UPDATE Setting AS S
+        SET led_preset_en = #{type}
+        WHERE S.program_id = 1
+    </update>
+
+    <update id="patchLedPresetCount">
+        UPDATE Setting AS S
+        SET led_preset_count = #{presetCount}
+        WHERE S.program_id = 1
+    </update>
+
+    <update id="patchLedInputEnable">
+        UPDATE Setting AS S
+        SET led_input_select_en = #{type}
+        WHERE S.program_id = 1
+    </update>
+
+</mapper>
