@@ -46,4 +46,56 @@
         WHERE S.program_id = 1
     </update>
 
+    <select id="getDisplayInfoList" resultType="com.cudo.pixelviewer.vo.DisplaySettingVo">
+        SELECT *
+        FROM Displays_Setting
+    </select>
+
+    <select id="getDisplayInfo" resultType="com.cudo.pixelviewer.vo.DisplaySettingVo">
+        SELECT *
+        FROM Displays_Setting
+        WHERE display_id = #{displayId}
+    </select>
+
+    <insert id="postDisplayInfo" parameterType="Map" useGeneratedKeys="true" keyColumn="display_id"
+            keyProperty="displayId">
+        INSERT INTO Displays_Setting
+        (
+            display_nm, gpu_nm, pos_x, pos_y, width, height, primary_fl
+        )
+        VALUES
+        (
+            #{displayNm}, #{gpuNm}, #{posX}, #{posY}, #{width}, #{height}, #{primaryFl}
+        )
+    </insert>
+
+    <select id="putDisplayInfoValid" resultType="int">
+        SELECT COUNT(display_id)
+        FROM Displays_Setting
+        WHERE display_id = #{displayId}
+    </select>
+    <update id="putDisplayInfo" parameterType="Map">
+        UPDATE Displays_Setting
+        SET
+            display_nm = #{displayNm},
+            gpu_nm = #{gpuNm},
+            pos_x = #{posX},
+            pos_y = #{posY},
+            width = #{width},
+            height = #{height},
+            primary_fl = #{primaryFl}
+
+        WHERE display_id = #{displayId}
+    </update>
+
+    <select id="deleteDisplayInfoValid" resultType="int">
+        SELECT COUNT(display_id)
+        FROM Displays_Setting
+        WHERE display_id = #{displayId}
+    </select>
+    <delete id="deleteDisplayInfo" parameterType="Map">
+        DELETE FROM Displays_Setting
+        WHERE display_id = #{displayId}
+    </delete>
+
 </mapper>

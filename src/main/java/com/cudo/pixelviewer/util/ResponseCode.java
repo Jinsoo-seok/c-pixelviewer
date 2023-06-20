@@ -119,20 +119,14 @@ public enum ResponseCode {
     FAIL_UPDATE_SETTING_IMG_DEFAULT_PLAYTIME(4310, "FailedUpdateSettingImgDefaultPlaytime", "Failed to Update Setting Img Default Playtime"),
     FAIL_UPDATE_SETTING_EXTERNALINFO_AREA(4311, "FailedUpdateSettingExternalinfoArea", "Failed to Update Setting Externalinfo Area"),
 
+
+    FAIL_INSERT_DISPLAY_SETTING(4312, "FailedInsertDisplaySetting", "Failed Insert Display Setting"),
+    FAIL_UPDATE_DISPLAY_SETTING(4313, "FailedUpdateDisplaySetting", "Failed Update Display Setting"),
+    FAIL_DUPLICATE_DISPLAY_SETTING(4314, "FailedDuplicateDisplaySetting", "Failed Duplicate Display Setting"),
+    FAIL_DELETE_DISPLAY_SETTING(4315, "FailedDeleteDisplaySetting", "Failed Delete Display Setting"),
+    FAIL_NOT_EXIST_DISPLAY_SETTING(4316, "FailedNotExistDisplaySetting", "Failed Not Exist Display Setting"),
+
     FAIL_UNSUPPORTED_TYPE_SETTING(4300, "FailedUnsupportedTypeSetting", "Failed Unsupported Type Setting");
-
-
-
-//    FAIL_INSERT_QD(4004, "FailedInsertQD", "Failed Insert QD"),
-//    FAIL_UPDATE_QD(4005, "FailedUpdateQD", "Failed Update QD"),
-//    FAIL_DUPLICATE_QD(4006, "FailedDuplicateQD", "Failed Duplicate QD"),
-//    FAIL_INSERT_CHANNEL_SUB(4007, "FailedInsertChannelSub", "Failed Insert Channel Sub"),
-//    FAIL_INSERT_CHANNEL(4008, "FailedInsertChannel", "Failed Insert Channel"),
-//    FAIL_NOT_EXIST_CHANNEL(4009, "FailedNotExistChannel", "Failed Not Exist Channel"),
-//    FAIL_NOT_EXIST_DATA(4010, "FailedNotExistData", "Failed Not Exist Data"),
-//    FAIL_DUPLICATE_SERVICE_NAME(4011, "FailedDuplicateServiceName", "Failed Duplicate ServiceName"),
-//    FAIL_SERVICE_INSERT_DB(4012, "FailedServiceInsertDB", "Failed Service Insert DB"),
-//    FAIL_SERVICE_UPDATE_DB(4013, "FailedServiceUpdateDB", "Failed Service Update DB");
 
 
 

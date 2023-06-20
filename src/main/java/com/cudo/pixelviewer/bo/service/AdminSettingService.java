@@ -18,4 +18,16 @@ public interface AdminSettingService {
 
     Map<String, Object> patchLedInputEnable(Map<String, Object> param);
 
+
+
+    Map<String, Object> getDisplayInfoList();
+
+    Map<String, Object> getDisplayInfo(String displayId);
+
+    Map<String, Object> postDisplayInfo(Map<String, Object> param);
+
+    Map<String, Object> putDisplayInfo(Map<String, Object> param);
+
+    Map<String, Object> deleteDisplayInfo(Map<String, Object> param);
+
 }

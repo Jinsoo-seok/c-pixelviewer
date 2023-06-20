@@ -4,6 +4,7 @@ import com.cudo.pixelviewer.bo.mapper.AdminSettingMapper;
 import com.cudo.pixelviewer.util.ParameterUtils;
 import com.cudo.pixelviewer.util.ResponseCode;
 import com.cudo.pixelviewer.vo.AdminSettingVo;
+import com.cudo.pixelviewer.vo.DisplaySettingVo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -210,6 +211,112 @@ public class AdminSettingServiceImpl implements AdminSettingService {
             resultMap.put("code", unsupportedCode.getCode());
             resultMap.put("message", unsupportedCode.getMessage());
             resultMap.put("data", UNSUPPORTED_TYPE_TEXT);
+        }
+        return resultMap;
+    }
+
+
+    @Override
+    public Map<String, Object> getDisplayInfoList() {
+        Map<String, Object> resultMap = new HashMap<>();
+
+        List<DisplaySettingVo> displaySettingVoList = adminSettingMapper.getDisplayInfoList();
+
+        if(displaySettingVoList.size() > 0){
+            resultMap.put("data", displaySettingVoList);
+            resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
+        }
+        else{
+            resultMap.putAll(ParameterUtils.responseOption(ResponseCode.NO_CONTENT.getCodeName()));
+        }
+        return resultMap;
+    }
+
+    @Override
+    public Map<String, Object> getDisplayInfo(String displayId) {
+        Map<String, Object> resultMap = new HashMap<>();
+
+        DisplaySettingVo displaySettingVo = adminSettingMapper.getDisplayInfo(displayId);
+
+        if(displaySettingVo != null){
+            resultMap.put("data", displaySettingVo);
+            resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
+        }
+        else{
+            resultMap.putAll(ParameterUtils.responseOption(ResponseCode.NO_CONTENT.getCodeName()));
+        }
+        return resultMap;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Map<String, Object> postDisplayInfo(Map<String, Object> param) {
+        Map<String, Object> resultMap = new HashMap<>();
+
+        int patchLayerTopMostResult = adminSettingMapper.postDisplayInfo(param);
+
+        if (patchLayerTopMostResult == 1) { // Success : 1
+            resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
+
+        } else {
+            ResponseCode failCode = ResponseCode.FAIL_INSERT_DISPLAY_SETTING;
+            resultMap.put("code", failCode.getCode());
+            resultMap.put("message", failCode.getMessage());
+        }
+
+        return resultMap;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Map<String, Object> putDisplayInfo(Map<String, Object> param) {
+        Map<String, Object> resultMap = new HashMap<>();
+
+        int putDisplayInfoValid = adminSettingMapper.putDisplayInfoValid(param);
+
+        if(putDisplayInfoValid == 1) {
+            int patchLayerTopMostResult = adminSettingMapper.putDisplayInfo(param);
+
+            if (patchLayerTopMostResult == 1) { // Success : 1
+                resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
+
+            } else {
+                ResponseCode failCode = ResponseCode.FAIL_UPDATE_DISPLAY_SETTING;
+                resultMap.put("code", failCode.getCode());
+                resultMap.put("message", failCode.getMessage());
+            }
+        }
+        else{
+            ResponseCode failCode = ResponseCode.FAIL_NOT_EXIST_DISPLAY_SETTING;
+            resultMap.put("code", failCode.getCode());
+            resultMap.put("message", failCode.getMessage());
+        }
+        return resultMap;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Map<String, Object> deleteDisplayInfo(Map<String, Object> param) {
+        Map<String, Object> resultMap = new HashMap<>();
+
+        int putDisplayInfoValid = adminSettingMapper.deleteDisplayInfoValid(param);
+
+        if(putDisplayInfoValid == 1) {
+            int patchLayerTopMostResult = adminSettingMapper.deleteDisplayInfo(param);
+
+            if (patchLayerTopMostResult == 1) { // Success : 1
+                resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
+
+            } else {
+                ResponseCode failCode = ResponseCode.FAIL_DELETE_DISPLAY_SETTING;
+                resultMap.put("code", failCode.getCode());
+                resultMap.put("message", failCode.getMessage());
+            }
+        }
+        else{
+            ResponseCode failCode = ResponseCode.FAIL_NOT_EXIST_DISPLAY_SETTING;
+            resultMap.put("code", failCode.getCode());
+            resultMap.put("message", failCode.getMessage());
         }
         return resultMap;
     }
