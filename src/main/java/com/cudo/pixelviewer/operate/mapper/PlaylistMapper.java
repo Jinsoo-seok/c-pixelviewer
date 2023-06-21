@@ -12,7 +12,9 @@ public interface PlaylistMapper {
 
     List<PlaylistVo> getPlaylistList();
 
-    PlaylistVo getPlaylist(String playlistId);
+//    PlaylistVo getPlaylist(String playlistId);
+    Map<String, Object> getPlaylist(String playlistId);
+    List<Map<String, Object>> getPlaylistContentList(String contentIdList);
 
     int postPlaylistValid(Map<String, Object> param);
     int postPlaylist(Map<String, Object> param);

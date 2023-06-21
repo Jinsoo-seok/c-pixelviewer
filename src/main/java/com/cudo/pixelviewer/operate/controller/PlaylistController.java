@@ -48,19 +48,19 @@ public class PlaylistController {
         return responseMap;
     }
 
-    @GetMapping("/{Id}")
+    @GetMapping("/{layerId}")
     public Map<String, Object> getPlaylist(HttpServletRequest request
-                                        , @PathVariable String Id) {
+                                        , @PathVariable String layerId) {
         long startTime = System.currentTimeMillis();
         String apiInfo = "["+ request.getRequestURI() + "] [" + request.getMethod() + "]";
-        log.info("{} [START] [{}] - {}", apiInfo, startTime, Id);
+        log.info("{} [START] [{}] - {}", apiInfo, startTime, layerId);
 
         Map<String, Object> responseMap = new HashMap<>();
         responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
 
 
         try {
-            responseMap = playlistService.getPlaylist(Id);
+            responseMap = playlistService.getPlaylist(layerId);
         }
         catch (Exception exception) {
             log.error("[Exception][getPlaylist] - {}", exception.getMessage());

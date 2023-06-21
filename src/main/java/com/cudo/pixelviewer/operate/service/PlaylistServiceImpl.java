@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,13 +37,22 @@ public class PlaylistServiceImpl implements PlaylistService {
     }
 
     @Override
-    public Map<String, Object> getPlaylist(String Id) {
+    public Map<String, Object> getPlaylist(String layerId) {
         Map<String, Object> resultMap = new HashMap<>();
 
-        PlaylistVo playlistVo = playlistMapper.getPlaylist(Id);
+//        PlaylistVo playlistVo = playlistMapper.getPlaylist(layerId);
+        Map<String, Object> playlist = playlistMapper.getPlaylist(layerId);
 
-        if(playlistVo != null){
-            resultMap.put("data", playlistVo);
+        if(playlist != null){
+            String contentIdList = (String) playlist.get("content_id_list");
+            String queryTemp = "(" + contentIdList + ")";
+
+            List<Map<String, Object>> playlistContentList = playlistMapper.getPlaylistContentList(queryTemp);
+            if(playlistContentList.size() != 0){
+                playlist.put("contentArray", playlistContentList);
+            }
+
+            resultMap.put("data", playlist);
             resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
         }
         else{

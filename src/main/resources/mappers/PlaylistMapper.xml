@@ -8,10 +8,15 @@
         FROM Playlists
     </select>
 
-    <select id="getPlaylist" resultType="com.cudo.pixelviewer.vo.PlaylistVo">
+    <select id="getPlaylist" resultType="Map">
         SELECT *
         FROM Playlists
         WHERE Playlists.playlist_id = #{playlistId}
+    </select>
+    <select id="getPlaylistContentList" resultType="Map">
+        SELECT *
+        FROM pixelviewer.playlist_contents
+        WHERE content_id IN ${contentIdList}
     </select>
 
     <select id="postPlaylistValid" resultType="int">
@@ -25,11 +30,11 @@
             keyProperty="playlistId">
         INSERT INTO Playlists
         (
-            playlist_nm, layer_id, preset_id, screen_id
+            playlist_nm, layer_id, preset_id, screen_id, content_id_list
         )
         VALUES
         (
-            #{playlistNm}, #{layerId}, #{presetId}, #{screenId}
+            #{playlistNm}, #{layerId}, #{presetId}, #{screenId}, #{contentIdList}
         )
     </insert>
 
@@ -67,22 +72,31 @@
     </update>
 
 
-    <select id="getPlaylistContentsList" resultType="com.cudo.pixelviewer.vo.PlaylistContentsVo">
+    <select id="getPlaylistContentsList2" resultType="com.cudo.pixelviewer.vo.PlaylistContentsVo">
         SELECT *
         FROM Playlist_Items
     </select>
+    <select id="getPlaylistContentsList" resultType="com.cudo.pixelviewer.vo.PlaylistContentsVo">
+        SELECT *
+        FROM playlist_contents
+    </select>
 
-    <select id="getPlaylistContents" resultType="com.cudo.pixelviewer.vo.PlaylistContentsVo">
+    <select id="getPlaylistContents2" resultType="com.cudo.pixelviewer.vo.PlaylistContentsVo">
         SELECT *
         FROM Playlist_Items
         WHERE item_id = #{itemId}
     </select>
+    <select id="getPlaylistContents" resultType="com.cudo.pixelviewer.vo.PlaylistContentsVo">
+        SELECT *
+        FROM playlist_contents
+        WHERE content_id = #{itemId}
+    </select>
 
-    <select id="postPlaylistContentsValid" resultType="int">
+    <select id="postPlaylistContentsValid2" resultType="int">
         SELECT count(item_id)
         FROM Playlist_Items
     </select>
-    <insert id="postPlaylistContents" parameterType="Map" useGeneratedKeys="true" keyColumn="item_id"
+    <insert id="postPlaylistContents2" parameterType="Map" useGeneratedKeys="true" keyColumn="item_id"
             keyProperty="itemId">
         INSERT INTO Playlist_Items
         (
@@ -97,37 +111,88 @@
             , #{weatherFl}, #{airInfoFl}
         )
     </insert>
+    <select id="postPlaylistContentsValid" resultType="int">
+        SELECT count(content_id)
+        FROM playlist_contents
+    </select>
+    <insert id="postPlaylistContents" parameterType="Map" useGeneratedKeys="true" keyColumn="content_id"
+            keyProperty="itemId">
+        INSERT INTO playlist_contents
+        (
+            type
+            , cts_nm, cts_path, playtime
+            , weather_fl, air_info_fl
+        )
+        VALUES
+            (
+                #{type}
+                , #{ctsNm}, #{ctsPath}, #{playtime}
+                , #{weatherFl}, #{airInfoFl}
+            )
+    </insert>
 
-    <select id="deletePlaylistContentsValid" resultType="int">
+    <select id="deletePlaylistContentsValid2" resultType="int">
         SELECT count(item_id)
         FROM Playlist_Items
         WHERE item_id = #{itemId}
     </select>
-    <update id="deletePlaylistContents">
+    <update id="deletePlaylistContents2">
         DELETE I
         FROM Playlist_Items AS I
         WHERE item_id = #{itemId}
     </update>
+    <select id="deletePlaylistContentsValid" resultType="int">
+        SELECT count(content_id)
+        FROM playlist_contents
+        WHERE content_id = #{itemId}
+    </select>
+    <update id="deletePlaylistContents">
+        DELETE PC
+        FROM playlist_contents AS PC
+        WHERE content_id = #{itemId}
+    </update>
 
-    <select id="patchContentsNameValid" resultType="int">
+    <select id="patchContentsNameValid2" resultType="int">
         SELECT count(item_id)
         FROM Playlist_Items
         WHERE item_id = #{itemId}
     </select>
-    <update id="patchContentsName">
+    <update id="patchContentsName2">
         UPDATE Playlist_Items
         SET cts_nm = #{ctsNm}
         WHERE item_id = #{itemId}
     </update>
 
-    <select id="patchContentsPlaytimeValid" resultType="int">
+    <select id="patchContentsNameValid" resultType="int">
+        SELECT count(content_id)
+        FROM playlist_contents
+        WHERE content_id = #{itemId}
+    </select>
+    <update id="patchContentsName">
+        UPDATE playlist_contents
+        SET cts_nm = #{ctsNm}
+        WHERE content_id = #{itemId}
+    </update>
+
+    <select id="patchContentsPlaytimeValid2" resultType="int">
         SELECT count(item_id)
         FROM Playlist_Items
         WHERE item_id = #{itemId}
     </select>
-    <update id="patchContentsPlaytime">
+    <update id="patchContentsPlaytime2">
         UPDATE Playlist_Items
         SET playtime = #{playtime}
         WHERE item_id = #{itemId}
+    </update>
+
+    <select id="patchContentsPlaytimeValid" resultType="int">
+        SELECT count(content_id)
+        FROM playlist_contents
+        WHERE content_id = #{itemId}
+    </select>
+    <update id="patchContentsPlaytime">
+        UPDATE playlist_contents
+        SET playtime = #{playtime}
+        WHERE content_id = #{itemId}
     </update>
 </mapper>
