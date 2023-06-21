@@ -11,6 +11,7 @@
     <select id="getPreset" resultType="com.cudo.pixelviewer.vo.PresetVo">
         SELECT *
         FROM Presets AS P
+        LEFT JOIN Layers AS L ON L.preset_id = P.preset_id
         WHERE P.preset_id = #{presetId}
     </select>
     <select id="getPresetLayers" resultType="com.cudo.pixelviewer.vo.LayerVo">
@@ -67,8 +68,32 @@
     </select>
     <update id="putPreset">
         UPDATE Presets
-        SET preset_nm = #{presetNm}
+        SET
+            preset_nm = #{presetNm}
+          , rowsize = #{rowsize}
+          , columnsize = #{columnsize}
         WHERE Presets.preset_id = #{presetId}
     </update>
+    <insert id="saveLayer" parameterType="Map">
+        INSERT INTO Layers
+        (layer_id, preset_id, screen_id, layer_nm, pos_x, pos_y, width, height, ord, subtitle_first_yn, subtitle_second_yn)
+        VALUES
+        <foreach collection="layerList" item="item" separator=",">
+            (#{item.layerId}, #{item.presetId}, #{item.screenId},
+            #{item.layerNm}, #{item.posX}, #{item.posY},
+            #{item.width}, #{item.height}, #{item.ord},
+            false, false
+            )
+        </foreach>
+        ON DUPLICATE KEY UPDATE
+        preset_id = VALUES(preset_id),
+        screen_id = VALUES(screen_id),
+        layer_nm = VALUES(layer_nm),
+        pos_x = VALUES(pos_x),
+        pos_y = VALUES(pos_y),
+        width = VALUES(width),
+        height = VALUES(height),
+        ord = VALUES(ord)
+    </insert>
 
 </mapper>

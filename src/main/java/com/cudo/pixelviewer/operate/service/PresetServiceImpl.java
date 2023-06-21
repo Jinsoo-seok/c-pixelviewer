@@ -150,6 +150,9 @@ public class PresetServiceImpl implements PresetService {
             int putPresetResult = presetMapper.putPreset(param);
 
             if(putPresetResult == 1){ // Success : 1
+                // TODO : 예외처리
+                int saveLayerResult = presetMapper.saveLayer(param);
+
                 resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
             }
             else{

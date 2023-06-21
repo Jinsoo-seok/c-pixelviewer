@@ -172,7 +172,6 @@ public class PresetController {
         return responseMap;
     }
 
-    // TODO : 테이블 필드 수정되면 작업 예정
     @PutMapping
     public Map<String, Object> putPreset(HttpServletRequest request
             , @RequestBody Map<String, Object> param) {
@@ -183,12 +182,15 @@ public class PresetController {
         Map<String, Object> responseMap = new HashMap<>();
         responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
 
-        String[] keyList = {"presetId", "presetNm"};
+        String[] keyList = {"presetId", "presetNm", "rowsize", "columnsize", "layerList"};
 
         try {
             parameterValidation(param, keyList);
             parameterInt("presetId", param.get("presetId"), true);
             parameterString("presetNm", param.get("presetNm"), true, 0, null);
+            parameterInt("rowsize", param.get("rowsize"), true);
+            parameterInt("columnsize", param.get("columnsize"), true);
+            parameterArray("layerList", param.get("layerList"), true);
 
             responseMap = presetService.putPreset(param);
         }

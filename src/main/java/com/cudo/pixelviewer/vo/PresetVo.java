@@ -15,6 +15,6 @@ public class PresetVo implements Serializable {
 
     private String presetNm;
 
-    private Integer row;
-    private Integer column;
+    private Integer rowsize;
+    private Integer columnsize;
 }
