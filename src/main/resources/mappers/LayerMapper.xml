@@ -3,16 +3,49 @@
 
 <mapper namespace="com.cudo.pixelviewer.operate.mapper.LayerMapper">
 
-    <select id="getLayerList" resultType="com.cudo.pixelviewer.vo.LayerVo">
-        SELECT *
-        FROM Layers
+
+<!--    <select id="getLayerList" resultType="com.cudo.pixelviewer.vo.LayerVo">-->
+    <select id="getLayerList" resultType="Map">
+        SELECT layer_id AS layerId, preset_id AS presetId, screen_id AS screenId, layer_nm AS layerNm
+             , pos_x AS posX, pos_y AS posY, width AS width, height AS height, ord AS ord
+             , subtitle_first_yn AS subtitleFirstYn, subtitle_second_yn AS subtitleSecondYn
+        FROM Layers AS L
+    </select>
+    <select id="getLayerListPlayList" resultType="Integer">
+        SELECT playlist_id
+        FROM Playlists
+        where layer_id = #{layerId}
     </select>
 
-    <select id="getLayer" resultType="com.cudo.pixelviewer.vo.LayerVo">
-        SELECT *
-        FROM Layers
-        WHERE Layers.layer_id = #{layerId}
+<!--    <select id="getLayer" resultType="com.cudo.pixelviewer.vo.LayerVo">-->
+    <select id="getLayer" resultType="Map">
+        SELECT L.layer_id AS layerId, L.preset_id AS presetId, L.screen_id AS screenId, L.layer_nm AS layerNm
+             , L.pos_x AS posX, L.pos_y AS posY, L.width AS width, L.height AS height, L.ord AS ord
+             , L.subtitle_first_yn AS subtitleFirstYn, L.subtitle_second_yn AS subtitleSecondYn
+        FROM Layers AS L
+        WHERE L.layer_id = #{layerId}
     </select>
+    <select id="getLayerLayerObject" resultType="Map">
+        SELECT *
+        FROM LayerObjects
+        WHERE layer_id = #{layerId}
+    </select>
+    <select id="getLayerObjectExternalVideo" resultType="Map">
+        SELECT *
+        FROM ExternalVideo
+        WHERE object_id = #{objectId}
+    </select>
+    <select id="getLayerObjectExternalInfo" resultType="Map">
+        SELECT *
+        FROM External_Info
+        WHERE object_id = #{objectId}
+    </select>
+    <select id="getLayerObjectExternalSubtitle" resultType="Map">
+        SELECT *
+        FROM Subtitles
+        WHERE object_id = #{objectId}
+    </select>
+
 
     <select id="postLayerValid" resultType="int">
         SELECT count(layer_id)

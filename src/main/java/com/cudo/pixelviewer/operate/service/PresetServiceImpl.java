@@ -3,6 +3,7 @@ package com.cudo.pixelviewer.operate.service;
 import com.cudo.pixelviewer.operate.mapper.PresetMapper;
 import com.cudo.pixelviewer.util.ParameterUtils;
 import com.cudo.pixelviewer.util.ResponseCode;
+import com.cudo.pixelviewer.vo.LayerVo;
 import com.cudo.pixelviewer.vo.PresetVo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -38,11 +39,16 @@ public class PresetServiceImpl implements PresetService {
     @Override
     public Map<String, Object> getPreset(String presetId) {
         Map<String, Object> resultMap = new HashMap<>();
+        Map<String, Object> dataMap = new HashMap<>();
 
         PresetVo presetVo = presetMapper.getPreset(presetId);
+        List<LayerVo> layerVoList = presetMapper.getPresetLayers(presetId);
 
         if(presetVo != null){
-            resultMap.put("data", presetVo);
+            dataMap.put("preset", presetVo);
+            dataMap.put("layerList", layerVoList);
+            resultMap.put("data", dataMap);
+
             resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
         }
         else{

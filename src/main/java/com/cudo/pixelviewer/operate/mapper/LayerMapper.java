@@ -9,9 +9,15 @@ import java.util.Map;
 @Mapper
 public interface LayerMapper {
 
-    List<LayerVo> getLayerList();
+    List<Map<String, Object>> getLayerList();
+    List<Integer> getLayerListPlayList(Integer layerId);
 
-    LayerVo getLayer(String layerId);
+//    LayerVo getLayer(String layerId);
+    Map<String, Object> getLayer(String layerId);
+    List<Map<String, Object>> getLayerLayerObject(String layerId);
+    Map<String, Object> getLayerObjectExternalVideo(Integer objectId);
+    Map<String, Object> getLayerObjectExternalInfo(Integer objectId);
+    Map<String, Object> getLayerObjectExternalSubtitle(Integer objectId);
 
     int postLayerValid(Map<String, Object> param);
     int postLayer(Map<String, Object> param);

@@ -10,8 +10,13 @@
 
     <select id="getPreset" resultType="com.cudo.pixelviewer.vo.PresetVo">
         SELECT *
-        FROM Presets
-        WHERE Presets.preset_id = #{presetId}
+        FROM Presets AS P
+        WHERE P.preset_id = #{presetId}
+    </select>
+    <select id="getPresetLayers" resultType="com.cudo.pixelviewer.vo.LayerVo">
+        SELECT *
+        FROM Layers AS L
+        WHERE L.preset_id = #{presetId}
     </select>
 
     <select id="postPresetValid" resultType="int">

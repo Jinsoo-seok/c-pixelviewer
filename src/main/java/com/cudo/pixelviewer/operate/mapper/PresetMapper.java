@@ -1,5 +1,6 @@
 package com.cudo.pixelviewer.operate.mapper;
 
+import com.cudo.pixelviewer.vo.LayerVo;
 import com.cudo.pixelviewer.vo.PresetVo;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -11,7 +12,8 @@ public interface PresetMapper {
 
     List<PresetVo> getPresetList();
 
-    PresetVo getPreset(String screenId);
+    PresetVo getPreset(String presetId);
+    List<LayerVo> getPresetLayers(String presetId);
 
     int postPresetValid(Map<String, Object> param);
     int postPreset(Map<String, Object> param);
