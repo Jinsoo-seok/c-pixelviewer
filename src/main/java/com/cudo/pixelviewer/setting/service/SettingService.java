@@ -8,4 +8,6 @@ public interface SettingService {
 
     Map<String, Object> patchSettingImageDefaultPlaytime(Map<String, Object> param);
 
+    Map<String, Object> getFontList();
+
 }

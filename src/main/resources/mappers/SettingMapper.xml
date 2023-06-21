@@ -11,10 +11,19 @@
 
     <update id="patchSettingImageDefaultPlaytime" parameterType="Map">
         UPDATE Setting
-        SET
-            img_default_playtime = #{playtime}
+        SET img_default_playtime = #{playtime}
         WHERE program_id = 1
     </update>
+
+    <select id="getFontList" resultType="Map">
+        SELECT font_id AS fontId, font_nm AS fontNm, font_fl AS fontFl
+        FROM Font_Info
+    </select>
+
+    <select id="getFontListV2" resultType="String">
+        SELECT font_nm AS fontNm
+        FROM Font_Info
+    </select>
 
 </mapper>
 

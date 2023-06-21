@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RequiredArgsConstructor
@@ -54,6 +55,29 @@ public class SettingServiceImpl implements SettingService {
         else{
             resultMap.put("code", ResponseCode.FAIL_UPDATE_SETTING_IMAGE_DEFAULT_PLAYTIME.getCode());
             resultMap.put("message", ResponseCode.FAIL_UPDATE_SETTING_IMAGE_DEFAULT_PLAYTIME.getMessage());
+        }
+        return resultMap;
+    }
+
+    @Override
+    public Map<String, Object> getFontList() {
+        Map<String, Object> resultMap = new HashMap<>();
+        Map<String, Object> dataMap = new HashMap<>();
+        resultMap.putAll(ParameterUtils.responseOption("NO_CONTENT"));
+
+        List<Map<String, Object>> fontList = settingMapper.getFontList();
+        List<String> fontListV2 = settingMapper.getFontListV2();
+
+        if(fontList.size() > 0) {
+            dataMap.put("list", fontList);
+            dataMap.put("listV2", fontListV2);
+
+            resultMap.put("data", dataMap);
+            resultMap.putAll(ParameterUtils.responseOption("SUCCESS"));
+
+        } else {
+            resultMap.put("code", ResponseCode.FAIL.getCode());
+            resultMap.put("message", ResponseCode.FAIL.getMessage());
         }
         return resultMap;
     }

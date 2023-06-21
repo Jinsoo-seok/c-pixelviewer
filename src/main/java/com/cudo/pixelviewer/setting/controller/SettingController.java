@@ -94,4 +94,28 @@ public class SettingController {
 
         return responseMap;
     }
+
+    @GetMapping("/api-manager/setting/font-list")
+    public Map<String, Object> getFontList(HttpServletRequest request) {
+        long startTime = System.currentTimeMillis();
+        String apiInfo = "["+ request.getRequestURI() + "] [" + request.getMethod() + "]";
+        log.info("{} [START] [{}]", apiInfo, startTime);
+
+        Map<String, Object> responseMap = new HashMap<>();
+
+
+        try {
+            responseMap = settingService.getFontList();
+        }
+        catch (Exception exception) {
+            log.error("[Exception][getFontList] - {}", exception.getMessage());
+            responseMap.put("exceptionMessage", exception.getMessage());
+        }
+
+        long endTime = System.currentTimeMillis();
+        long procTime = endTime-startTime;
+        log.info("{} [END] [{}] - {}", apiInfo, procTime, responseMap.get("code"));
+
+        return responseMap;
+    }
 }
