@@ -20,10 +20,10 @@ public class DisplayServiceImpl implements DisplayService {
 
 
     @Override
-    public Map<String, Object> getDisplayList() {
+    public Map<String, Object> getDisplayList(String screenId) {
         Map<String, Object> resultMap = new HashMap<>();
 
-        List<DisplayVo> displayVoList = displayMapper.getDisplayList();
+        List<DisplayVo> displayVoList = displayMapper.getDisplayList(screenId);
 
         if(displayVoList.size() > 0){
             resultMap.put("data", displayVoList);

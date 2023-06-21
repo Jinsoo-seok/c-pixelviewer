@@ -5,18 +5,22 @@
 
     <select id="getDisplayList" resultType="com.cudo.pixelviewer.vo.DisplayVo">
         SELECT *
-        FROM Displays
+        FROM Screen_Displays AS SD
+            LEFT JOIN Displays_Setting AS DS ON DS.display_id = SD.display_id
+        WHERE screen_id = #{screenId}
     </select>
 
     <select id="getDisplay" resultType="com.cudo.pixelviewer.vo.DisplayVo">
         SELECT *
-        FROM Displays
-        WHERE Displays.display_id = #{displayId}
+        FROM Screen_Displays AS SD
+            LEFT JOIN Displays_Setting AS DS ON DS.display_id = SD.display_id
+        WHERE SD.display_id = #{displayId}
     </select>
 
     <select id="getDisplayPortlist" resultType="Map">
         SELECT display_id, display_nm
-        FROM Displays
+        FROM Displays_Setting
+        ORDER BY display_id ASC
     </select>
 
     <select id="patchDisplayTestpatternValid" resultType="int">

@@ -4,9 +4,9 @@ import java.util.Map;
 
 public interface DisplayService {
 
-    Map<String, Object> getDisplayList();
+    Map<String, Object> getDisplayList(String screenId);
 
-    Map<String, Object> getDisplay(String screenId);
+    Map<String, Object> getDisplay(String displayId);
 
     Map<String, Object> getDisplayPortlist();
 

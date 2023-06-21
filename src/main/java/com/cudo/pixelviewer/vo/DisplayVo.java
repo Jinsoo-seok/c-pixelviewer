@@ -9,11 +9,14 @@ public class DisplayVo implements Serializable {
 
     private static final long serialVersionUID = -5477575129266580919L;
 
+    private Integer srcDisplayId;
+    private Integer screenId;
     private Integer displayId;
 
-    private Integer screenId;
-
     private String displayNm;
+
+    private Integer row;
+    private Integer column;
 
     private Integer posX;
     private Integer posY;
@@ -21,10 +24,6 @@ public class DisplayVo implements Serializable {
     private Integer width;
     private Integer height;
 
-    private Integer promaryFl;
-
+    private Integer primaryFl;
     private Integer patternFl;
-
-    private Integer row;
-    private Integer column;
 }

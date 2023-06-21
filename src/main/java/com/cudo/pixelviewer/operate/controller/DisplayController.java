@@ -24,8 +24,9 @@ public class DisplayController {
 
     final DisplayService displayService;
 
-    @GetMapping
-    public Map<String, Object> getDisplayList(HttpServletRequest request) {
+    @GetMapping("/{screenId}")
+    public Map<String, Object> getDisplayList(HttpServletRequest request
+                                              , @PathVariable String screenId) {
         long startTime = System.currentTimeMillis();
         String apiInfo = "["+ request.getRequestURI() + "] [" + request.getMethod() + "]";
         log.info("{} [START] [{}]", apiInfo, startTime);
@@ -35,7 +36,7 @@ public class DisplayController {
 
 
         try {
-            responseMap = displayService.getDisplayList();
+            responseMap = displayService.getDisplayList(screenId);
         }
         catch (Exception exception) {
             log.error("[Exception][getDisplayList] - {}", exception.getMessage());
@@ -49,7 +50,7 @@ public class DisplayController {
         return responseMap;
     }
 
-    @GetMapping("/{displayId}")
+    @GetMapping("/detail/{displayId}")
     public Map<String, Object> getDisplay(HttpServletRequest request
                                         , @PathVariable String displayId) {
         long startTime = System.currentTimeMillis();
@@ -75,7 +76,7 @@ public class DisplayController {
         return responseMap;
     }
 
-    // TODO : 관리자에서 등록한 디스플레이 정보를 그대로 내려주는 api >> 관리자에서 등록한 디스플레이 정보를 가진 테이블이 있어야함(아직 없음)
+    // TODO : 해당하는 스크린의 사용하는 디스플레이?인지 전체 디스플레이인지 확인 필요
     @GetMapping("/portlist")
     public Map<String, Object> getDisplayPortlist(HttpServletRequest request){
         long startTime = System.currentTimeMillis();

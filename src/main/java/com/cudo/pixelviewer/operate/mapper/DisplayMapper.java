@@ -9,7 +9,7 @@ import java.util.Map;
 @Mapper
 public interface DisplayMapper {
 
-    List<DisplayVo> getDisplayList();
+    List<DisplayVo> getDisplayList(String screenId);
 
     DisplayVo getDisplay(String displayId);
 
