@@ -17,4 +17,6 @@ public class PresetVo implements Serializable {
 
     private Integer rowsize;
     private Integer columnsize;
+
+    private Boolean userStyleYn;
 }

@@ -85,9 +85,18 @@ public class ScreenController {
         Map<String, Object> responseMap = new HashMap<>();
         responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
 
+        String[] keyList = {"screenNm"};
 
         try {
+            parameterValidation(param, keyList);
+            parameterString("screenNm", param.get("screenNm"), true, 0, null);
+
             responseMap = screenService.postScreen(param);
+        }
+        catch (ParamException paramException){
+            log.error("[paramException][postScreen] - {}", paramException.getMessage());
+            responseMap.put("code", paramException.getCode());
+            responseMap.put("message", paramException.getMessage());
         }
         catch (Exception exception) {
             log.error("[Exception][postScreen] - {}", exception.getMessage());

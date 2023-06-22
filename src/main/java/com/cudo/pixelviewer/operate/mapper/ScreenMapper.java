@@ -11,7 +11,9 @@ public interface ScreenMapper {
 
     List<ScreenVo> getScreenList();
 
-    ScreenVo getScreen(String screenId);
+//    ScreenVo getScreen(String screenId);
+    Map<String, Object> getScreen(String screenId);
+    List<Map<String, Object>> getScreenAllocateDisplays(String screenId);
 
     int postScreenValid(Map<String, Object> param);
     int postScreen(Map<String, Object> param);
@@ -24,5 +26,7 @@ public interface ScreenMapper {
 
     int putScreenValid(Map<String, Object> param);
     int putScreen(Map<String, Object> param);
+    int saveAllocateDisplays(Map<String, Object> param);
+
 
 }

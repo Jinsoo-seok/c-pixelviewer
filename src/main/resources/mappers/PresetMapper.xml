@@ -11,7 +11,6 @@
     <select id="getPreset" resultType="com.cudo.pixelviewer.vo.PresetVo">
         SELECT *
         FROM Presets AS P
-        LEFT JOIN Layers AS L ON L.preset_id = P.preset_id
         WHERE P.preset_id = #{presetId}
     </select>
     <select id="getPresetLayers" resultType="com.cudo.pixelviewer.vo.LayerVo">
@@ -72,6 +71,7 @@
             preset_nm = #{presetNm}
           , rowsize = #{rowsize}
           , columnsize = #{columnsize}
+          , user_style_yn = #{userStyleYn}
         WHERE Presets.preset_id = #{presetId}
     </update>
     <insert id="saveLayer" parameterType="Map">

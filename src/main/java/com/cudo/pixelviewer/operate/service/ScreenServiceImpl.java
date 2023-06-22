@@ -38,9 +38,14 @@ public class ScreenServiceImpl implements ScreenService {
     public Map<String, Object> getScreen(String screenId) {
         Map<String, Object> resultMap = new HashMap<>();
 
-        ScreenVo screenVo = screenMapper.getScreen(screenId);
+//        ScreenVo screenVo = screenMapper.getScreen(screenId);
+        Map<String, Object>  screenVo = screenMapper.getScreen(screenId);
+
 
         if(screenVo != null){
+            List<Map<String, Object>> screenAllocateDisplays = screenMapper.getScreenAllocateDisplays(screenId);
+            screenVo.put("allocateDisplays", screenAllocateDisplays);
+
             resultMap.put("data", screenVo);
             resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
         }
@@ -139,6 +144,7 @@ public class ScreenServiceImpl implements ScreenService {
             int putScreenResult = screenMapper.putScreen(param);
 
             if(putScreenResult == 1){ // Success : 1
+                int saveAllocateDisplaysResult = screenMapper.saveAllocateDisplays(param);
                 resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
             }
             else{

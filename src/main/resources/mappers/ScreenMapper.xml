@@ -8,10 +8,18 @@
         FROM Screens
     </select>
 
-    <select id="getScreen" resultType="com.cudo.pixelviewer.vo.ScreenVo">
-        SELECT *
+<!--    <select id="getScreen" resultType="com.cudo.pixelviewer.vo.ScreenVo">-->
+    <select id="getScreen" resultType="Map">
+        SELECT screen_id AS screenId, screen_nm AS screennm, rowsize AS rowsize, columnsize AS columnsize
         FROM Screens
         WHERE Screens.screen_id = #{screenId}
+    </select>
+    <select id="getScreenAllocateDisplays" resultType="Map">
+        SELECT SD.src_display_id AS srcDisplayId, SD.screen_id AS screenId, SD.display_id AS displayId, SD.rowsize AS rowsize, SD.columnsize AS columnsize,
+                DS.display_nm AS displayNm, DS.gpu_nm AS gpuNm, DS.pos_x AS posX, DS.pos_y AS posY, DS.width AS width, DS.height AS height, DS.primary_fl AS primaryFl
+        FROM Screen_Displays AS SD
+                 LEFT JOIN Displays_Setting AS DS ON DS.display_id = SD.display_id
+        WHERE screen_id = #{screenId}
     </select>
 
     <select id="postScreenValid" resultType="int">
@@ -29,7 +37,7 @@
         )
         VALUES
         (
-            "NULL", 0, 0
+            #{screenNm}, 0, 0
         )
     </insert>
 
@@ -65,6 +73,21 @@
         SET screen_nm = #{screenNm}, rowsize = #{rowsize}, columnsize = #{columnsize}
         WHERE Screens.screen_id = #{screenId}
     </update>
+    <insert id="saveAllocateDisplays" parameterType="Map">
+        INSERT INTO Screen_Displays
+        (src_display_id, screen_id, display_id, rowsize, columnsize)
+        VALUES
+        <foreach collection="allocateDisplays" item="item" separator=",">
+            (#{item.srcDisplayId}, #{item.screenId}, #{item.displayId},
+            #{item.rowsize}, #{item.columnsize}
+            )
+        </foreach>
+        ON DUPLICATE KEY UPDATE
+        screen_id = VALUES(screen_id),
+        display_id = VALUES(display_id),
+        rowsize = VALUES(rowsize),
+        columnsize = VALUES(columnsize)
+    </insert>
 
 </mapper>
 
