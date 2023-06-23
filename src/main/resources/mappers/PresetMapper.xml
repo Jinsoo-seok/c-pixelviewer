@@ -30,11 +30,11 @@
             keyProperty="presetId">
         INSERT INTO Presets
         (
-            screen_id, preset_nm, rowsize, columnsize
+            screen_id, preset_nm, rowsize, columnsize, user_style_yn
         )
         VALUES
         (
-            0, "NULL", 0, 0
+            #{screenId}, #{presetNm}, 0, 0, false
         )
     </insert>
 

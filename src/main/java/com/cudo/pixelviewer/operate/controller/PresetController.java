@@ -85,9 +85,19 @@ public class PresetController {
         Map<String, Object> responseMap = new HashMap<>();
         responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
 
+        String[] keyList = {"screenId", "presetNm"};
 
         try {
+            parameterValidation(param, keyList);
+            parameterInt("screenId", param.get("screenId"), true);
+            parameterString("presetNm", param.get("presetNm"), true, 0, null);
+
             responseMap = presetService.postPreset(param);
+        }
+        catch (ParamException paramException){
+            log.error("[paramException][postPreset] - {}", paramException.getMessage());
+            responseMap.put("code", paramException.getCode());
+            responseMap.put("message", paramException.getMessage());
         }
         catch (Exception exception) {
             log.error("[Exception][postPreset] - {}", exception.getMessage());
