@@ -285,7 +285,7 @@ public class PlaylistController {
         Map<String, Object> responseMap = new HashMap<>();
         responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
 
-        String[] keyList = {"playlistId", "ordNo", "type", "ctsNm", "ctsPath", "playtime", "weatherFl", "airInfoFl"};
+        String[] keyList = {"playlistId", "ordNo", "type", "ctsNm", "ctsPath", "playtime", "weatherFl", "airInfoFl", "stretch"};
 
         try {
             parameterValidation(param, keyList);
@@ -295,8 +295,12 @@ public class PlaylistController {
             parameterString("ctsNm", param.get("ctsNm"), true, 0, null);
             parameterString("ctsPath", param.get("ctsPath"), true, 0, null);
             parameterString("playtime", param.get("playtime"), true, 0, null);
-            parameterInt("weatherFl", param.get("weatherFl"), true);
-            parameterInt("airInfoFl", param.get("airInfoFl"), true);
+            parameterBoolean("weatherFl", param.get("weatherFl"), true);
+            parameterBoolean("airInfoFl", param.get("airInfoFl"), true);
+            parameterBoolean("stretch", param.get("stretch"), true);
+//            parameterInt("weatherFl", param.get("weatherFl"), true);
+//            parameterInt("airInfoFl", param.get("airInfoFl"), true);
+//            parameterInt("airInfoFl", param.get("airInfoFl"), true);
 
             responseMap = playlistService.postPlaylistContents(param);
         }
@@ -327,11 +331,11 @@ public class PlaylistController {
         Map<String, Object> responseMap = new HashMap<>();
         responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
 
-        String[] keyList = {"itemId"};
+        String[] keyList = {"contentId"};
 
         try {
             parameterValidation(param, keyList);
-            parameterInt("itemId", param.get("itemId"), true);
+            parameterInt("contentId", param.get("contentId"), true);
 
             responseMap = playlistService.deletePlaylistContents(param);
         }
@@ -362,11 +366,11 @@ public class PlaylistController {
         Map<String, Object> responseMap = new HashMap<>();
         responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
 
-        String[] keyList = {"itemId", "ctsNm"};
+        String[] keyList = {"contentId", "ctsNm"};
 
         try {
             parameterValidation(param, keyList);
-            parameterInt("itemId", param.get("itemId"), true);
+            parameterInt("contentId", param.get("contentId"), true);
             parameterString("ctsNm", param.get("ctsNm"), true, 0, null);
 
             responseMap = playlistService.patchContentsName(param);
@@ -397,11 +401,11 @@ public class PlaylistController {
         Map<String, Object> responseMap = new HashMap<>();
         responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
 
-        String[] keyList = {"itemId", "playtime"};
+        String[] keyList = {"contentId", "playtime"};
 
         try {
             parameterValidation(param, keyList);
-            parameterInt("itemId", param.get("itemId"), true);
+            parameterInt("contentId", param.get("contentId"), true);
             parameterString("playtime", param.get("playtime"), true, 0, null);
 
             responseMap = playlistService.patchContentsPlaytime(param);

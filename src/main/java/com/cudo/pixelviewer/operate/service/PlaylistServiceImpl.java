@@ -44,7 +44,7 @@ public class PlaylistServiceImpl implements PlaylistService {
         Map<String, Object> playlist = playlistMapper.getPlaylist(layerId);
 
         if(playlist != null){
-            String contentIdList = (String) playlist.get("content_id_list");
+            String contentIdList = (String) playlist.get("contentIdList");
             String queryTemp = "(" + contentIdList + ")";
 
             List<Map<String, Object>> playlistContentList = playlistMapper.getPlaylistContentList(queryTemp);
@@ -210,7 +210,7 @@ public class PlaylistServiceImpl implements PlaylistService {
             int postPlaylistContentsResult = playlistMapper.postPlaylistContents(param);
 
             if(postPlaylistContentsResult == 1){ // Success : 1
-                dataMap.put("itemId", param.get("itemId"));
+                dataMap.put("contentId", param.get("contentId"));
                 resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
                 resultMap.put("data", dataMap);
             }
