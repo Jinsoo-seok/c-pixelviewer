@@ -201,7 +201,6 @@ public class PresetServiceImpl implements PresetService {
         String agentUrl = "http://host:port/vieweragent/Preset/layer-placemen";
 
 
-        // TODO : 쿼리스트링에 LayerID?
         String screenIdQueryString = "screenId=" + param.get("screenId");
         String presetIdQueryString = "presetId=" + param.get("presetId");
 
@@ -298,7 +297,7 @@ public class PresetServiceImpl implements PresetService {
         /*
 
          */
-        // TODO : [DB] preset Status >> RUN
+        // TODO : [DB] preset Status >> STOP
         Map<String, Object> queryMap = new HashMap<>();
         queryMap.put("presetId", param.get("presetId"));
         queryMap.put("presetStatus", "WAIT");

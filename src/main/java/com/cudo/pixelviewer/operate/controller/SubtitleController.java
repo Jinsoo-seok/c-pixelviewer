@@ -80,7 +80,6 @@ public class SubtitleController {
         return responseMap;
     }
 
-    // TODO : 테이블 필드 어디?
     @PatchMapping("/text")
     public Map<String, Object> patchSubtitleText(HttpServletRequest request
                                                  , @RequestBody Map<String, Object> param) {

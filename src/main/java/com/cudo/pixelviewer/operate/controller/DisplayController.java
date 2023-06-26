@@ -76,7 +76,6 @@ public class DisplayController {
         return responseMap;
     }
 
-    // TODO : 해당하는 스크린의 사용하는 디스플레이?인지 전체 디스플레이인지 확인 필요
     @GetMapping("/portlist")
     public Map<String, Object> getDisplayPortlist(HttpServletRequest request){
         long startTime = System.currentTimeMillis();
