@@ -45,28 +45,20 @@ public class AdminSettingServiceImpl implements AdminSettingService {
     public Map<String, Object> patchLayerTopMost(Map<String, Object> param) {
         Map<String, Object> resultMap = new HashMap<>();
 
-        Integer type = (Integer) param.get("type");
+        Boolean type = (Boolean) param.get("type");
 
-        if (type == 10 || type == 20) {
-            int patchLayerTopMostResult = adminSettingMapper.patchLayerTopMost(param);
+        int patchLayerTopMostResult = adminSettingMapper.patchLayerTopMost(param);
 
-            if (patchLayerTopMostResult == 1) { // Success : 1
-                resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
+        if (patchLayerTopMostResult == 1) { // Success : 1
+            resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
 
-                String status = (type == 10) ? ENABLED_TEXT : DISABLED_TEXT;
-                resultMap.put("data", status);
-
-            } else {
-                ResponseCode failCode = ResponseCode.FAIL_UPDATE_SETTING_VIEW_TOP_MOST_EN;
-                resultMap.put("code", failCode.getCode());
-                resultMap.put("message", failCode.getMessage());
-            }
+            String status = (type == true) ? ENABLED_TEXT : DISABLED_TEXT;
+            resultMap.put("data", status);
         }
-        else{
-            ResponseCode unsupportedCode = ResponseCode.FAIL_UNSUPPORTED_TYPE_SETTING;
-            resultMap.put("code", unsupportedCode.getCode());
-            resultMap.put("message", unsupportedCode.getMessage());
-            resultMap.put("data", UNSUPPORTED_TYPE_TEXT);
+        else {
+            ResponseCode failCode = ResponseCode.FAIL_UPDATE_SETTING_VIEW_TOP_MOST_EN;
+            resultMap.put("code", failCode.getCode());
+            resultMap.put("message", failCode.getMessage());
         }
         return resultMap;
     }
@@ -76,28 +68,20 @@ public class AdminSettingServiceImpl implements AdminSettingService {
     public Map<String, Object> patchTempHumi(Map<String, Object> param) {
         Map<String, Object> resultMap = new HashMap<>();
 
-        Integer type = (Integer) param.get("type");
+        Boolean type = (Boolean) param.get("type");
 
-        if (type == 10 || type == 20) {
-            int patchLayerTopMostResult = adminSettingMapper.patchTempHumi(param);
+        int patchLayerTopMostResult = adminSettingMapper.patchTempHumi(param);
 
-            if (patchLayerTopMostResult == 1) { // Success : 1
-                resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
+        if (patchLayerTopMostResult == 1) { // Success : 1
+            resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
 
-                String status = (type == 10) ? ENABLED_TEXT : DISABLED_TEXT;
-                resultMap.put("data", status);
-
-            } else {
-                ResponseCode failCode = ResponseCode.FAIL_UPDATE_SETTING_VIEW_TEMP_HUMI_EN;
-                resultMap.put("code", failCode.getCode());
-                resultMap.put("message", failCode.getMessage());
-            }
+            String status = (type == true) ? ENABLED_TEXT : DISABLED_TEXT;
+            resultMap.put("data", status);
         }
-        else{
-            ResponseCode unsupportedCode = ResponseCode.FAIL_UNSUPPORTED_TYPE_SETTING;
-            resultMap.put("code", unsupportedCode.getCode());
-            resultMap.put("message", unsupportedCode.getMessage());
-            resultMap.put("data", UNSUPPORTED_TYPE_TEXT);
+        else {
+            ResponseCode failCode = ResponseCode.FAIL_UPDATE_SETTING_VIEW_TEMP_HUMI_EN;
+            resultMap.put("code", failCode.getCode());
+            resultMap.put("message", failCode.getMessage());
         }
         return resultMap;
     }
@@ -107,20 +91,21 @@ public class AdminSettingServiceImpl implements AdminSettingService {
     public Map<String, Object> patchControlType(Map<String, Object> param) {
         Map<String, Object> resultMap = new HashMap<>();
 
-        Integer type = (Integer) param.get("type");
-        String unsupportedTypeText = "10:TCP, 20:USB";
+        String type = (String) param.get("type");
+
+        String unsupportedTypeText = "Possible Types : TCP, USB";
         String[] controlTypeList = {"TCP", "USB"};
 
-        if (type == 10 || type == 20) {
+        if(type.equals("TCP") || type.equals("USB") ) {
+
             int patchLayerTopMostResult = adminSettingMapper.patchControlType(param);
 
             if (patchLayerTopMostResult == 1) { // Success : 1
                 resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
 
-                String status = (type == 10) ? controlTypeList[0] : controlTypeList[1];
-                resultMap.put("data", status);
-
-            } else {
+                resultMap.put("data", type);
+            }
+            else {
                 ResponseCode failCode = ResponseCode.FAIL_UPDATE_SETTING_LED_COMM_TYPE;
                 resultMap.put("code", failCode.getCode());
                 resultMap.put("message", failCode.getMessage());
@@ -140,28 +125,20 @@ public class AdminSettingServiceImpl implements AdminSettingService {
     public Map<String, Object> patchLedPresetEnable(Map<String, Object> param) {
         Map<String, Object> resultMap = new HashMap<>();
 
-        Integer type = (Integer) param.get("type");
+        Boolean type = (Boolean) param.get("type");
 
-        if (type == 10 || type == 20) {
-            int patchLayerTopMostResult = adminSettingMapper.patchLedPresetEnable(param);
+        int patchLayerTopMostResult = adminSettingMapper.patchLedPresetEnable(param);
 
-            if (patchLayerTopMostResult == 1) { // Success : 1
-                resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
+        if (patchLayerTopMostResult == 1) { // Success : 1
+            resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
 
-                String status = (type == 10) ? ENABLED_TEXT : DISABLED_TEXT;
-                resultMap.put("data", status);
-
-            } else {
-                ResponseCode failCode = ResponseCode.FAIL_UPDATE_SETTING_LED_PRESET_EN;
-                resultMap.put("code", failCode.getCode());
-                resultMap.put("message", failCode.getMessage());
-            }
+            String status = (type == true) ? ENABLED_TEXT : DISABLED_TEXT;
+            resultMap.put("data", status);
         }
-        else{
-            ResponseCode unsupportedCode = ResponseCode.FAIL_UNSUPPORTED_TYPE_SETTING;
-            resultMap.put("code", unsupportedCode.getCode());
-            resultMap.put("message", unsupportedCode.getMessage());
-            resultMap.put("data", UNSUPPORTED_TYPE_TEXT);
+        else {
+            ResponseCode failCode = ResponseCode.FAIL_UPDATE_SETTING_LED_PRESET_EN;
+            resultMap.put("code", failCode.getCode());
+            resultMap.put("message", failCode.getMessage());
         }
         return resultMap;
     }
@@ -189,28 +166,20 @@ public class AdminSettingServiceImpl implements AdminSettingService {
     public Map<String, Object> patchLedInputEnable(Map<String, Object> param) {
         Map<String, Object> resultMap = new HashMap<>();
 
-        Integer type = (Integer) param.get("type");
+        Boolean type = (Boolean) param.get("type");
 
-        if (type == 10 || type == 20) {
-            int patchLayerTopMostResult = adminSettingMapper.patchLedInputEnable(param);
+        int patchLayerTopMostResult = adminSettingMapper.patchLedInputEnable(param);
 
-            if (patchLayerTopMostResult == 1) { // Success : 1
-                resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
+        if (patchLayerTopMostResult == 1) { // Success : 1
+            resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
 
-                String status = (type == 10) ? ENABLED_TEXT : DISABLED_TEXT;
-                resultMap.put("data", status);
-
-            } else {
-                ResponseCode failCode = ResponseCode.FAIL_UPDATE_SETTING_LED_INPUT_SELECT_EN;
-                resultMap.put("code", failCode.getCode());
-                resultMap.put("message", failCode.getMessage());
-            }
+            String status = (type == true) ? ENABLED_TEXT : DISABLED_TEXT;
+            resultMap.put("data", status);
         }
-        else{
-            ResponseCode unsupportedCode = ResponseCode.FAIL_UNSUPPORTED_TYPE_SETTING;
-            resultMap.put("code", unsupportedCode.getCode());
-            resultMap.put("message", unsupportedCode.getMessage());
-            resultMap.put("data", UNSUPPORTED_TYPE_TEXT);
+        else {
+            ResponseCode failCode = ResponseCode.FAIL_UPDATE_SETTING_LED_INPUT_SELECT_EN;
+            resultMap.put("code", failCode.getCode());
+            resultMap.put("message", failCode.getMessage());
         }
         return resultMap;
     }

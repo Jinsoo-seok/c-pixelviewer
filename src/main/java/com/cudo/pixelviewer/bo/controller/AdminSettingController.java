@@ -62,7 +62,7 @@ public class AdminSettingController {
 
         try {
             parameterValidation(param, keyList);
-            parameterInt("type", param.get("type"), true);
+            parameterBoolean("type", param.get("type"), true);
 
             responseMap = adminSettingService.patchLayerTopMost(param);
         }
@@ -97,7 +97,7 @@ public class AdminSettingController {
 
         try {
             parameterValidation(param, keyList);
-            parameterInt("type", param.get("type"), true);
+            parameterBoolean("type", param.get("type"), true);
 
             responseMap = adminSettingService.patchTempHumi(param);
         }
@@ -132,7 +132,7 @@ public class AdminSettingController {
 
         try {
             parameterValidation(param, keyList);
-            parameterInt("type", param.get("type"), true);
+            parameterString("type", param.get("type"), true, 0, null);
 
             responseMap = adminSettingService.patchControlType(param);
         }
@@ -167,7 +167,7 @@ public class AdminSettingController {
 
         try {
             parameterValidation(param, keyList);
-            parameterInt("type", param.get("type"), true);
+            parameterBoolean("type", param.get("type"), true);
 
             responseMap = adminSettingService.patchLedPresetEnable(param);
         }
@@ -237,7 +237,7 @@ public class AdminSettingController {
 
         try {
             parameterValidation(param, keyList);
-            parameterInt("type", param.get("type"), true);
+            parameterBoolean("type", param.get("type"), true);
 
             responseMap = adminSettingService.patchLedInputEnable(param);
         }

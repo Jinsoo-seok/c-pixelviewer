@@ -1,5 +1,6 @@
 package com.cudo.pixelviewer.vo;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -9,20 +10,21 @@ public class AdminSettingVo implements Serializable {
 
     private static final long serialVersionUID = 8887096718322941951L;
 
+    @JsonIgnore
     private Integer programId;
 
-    private Integer viewTopmostEn;
-    private Integer viewTemphumiEn;
+    private Boolean viewTopmostEn;
+    private Boolean viewTemphumiEn;
 
-    private Integer ledCommType;
-    private Integer ledPresetEn;
-    private Integer ledInputSelectEn;
-    private Integer ledBrightnessControlEn;
+    private String ledCommType;
+    private Boolean ledPresetEn;
+    private Boolean ledInputSelectEn;
+    private Boolean ledBrightnessControlEn;
     private Integer ledPresetCount;
 
-    private Integer pwrControlEn;
+    private Boolean pwrControlEn;
 
-    private Integer loginEn;
+    private Boolean loginEn;
 
     private String imgDefaultPlaytime;
 
