@@ -84,7 +84,7 @@ public class ExternalServiceImpl implements ExternalService {
         Map<String, Object> resultMap = new HashMap<>();
         Map<String, Object> dataMap = new HashMap<>();
 
-        if(param.get("type").equals(20)) {
+        if(param.get("type").equals(20) || param.get("type").equals(40)) {
             Integer externalCheck = externalMapper.postExternalInfoValid(param);
 
             // 없으면 insert (LayerObjects, External_info)

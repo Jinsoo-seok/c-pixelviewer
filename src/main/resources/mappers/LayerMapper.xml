@@ -31,12 +31,12 @@
         WHERE layer_id = #{layerId}
     </select>
     <select id="getLayerObjectExternalVideo" resultType="Map">
-        SELECT *
+        SELECT pos_x AS posX, pos_y AS posY, ord AS ord, rtsp_url AS rtspUrl,  video_nm AS videoNm, ex_video_id AS exVideoId, width AS width, video_format AS videoFormat, type AS type, object_id AS objectId, height AS height
         FROM ExternalVideo
         WHERE object_id = #{objectId}
     </select>
     <select id="getLayerObjectExternalInfo" resultType="Map">
-        SELECT *
+        SELECT ord AS ord, underline AS underline, font_nm AS fontNm, font_size AS fontSize, forecolor AS forecolor, bold AS bold, type AS type, object_id AS objectId, italic AS italic, pos_y AS posY, ex_info_id AS exInfoId, pos_x AS posX, image_layout AS imageLayout, width AS width, height AS height, image_list AS imageList
         FROM External_Info
         WHERE object_id = #{objectId}
     </select>

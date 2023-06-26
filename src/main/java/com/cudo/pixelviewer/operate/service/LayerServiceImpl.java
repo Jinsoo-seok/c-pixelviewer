@@ -66,9 +66,9 @@ public class LayerServiceImpl implements LayerService {
                             break;
                         case 20:
                             System.out.println("type 20");
-                            Map<String, Object> infoTemp = layerMapper.getLayerObjectExternalInfo((Integer) lo.get("object_id"));
-                            subMap.put("type", "외부정보");
-                            subMap.put("data", infoTemp);
+                            Map<String, Object> weatherInfoTemp = layerMapper.getLayerObjectExternalInfo((Integer) lo.get("object_id"));
+                            subMap.put("type", "외부정보(날씨)");
+                            subMap.put("data", weatherInfoTemp);
                             layerObjectList.add(subMap);
                             break;
                         case 30:
@@ -86,6 +86,12 @@ public class LayerServiceImpl implements LayerService {
 
                             subMap.put("type", "자막");
                             subMap.put("data", subtitleTemp);
+                            layerObjectList.add(subMap);
+                            break;
+                        case 40:
+                            Map<String, Object> airInfoTemp = layerMapper.getLayerObjectExternalInfo((Integer) lo.get("object_id"));
+                            subMap.put("type", "외부정보(먼지)");
+                            subMap.put("data", airInfoTemp);
                             layerObjectList.add(subMap);
                             break;
                         default:
