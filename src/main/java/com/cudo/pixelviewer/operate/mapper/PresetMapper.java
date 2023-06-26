@@ -26,5 +26,6 @@ public interface PresetMapper {
 
     int putPresetValid(Map<String, Object> param);
     int putPreset(Map<String, Object> param);
+    int putPresetDeleteLayers(Map<String, Object> param);
     int saveLayer(Map<String, Object> param);
 }

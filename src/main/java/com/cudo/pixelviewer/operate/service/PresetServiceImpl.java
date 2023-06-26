@@ -1,6 +1,8 @@
 package com.cudo.pixelviewer.operate.service;
 
+import com.cudo.pixelviewer.operate.mapper.LayerMapper;
 import com.cudo.pixelviewer.operate.mapper.PresetMapper;
+import com.cudo.pixelviewer.operate.mapper.ScreenMapper;
 import com.cudo.pixelviewer.util.ParameterUtils;
 import com.cudo.pixelviewer.util.ResponseCode;
 import com.cudo.pixelviewer.vo.LayerVo;
@@ -17,7 +19,11 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class PresetServiceImpl implements PresetService {
 
+    final ScreenMapper screenMapper;
+
     final PresetMapper presetMapper;
+
+    final LayerMapper layerMapper;
 
 
     @Override
@@ -150,6 +156,8 @@ public class PresetServiceImpl implements PresetService {
             int putPresetResult = presetMapper.putPreset(param);
 
             if(putPresetResult == 1){ // Success : 1
+                int deleteLayerResult = presetMapper.putPresetDeleteLayers(param);
+
                 // TODO : 예외처리
                 int saveLayerResult = presetMapper.saveLayer(param);
 
