@@ -82,13 +82,13 @@
     </update>
     <insert id="saveLayer" parameterType="Map">
         INSERT INTO Layers
-        (layer_id, preset_id, screen_id, layer_nm, pos_x, pos_y, width, height, ord, subtitle_first_yn, subtitle_second_yn)
+        (layer_id, preset_id, screen_id, layer_nm, pos_x, pos_y, width, height, ord, sub_first_en, sub_second_en, ex_video_en, weather_en, air_en)
         VALUES
         <foreach collection="layerList" item="item" separator=",">
             (#{item.layerId}, #{item.presetId}, #{item.screenId},
             #{item.layerNm}, #{item.posX}, #{item.posY},
             #{item.width}, #{item.height}, #{item.ord},
-            false, false
+            false, false, false, false, false
             )
         </foreach>
         ON DUPLICATE KEY UPDATE

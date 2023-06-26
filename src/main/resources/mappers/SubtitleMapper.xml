@@ -34,8 +34,8 @@
     <update id="postSubtitleLayer" parameterType="Map">
         UPDATE Layers
         SET
-            subtitle_first_yn = #{subtitleFirstYn},
-            subtitle_second_yn = #{subtitleSecondYn}
+            sub_first_en = #{subFirstEn},
+            sub_second_en = #{subSecondEn}
         WHERE layer_id = #{layerId}
     </update>
 

@@ -8,7 +8,8 @@
     <select id="getLayerList" resultType="Map">
         SELECT layer_id AS layerId, preset_id AS presetId, screen_id AS screenId, layer_nm AS layerNm
              , pos_x AS posX, pos_y AS posY, width AS width, height AS height, ord AS ord
-             , subtitle_first_yn AS subtitleFirstYn, subtitle_second_yn AS subtitleSecondYn
+             , sub_first_en AS subFirstEn, sub_second_en AS subSecondEn
+             , ex_video_en AS exVideoEn, weather_en AS weatherEn, air_en AS airEn
         FROM Layers AS L
     </select>
     <select id="getLayerListPlayList" resultType="Integer">
@@ -21,7 +22,8 @@
     <select id="getLayer" resultType="Map">
         SELECT L.layer_id AS layerId, L.preset_id AS presetId, L.screen_id AS screenId, L.layer_nm AS layerNm
              , L.pos_x AS posX, L.pos_y AS posY, L.width AS width, L.height AS height, L.ord AS ord
-             , L.subtitle_first_yn AS subtitleFirstYn, L.subtitle_second_yn AS subtitleSecondYn
+             , L.sub_first_en AS subFirstEn, L.sub_second_en AS subSecondEn
+             , L.ex_video_en AS exVideoEn, L.weather_en AS weatherEn, L.air_en AS airEn
         FROM Layers AS L
         WHERE L.layer_id = #{layerId}
     </select>
@@ -58,11 +60,11 @@
             keyProperty="layerId">
         INSERT INTO Layers
         (
-            screen_id, preset_id, layer_nm, pos_x, pos_y, width, height, ord, subtitle_first_yn, subtitle_second_yn
+            screen_id, preset_id, layer_nm, pos_x, pos_y, width, height, ord, sub_first_en, sub_second_en, ex_video_en, weather_en, air_en
         )
         VALUES
         (
-            #{screenId}, #{presetId}, #{layerNm}, 0, 0, 0, 0, 0, false, false
+            #{screenId}, #{presetId}, #{layerNm}, 0, 0, 0, 0, 0, false, false, false, false, false
         )
     </insert>
 
@@ -87,7 +89,8 @@
         SET preset_id = #{presetId}, screen_id = #{screenId}
             , layer_nm = #{layerNm}, pos_x = #{posX}, pos_y = #{posY}
             , width = #{width}, height = #{height}, ord = #{ord}
-            , subtitle_first_yn = #{subtitleFirstYn}, subtitle_second_yn = #{subtitleSecondYn}
+            , sub_first_en = #{subFirstEn}, sub_second_en = #{subSecondEn}
+            , ex_video_en = #{exVideoEn}, weather_en = #{weatherEn}, air_en = #{airEn}
         WHERE Layers.layer_id = #{layerId}
     </update>
 

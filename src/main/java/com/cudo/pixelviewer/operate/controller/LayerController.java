@@ -159,7 +159,8 @@ public class LayerController {
 
         String[] keyList = {"presetId", "screenId", "layerNm"
                 , "posX", "posY", "width", "height", "ord"
-                , "subtitleFirstYn", "subtitleSecondYn"
+                , "subFirstEn", "subSecondEn"
+                , "exVideoEn", "weatherEn", "airEn"
         };
 
         try {
@@ -172,8 +173,11 @@ public class LayerController {
             parameterInt("width", param.get("width"), true);
             parameterInt("height", param.get("height"), true);
             parameterInt("ord", param.get("ord"), true);
-            parameterBoolean("subtitleFirstYn", param.get("subtitleFirstYn"), true);
-            parameterBoolean("subtitleSecondYn", param.get("subtitleSecondYn"), true);
+            parameterBoolean("subFirstEn", param.get("subFirstEn"), true);
+            parameterBoolean("subSecondEn", param.get("subSecondEn"), true);
+            parameterBoolean("exVideoEn", param.get("exVideoEn"), true);
+            parameterBoolean("weatherEn", param.get("weatherEn"), true);
+            parameterBoolean("airEn", param.get("airEn"), true);
 
             responseMap = layerService.putLayer(param);
         }

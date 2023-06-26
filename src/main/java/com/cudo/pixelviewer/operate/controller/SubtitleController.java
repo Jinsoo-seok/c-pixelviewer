@@ -36,7 +36,7 @@ public class SubtitleController {
         String[] keyList = {
                 "presetId", "screenId"
                 , "layerId", "type"
-                , "subtitleFirstYn", "subtitleSecondYn"
+                , "subFirstEn", "subSecondEn"
 //                , "posX", "posY", "width", "height", "ord"
 //                , "scrollWay", "scrollSpeed", "scrollStartLocation"
                 , "subtitleStyleArray"};
@@ -47,8 +47,8 @@ public class SubtitleController {
             parameterInt("screenId", param.get("screenId"), true);
             parameterInt("layerId", param.get("layerId"), true);
             parameterInt("type", param.get("type"), true);
-            parameterBoolean("subtitleFirstYn", param.get("subtitleFirstYn"), true);
-            parameterBoolean("subtitleSecondYn", param.get("subtitleSecondYn"), true);
+            parameterBoolean("subFirstEn", param.get("subFirstEn"), true);
+            parameterBoolean("subSecondEn", param.get("subSecondEn"), true);
 //            parameterInt("posX", param.get("posX"), true);
 //            parameterInt("posY", param.get("posY"), true);
 //            parameterInt("width", param.get("width"), true);
