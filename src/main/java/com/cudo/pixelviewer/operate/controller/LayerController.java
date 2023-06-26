@@ -85,9 +85,20 @@ public class LayerController {
         Map<String, Object> responseMap = new HashMap<>();
         responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
 
+        String[] keyList = {"screenId", "presetId", "layerNm"};
 
         try {
+            parameterValidation(param, keyList);
+            parameterInt("screenId", param.get("screenId"), true);
+            parameterInt("presetId", param.get("presetId"), true);
+            parameterString("layerNm", param.get("layerNm"), true, 0, null);
+
             responseMap = layerService.postLayer(param);
+        }
+        catch (ParamException paramException){
+            log.error("[paramException][postLayer] - {}", paramException.getMessage());
+            responseMap.put("code", paramException.getCode());
+            responseMap.put("message", paramException.getMessage());
         }
         catch (Exception exception) {
             log.error("[Exception][postLayer] - {}", exception.getMessage());
@@ -146,7 +157,10 @@ public class LayerController {
         Map<String, Object> responseMap = new HashMap<>();
         responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
 
-        String[] keyList = {"presetId", "screenId", "layerNm", "posX", "posY", "width", "height", "ord"};
+        String[] keyList = {"presetId", "screenId", "layerNm"
+                , "posX", "posY", "width", "height", "ord"
+                , "subtitleFirstYn", "subtitleSecondYn"
+        };
 
         try {
             parameterValidation(param, keyList);
@@ -158,6 +172,8 @@ public class LayerController {
             parameterInt("width", param.get("width"), true);
             parameterInt("height", param.get("height"), true);
             parameterInt("ord", param.get("ord"), true);
+            parameterBoolean("subtitleFirstYn", param.get("subtitleFirstYn"), true);
+            parameterBoolean("subtitleSecondYn", param.get("subtitleSecondYn"), true);
 
             responseMap = layerService.putLayer(param);
         }

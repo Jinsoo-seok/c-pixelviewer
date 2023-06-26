@@ -58,11 +58,11 @@
             keyProperty="layerId">
         INSERT INTO Layers
         (
-            preset_id, screen_id, layer_nm, pos_x, pos_y, width, height, ord
+            screen_id, preset_id, layer_nm, pos_x, pos_y, width, height, ord, subtitle_first_yn, subtitle_second_yn
         )
         VALUES
         (
-            1, 1, "NULL", 0, 0, 0, 0, 0
+            #{screenId}, #{presetId}, #{layerNm}, 0, 0, 0, 0, 0, false, false
         )
     </insert>
 
@@ -87,6 +87,7 @@
         SET preset_id = #{presetId}, screen_id = #{screenId}
             , layer_nm = #{layerNm}, pos_x = #{posX}, pos_y = #{posY}
             , width = #{width}, height = #{height}, ord = #{ord}
+            , subtitle_first_yn = #{subtitleFirstYn}, subtitle_second_yn = #{subtitleSecondYn}
         WHERE Layers.layer_id = #{layerId}
     </update>
 

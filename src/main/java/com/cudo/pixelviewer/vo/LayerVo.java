@@ -25,4 +25,7 @@ public class LayerVo implements Serializable {
 
     private Integer ord;
 
+    private Boolean subtitleFirstYn;
+    private Boolean subtitleSecondYn;
+
 }
