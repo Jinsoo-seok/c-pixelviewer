@@ -34,7 +34,7 @@
         )
         VALUES
         (
-            #{screenId}, #{presetNm}, 0, 0, false, "CREATE"
+            #{screenId}, #{presetNm}, 0, 0, false, "WAIT"
         )
     </insert>
 
@@ -72,7 +72,7 @@
           , rowsize = #{rowsize}
           , columnsize = #{columnsize}
           , user_style_yn = #{userStyleYn}
-          , preset_status = "MODIFY"
+          , preset_status = "WAIT"
         WHERE Presets.preset_id = #{presetId}
     </update>
     <update id="putPresetDeleteLayers">
@@ -107,5 +107,10 @@
         FROM Layers AS L
         WHERE L.preset_id = #{presetId}
     </select>
+    <update id="patchPresetStatus">
+        UPDATE Presets
+        SET preset_status = #{presetStatus}
+        WHERE Presets.preset_id = #{presetId}
+    </update>
 
 </mapper>

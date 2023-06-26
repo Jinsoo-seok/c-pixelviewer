@@ -278,6 +278,10 @@ public class PresetServiceImpl implements PresetService {
 //        });
 
         // TODO : [DB] preset Status >> RUN
+        Map<String, Object> queryMap = new HashMap<>();
+        queryMap.put("presetId", param.get("presetId"));
+        queryMap.put("presetStatus", "RUN");
+         int patchPresetStatusResult = presetMapper.patchPresetStatus(queryMap);
 
         resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
         return resultMap;
@@ -287,6 +291,18 @@ public class PresetServiceImpl implements PresetService {
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> patchPresetStop(Map<String, Object> param) {
         Map<String, Object> resultMap = new HashMap<>();
+
+        String agentUrl = "http://host:port/vieweragent/Preset/layer-placemen";
+
+        // TODO : Agent 연동
+        /*
+
+         */
+        // TODO : [DB] preset Status >> RUN
+        Map<String, Object> queryMap = new HashMap<>();
+        queryMap.put("presetId", param.get("presetId"));
+        queryMap.put("presetStatus", "WAIT");
+         int patchPresetStatusResult = presetMapper.patchPresetStatus(queryMap);
 
 
 
