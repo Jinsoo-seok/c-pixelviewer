@@ -88,6 +88,9 @@ public class ViewerServiceImpl implements ViewerService {
 
 //            resultMap.put("data", layerMap);
             resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
+            
+            // TODO : 레이어의 y/n 체크 추가
+            // TODO : PlayList 추가
         }
         else{
             resultMap.putAll(ParameterUtils.responseOption(ResponseCode.NO_CONTENT.getCodeName()));
