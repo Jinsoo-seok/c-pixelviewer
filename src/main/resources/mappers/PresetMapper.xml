@@ -30,11 +30,11 @@
             keyProperty="presetId">
         INSERT INTO Presets
         (
-            screen_id, preset_nm, rowsize, columnsize, user_style_yn
+            screen_id, preset_nm, rowsize, columnsize, user_style_yn, preset_status
         )
         VALUES
         (
-            #{screenId}, #{presetNm}, 0, 0, false
+            #{screenId}, #{presetNm}, 0, 0, false, "CREATE"
         )
     </insert>
 
@@ -72,6 +72,7 @@
           , rowsize = #{rowsize}
           , columnsize = #{columnsize}
           , user_style_yn = #{userStyleYn}
+          , preset_status = "MODIFY"
         WHERE Presets.preset_id = #{presetId}
     </update>
     <update id="putPresetDeleteLayers">
@@ -100,5 +101,11 @@
         height = VALUES(height),
         ord = VALUES(ord)
     </insert>
+
+    <select id="getPresetLayersToAgent" resultType="com.cudo.pixelviewer.vo.LayerToAgentVo">
+        SELECT *
+        FROM Layers AS L
+        WHERE L.preset_id = #{presetId}
+    </select>
 
 </mapper>

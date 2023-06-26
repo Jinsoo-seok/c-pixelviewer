@@ -221,7 +221,6 @@ public class PresetController {
         return responseMap;
     }
 
-    // TODO : 로직 설명 듣기
     @PatchMapping("/run")
     public Map<String, Object> patchPresetRun(HttpServletRequest request
             , @RequestBody Map<String, Object> param) {
@@ -232,20 +231,20 @@ public class PresetController {
         Map<String, Object> responseMap = new HashMap<>();
         responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
 
-//        String[] keyList = {"presetId", "presetNm"};
+        String[] keyList = {"screenId", "presetId"};
 
         try {
-//            parameterValidation(param, keyList);
-//            parameterInt("presetId", param.get("presetId"), true);
-//            parameterString("presetNm", param.get("presetNm"), true, 0, null);
+            parameterValidation(param, keyList);
+            parameterInt("screenId", param.get("screenId"), true);
+            parameterInt("presetId", param.get("presetId"), true);
 
             responseMap = presetService.patchPresetRun(param);
         }
-//        catch (ParamException paramException){
-//            log.error("[paramException][patchPresetRun] - {}", paramException.getMessage());
-//            responseMap.put("code", paramException.getCode());
-//            responseMap.put("message", paramException.getMessage());
-//        }
+        catch (ParamException paramException){
+            log.error("[paramException][patchPresetRun] - {}", paramException.getMessage());
+            responseMap.put("code", paramException.getCode());
+            responseMap.put("message", paramException.getMessage());
+        }
         catch (Exception exception) {
             log.error("[Exception][patchPresetRun] - {}", exception.getMessage());
             responseMap.put("exceptionMessage", exception.getMessage());
@@ -258,7 +257,6 @@ public class PresetController {
         return responseMap;
     }
 
-    // TODO : 로직 설명 듣기
     @PatchMapping("/stop")
     public Map<String, Object> patchPresetStop(HttpServletRequest request
             , @RequestBody Map<String, Object> param) {
@@ -269,20 +267,20 @@ public class PresetController {
         Map<String, Object> responseMap = new HashMap<>();
         responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
 
-//        String[] keyList = {"presetId", "presetNm"};
+        String[] keyList = {"screenId", "presetId"};
 
         try {
-//            parameterValidation(param, keyList);
-//            parameterInt("presetId", param.get("presetId"), true);
-//            parameterString("presetNm", param.get("presetNm"), true, 0, null);
+            parameterValidation(param, keyList);
+            parameterInt("screenId", param.get("screenId"), true);
+            parameterInt("presetId", param.get("presetId"), true);
 
             responseMap = presetService.patchPresetStop(param);
         }
-//        catch (ParamException paramException){
-//            log.error("[paramException][patchPresetStop] - {}", paramException.getMessage());
-//            responseMap.put("code", paramException.getCode());
-//            responseMap.put("message", paramException.getMessage());
-//        }
+        catch (ParamException paramException){
+            log.error("[paramException][patchPresetStop] - {}", paramException.getMessage());
+            responseMap.put("code", paramException.getCode());
+            responseMap.put("message", paramException.getMessage());
+        }
         catch (Exception exception) {
             log.error("[Exception][patchPresetStop] - {}", exception.getMessage());
             responseMap.put("exceptionMessage", exception.getMessage());

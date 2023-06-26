@@ -19,4 +19,6 @@ public class PresetVo implements Serializable {
     private Integer columnsize;
 
     private Boolean userStyleYn;
+
+    private String presetStatus;
 }
