@@ -5,6 +5,7 @@ import com.cudo.pixelviewer.operate.mapper.PlaylistMapper;
 import com.cudo.pixelviewer.util.ParameterUtils;
 import com.cudo.pixelviewer.util.ResponseCode;
 import lombok.RequiredArgsConstructor;
+import org.json.simple.JSONArray;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.springframework.stereotype.Service;
@@ -38,28 +39,49 @@ public class ViewerServiceImpl implements ViewerService {
 
                     switch (type) {
                         case 10:
-                            Map<String, Object> videoTemp = layerMapper.getLayerObjectExternalVideo((Integer) lo.get("object_id"));
-                            resultMap.put("externalVideo", videoTemp);
+                            if(layerMap.get("exVideoEn").equals(1)) {
+                                Map<String, Object> videoTemp = layerMapper.getLayerObjectExternalVideo((Integer) lo.get("object_id"));
+                                resultMap.put("externalVideo", videoTemp);
+                            }
                             break;
                         case 20:
-                            Map<String, Object> weatherInfoTemp = layerMapper.getLayerObjectExternalInfo((Integer) lo.get("object_id"));
-                            resultMap.put("weatherForm", weatherInfoTemp);
+                            if(layerMap.get("weatherEn").equals(1)) {
+                                Map<String, Object> weatherInfoTemp = layerMapper.getLayerObjectExternalInfo((Integer) lo.get("object_id"));
+                                resultMap.put("weatherForm", weatherInfoTemp);
+                            }
                             break;
                         case 30:
-                            Map<String, Object> subtitleTemp = layerMapper.getLayerObjectExternalSubtitle((Integer) lo.get("object_id"));
-                            String temp = (String) subtitleTemp.get("subtitle_style");
+                            if(layerMap.get("subFirstEn").equals(1) || layerMap.get("subSecondEn").equals(1)) {
+                                Map<String, Object> subtitleTemp = layerMapper.getLayerObjectExternalSubtitle((Integer) lo.get("object_id"));
+                                String temp = (String) subtitleTemp.get("subtitle_style");
 
-                            try {
-                                JSONParser parser = new JSONParser();
-                                Object obj = parser.parse(temp);
-                                resultMap.put("subtitleStyleArray", obj);
-                            } catch (ParseException e) {
-                                e.printStackTrace();
+                                try {
+                                    JSONParser parser = new JSONParser();
+                                    Object obj = parser.parse(temp);
+                                    JSONArray jsonArrayTemp = (JSONArray) obj;
+
+                                    // TODO : 자막 y/n 미완성
+                                    if(layerMap.get("subFirstEn").equals(0)){
+                                        jsonArrayTemp.remove(0);
+                                    }
+                                    else if(layerMap.get("subSecondEn").equals(0)){
+                                        jsonArrayTemp.remove(1);
+                                    }
+                                    else{
+                                        //둘 다 활성화
+                                    }
+
+                                    resultMap.put("subtitleStyleArray", jsonArrayTemp);
+                                } catch (ParseException e) {
+                                    e.printStackTrace();
+                                }
                             }
                             break;
                         case 40:
-                            Map<String, Object> airInfoTemp = layerMapper.getLayerObjectExternalInfo((Integer) lo.get("object_id"));
-                            resultMap.put("airForm", airInfoTemp);
+                            if(layerMap.get("airEn").equals(1)) {
+                                Map<String, Object> airInfoTemp = layerMapper.getLayerObjectExternalInfo((Integer) lo.get("object_id"));
+                                resultMap.put("airForm", airInfoTemp);
+                            }
                             break;
                         default:
                             System.out.println("type Unknown");
@@ -81,8 +103,6 @@ public class ViewerServiceImpl implements ViewerService {
                 }
             }
             resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
-            
-            // TODO : 레이어의 y/n 체크 추가
         }
         else{
             resultMap.putAll(ParameterUtils.responseOption(ResponseCode.NO_CONTENT.getCodeName()));
