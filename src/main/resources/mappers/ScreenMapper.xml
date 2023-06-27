@@ -77,6 +77,7 @@
     <update id="putScreen">
         UPDATE Screens
         SET screen_nm = #{screenNm}, rowsize = #{rowsize}, columnsize = #{columnsize}
+          , pos_x = #{posX}, pos_y = #{posY}, width = #{width}, height = #{height}
         WHERE Screens.screen_id = #{screenId}
     </update>
     <insert id="saveAllocateDisplays" parameterType="Map">

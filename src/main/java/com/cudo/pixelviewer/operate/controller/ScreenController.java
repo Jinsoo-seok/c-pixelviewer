@@ -191,7 +191,7 @@ public class ScreenController {
         Map<String, Object> responseMap = new HashMap<>();
         responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
 
-        String[] keyList = {"screenId", "screenNm", "rowsize", "columnsize"};
+        String[] keyList = {"screenId", "screenNm", "rowsize", "columnsize", "posX", "posY", "width", "height"};
 
         try {
             parameterValidation(param, keyList);
@@ -199,6 +199,10 @@ public class ScreenController {
             parameterString("screenNm", param.get("screenNm"), true, 0, null);
             parameterInt("rowsize", param.get("rowsize"), true);
             parameterInt("columnsize", param.get("columnsize"), true);
+            parameterInt("posX", param.get("posX"), true);
+            parameterInt("posY", param.get("posY"), true);
+            parameterInt("width", param.get("width"), true);
+            parameterInt("height", param.get("height"), true);
 
             responseMap = screenService.putScreenSet(param);
         }
