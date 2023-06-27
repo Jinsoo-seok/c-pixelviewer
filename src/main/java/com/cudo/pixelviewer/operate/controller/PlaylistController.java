@@ -294,7 +294,7 @@ public class PlaylistController {
             parameterInt("type", param.get("type"), true);
             parameterString("ctsNm", param.get("ctsNm"), true, 0, null);
             parameterString("ctsPath", param.get("ctsPath"), true, 0, null);
-            parameterString("playtime", param.get("playtime"), true, 0, null);
+            parameterInt("playtime", param.get("playtime"), true);
             parameterBoolean("weatherFl", param.get("weatherFl"), true);
             parameterBoolean("airInfoFl", param.get("airInfoFl"), true);
             parameterBoolean("stretch", param.get("stretch"), true);
@@ -406,7 +406,7 @@ public class PlaylistController {
         try {
             parameterValidation(param, keyList);
             parameterInt("contentId", param.get("contentId"), true);
-            parameterString("playtime", param.get("playtime"), true, 0, null);
+            parameterInt("playtime", param.get("playtime"), true);
 
             responseMap = playlistService.patchContentsPlaytime(param);
         }

@@ -15,7 +15,7 @@ public class PlaylistContentsVo implements Serializable {
 
     private String ctsNm;
     private String ctsPath;
-    private String playtime;
+    private Integer playtime;
 
     private Boolean weatherFl;
     private Boolean airInfoFl;

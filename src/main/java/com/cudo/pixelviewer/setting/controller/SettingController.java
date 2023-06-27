@@ -13,8 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.cudo.pixelviewer.util.ParameterUtils.parameterString;
-import static com.cudo.pixelviewer.util.ParameterUtils.parameterValidation;
+import static com.cudo.pixelviewer.util.ParameterUtils.*;
 
 @Slf4j
 @RestController
@@ -74,7 +73,7 @@ public class SettingController {
 
         try {
             parameterValidation(param, keyList);
-            parameterString("playtime", param.get("playtime"), true, 0, null);
+            parameterInt("playtime", param.get("playtime"), true);
 
             responseMap = settingService.patchSettingImageDefaultPlaytime(param);
         }
