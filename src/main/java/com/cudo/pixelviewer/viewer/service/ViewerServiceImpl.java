@@ -6,11 +6,15 @@ import com.cudo.pixelviewer.util.ParameterUtils;
 import com.cudo.pixelviewer.util.ResponseCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -103,6 +107,48 @@ public class ViewerServiceImpl implements ViewerService {
             resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
         }
         else{
+            resultMap.putAll(ParameterUtils.responseOption(ResponseCode.NO_CONTENT.getCodeName()));
+        }
+        return resultMap;
+    }
+
+    @Override
+    public Map<String, Object> putUpdateAndHealthCheck(Map<String, Object> param) {
+        Map<String, Object> resultMap = new HashMap<>();
+
+        // TODO : 규격 확인 필요 >> 이후 진행
+        if(true){
+
+            resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
+        }
+        else{
+            resultMap.putAll(ParameterUtils.responseOption(ResponseCode.NO_CONTENT.getCodeName()));
+        }
+        return resultMap;
+    }
+
+    @Override
+    public Map<String, Object> postPreviewImgUpload(String screenId, MultipartFile file) {
+        Map<String, Object> resultMap = new HashMap<>();
+
+        if (file != null && !file.isEmpty()) {
+            try {
+                String desktopPath = System.getProperty("user.home") + File.separator + "Desktop";
+                String originalFilename = file.getOriginalFilename();
+                String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+                String filePath = desktopPath + File.separator + screenId + extension;
+
+                File destFile = new File(filePath);
+                FileUtils.copyInputStreamToFile(file.getInputStream(), destFile);
+
+                resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
+            } catch (IOException ioException) {
+                ioException.printStackTrace();
+                log.error("[paramException][postPreviewImgUpload] - {}", ioException.getMessage());
+                resultMap.put("code", ResponseCode.FAIL.getCode());
+                resultMap.put("message", ioException.getMessage());
+            }
+        } else {
             resultMap.putAll(ParameterUtils.responseOption(ResponseCode.NO_CONTENT.getCodeName()));
         }
         return resultMap;
