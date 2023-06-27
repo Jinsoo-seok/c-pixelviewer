@@ -49,6 +49,7 @@
     <update id="deleteScreen">
         DELETE S.*, P.*, L.*, LO.*, EV.*, EI.*, ST.*
         FROM Screens AS S
+            LEFT JOIN Screen_Displays as SD ON SD.screen_id = S.screen_id
             LEFT JOIN Presets as P ON P.screen_id = S.screen_id
             LEFT JOIN Layers as L ON L.screen_id = S.screen_id
             LEFT JOIN LayerObjects as LO ON LO.screen_id = S.screen_id
