@@ -117,7 +117,7 @@ public class PresetServiceImpl implements PresetService {
         if(presetCheck == 1){  // Exist : 1
             int deletePresetResult = presetMapper.deletePreset(param);
 
-            if(deletePresetResult == 1){ // Success : 1
+            if(deletePresetResult > 1){ // Success
                 resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
             }
             else{

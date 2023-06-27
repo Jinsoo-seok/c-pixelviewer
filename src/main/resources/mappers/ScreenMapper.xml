@@ -47,8 +47,14 @@
         WHERE Screens.screen_id = #{screenId}
     </select>
     <update id="deleteScreen">
-        DELETE S
+        DELETE S.*, P.*, L.*, LO.*, EV.*, EI.*, ST.*
         FROM Screens AS S
+            LEFT JOIN Presets as P ON P.screen_id = S.screen_id
+            LEFT JOIN Layers as L ON L.screen_id = S.screen_id
+            LEFT JOIN LayerObjects as LO ON LO.screen_id = S.screen_id
+            LEFT JOIN ExternalVideo as EV ON EV.screen_id = S.screen_id
+            LEFT JOIN External_Info as EI ON EI.screen_id = S.screen_id
+            LEFT JOIN Subtitles as ST ON ST.screen_id = S.screen_id
         WHERE S.screen_id = #{screenId}
     </update>
 

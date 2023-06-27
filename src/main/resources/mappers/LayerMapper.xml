@@ -74,9 +74,13 @@
         WHERE Layers.layer_id = #{layerId}
     </select>
     <update id="deleteLayer">
-        DELETE S
-        FROM Layers AS S
-        WHERE S.layer_id = #{layerId}
+        DELETE L.*, LO.*, EV.*, EI.*, S.*
+        FROM Layers AS L
+            LEFT JOIN LayerObjects as LO ON LO.layer_id = L.layer_id
+            LEFT JOIN ExternalVideo as EV ON EV.layer_id = L.layer_id
+            LEFT JOIN External_Info as EI ON EI.layer_id = L.layer_id
+            LEFT JOIN Subtitles as S ON S.layer_id = L.layer_id
+        WHERE L.layer_id = #{layerId}
     </update>
 
     <select id="putLayerValid" resultType="int">

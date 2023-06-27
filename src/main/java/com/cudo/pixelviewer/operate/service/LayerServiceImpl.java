@@ -152,7 +152,7 @@ public class LayerServiceImpl implements LayerService {
         if(layerCheck == 1){  // Exist : 1
             int deleteLayerResult = layerMapper.deleteLayer(param);
 
-            if(deleteLayerResult == 1){ // Success : 1
+            if(deleteLayerResult > 1){ // Success : 1
                 resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
             }
             else{

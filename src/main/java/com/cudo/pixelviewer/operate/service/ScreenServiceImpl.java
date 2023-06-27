@@ -93,7 +93,7 @@ public class ScreenServiceImpl implements ScreenService {
         if(screenCheck == 1){  // Exist : 1
             int deleteScreenResult = screenMapper.deleteScreen(param);
 
-            if(deleteScreenResult == 1){ // Success : 1
+            if(deleteScreenResult > 1){ // Success : 1
                 resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
             }
             else{
