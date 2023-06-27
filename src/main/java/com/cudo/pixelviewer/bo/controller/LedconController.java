@@ -48,7 +48,6 @@ public class LedconController {
         return responseMap;
     }
 
-    // TODO : 필수값 체크
     @PostMapping
     public Map<String, Object> postLedcon(HttpServletRequest request
                                         , @RequestBody Map<String, Object> param) {
