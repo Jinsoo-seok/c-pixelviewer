@@ -17,8 +17,8 @@
         INSERT INTO LayerObjects (layer_id, preset_id, screen_id, type, object_nm)
         VALUES (#{layerId}, #{presetId}, #{screenId}, #{type}, #{objectNm});
 
-        INSERT INTO Subtitles (object_id, subtitle_style)
-        VALUES (LAST_INSERT_ID(), #{subtitleStyle});
+        INSERT INTO Subtitles (screen_id, preset_id, layer_id, object_id, subtitle_style)
+        VALUES (#{screenId}, #{presetId}, #{layerId}, LAST_INSERT_ID(), #{subtitleStyle});
     </insert>
     <update id="putSubtitle" parameterType="Map">
         <selectKey keyProperty="subtitleId" resultType="int" order="AFTER">

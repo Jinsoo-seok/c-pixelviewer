@@ -68,10 +68,12 @@ public class ExternalController {
         Map<String, Object> responseMap = new HashMap<>();
         responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
 
-        String[] keyList = {"layerId", "objectNm", "type", "posX", "posY", "width", "height", "ord", "rtspUrl", "videoNm", "videoFormat"};
+        String[] keyList = {"screenId", "presetId", "layerId", "objectNm", "type", "posX", "posY", "width", "height", "ord", "rtspUrl", "videoNm", "videoFormat"};
 
         try {
             parameterValidation(param, keyList);
+            parameterInt("screenId", param.get("screenId"), true);
+            parameterInt("presetId", param.get("presetId"), true);
             parameterInt("layerId", param.get("layerId"), true);
             parameterString("objectNm", param.get("objectNm"), true, 0, null);
             parameterInt("type", param.get("type"), true);
@@ -113,10 +115,12 @@ public class ExternalController {
         Map<String, Object> responseMap = new HashMap<>();
         responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
 
-        String[] keyList = {"layerId", "objectNm", "type", "posX", "posY", "width", "height", "ord"};
+        String[] keyList = {"screenId", "presetId", "layerId", "objectNm", "type", "posX", "posY", "width", "height", "ord"};
 
         try {
             parameterValidation(param, keyList);
+            parameterInt("screenId", param.get("screenId"), true);
+            parameterInt("presetId", param.get("presetId"), true);
             parameterInt("layerId", param.get("layerId"), true);
             parameterString("objectNm", param.get("objectNm"), true, 0, null);
             parameterInt("type", param.get("type"), true);

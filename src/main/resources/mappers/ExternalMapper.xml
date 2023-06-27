@@ -24,11 +24,11 @@
             SELECT LAST_INSERT_ID()
         </selectKey>
 
-        INSERT INTO LayerObjects (layer_id, preset_id, screen_id, type, object_nm)
-        VALUES (#{layerId}, #{presetId}, #{screenId}, #{type}, #{objectNm});
+        INSERT INTO LayerObjects (screen_id, preset_id, layer_id, type, object_nm)
+        VALUES (#{screenId}, #{presetId}, #{layerId}, #{type}, #{objectNm});
 
-        INSERT INTO ExternalVideo (object_id, type, pos_x, pos_y, width, height, ord, rtsp_url, video_nm, video_format)
-        VALUES (LAST_INSERT_ID(), #{type}, #{posX}, #{posY}, #{width}, #{height}, #{ord}, #{rtspUrl}, #{videoNm}, #{videoFormat});
+        INSERT INTO ExternalVideo (screen_id, preset_id, layer_id, object_id, type, pos_x, pos_y, width, height, ord, rtsp_url, video_nm, video_format)
+        VALUES (#{screenId}, #{presetId}, #{layerId}, LAST_INSERT_ID(), #{type}, #{posX}, #{posY}, #{width}, #{height}, #{ord}, #{rtspUrl}, #{videoNm}, #{videoFormat});
     </insert>
     <update id="putExternalVideo" parameterType="Map">
         <selectKey keyProperty="externalId" resultType="int" order="AFTER">
@@ -63,12 +63,12 @@
             SELECT LAST_INSERT_ID()
         </selectKey>
 
-        INSERT INTO LayerObjects (layer_id, preset_id, screen_id, type, object_nm)
-        VALUES (#{layerId}, #{presetId}, #{screenId}, #{type}, #{objectNm});
+        INSERT INTO LayerObjects (screen_id, preset_id, layer_id, type, object_nm)
+        VALUES (#{screenId}, #{presetId}, #{layerId}, #{type}, #{objectNm});
 
-        INSERT INTO External_Info (object_id, type, pos_x, pos_y, width, height, ord
+        INSERT INTO External_Info (screen_id, preset_id, layer_id, object_id, type, pos_x, pos_y, width, height, ord
         , image_list, font_nm, font_size, bold, italic, underline, forecolor, image_layout)
-        VALUES (LAST_INSERT_ID(), #{type}, #{posX}, #{posY}, #{width}, #{height}, #{ord}
+        VALUES (#{screenId}, #{presetId}, #{layerId}, LAST_INSERT_ID(), #{type}, #{posX}, #{posY}, #{width}, #{height}, #{ord}
         , #{imageList}, #{fontNm}, #{fontSize}, #{bold}, #{italic}, #{underline}, #{forecolor}, #{imageLayout});
     </insert>
     <update id="putExternalInfo" parameterType="Map">

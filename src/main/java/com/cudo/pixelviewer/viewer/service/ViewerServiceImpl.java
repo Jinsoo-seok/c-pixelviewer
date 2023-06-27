@@ -5,6 +5,7 @@ import com.cudo.pixelviewer.operate.mapper.PlaylistMapper;
 import com.cudo.pixelviewer.util.ParameterUtils;
 import com.cudo.pixelviewer.util.ResponseCode;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONArray;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -15,6 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ViewerServiceImpl implements ViewerService {
@@ -60,7 +62,6 @@ public class ViewerServiceImpl implements ViewerService {
                                     Object obj = parser.parse(temp);
                                     JSONArray jsonArrayTemp = (JSONArray) obj;
 
-                                    // TODO : 자막 y/n 미완성
                                     if(layerMap.get("subFirstEn").equals(0)){
                                         jsonArrayTemp.remove(0);
                                     }
@@ -70,7 +71,6 @@ public class ViewerServiceImpl implements ViewerService {
                                     else{
                                         //둘 다 활성화
                                     }
-
                                     resultMap.put("subtitleStyleArray", jsonArrayTemp);
                                 } catch (ParseException e) {
                                     e.printStackTrace();
@@ -84,13 +84,11 @@ public class ViewerServiceImpl implements ViewerService {
                             }
                             break;
                         default:
-                            System.out.println("type Unknown");
-                            // TODO : 예외처리
+                            log.info("[VIEWER PLAYINFO][UNSUPPORTED TYPE] - [{}]", type);
                             break;
                     }
                 }
             }
-
             Map<String, Object> playlist = playlistMapper.getPlaylist(layerId);
 
             if(playlist != null) {
