@@ -131,6 +131,7 @@ public class PwrconController {
         Map<String, Object> responseMap = new HashMap<>();
         responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
 
+        // TODO : 추후 확장 예정
 //        String[] keyList = {
 //                "condeviceId", "ip", "port", "modelNm", "serialNo", "mpcmuCnt", "dpcmuCnt", "state",
 //                "spec1", "spec2", "spec3", "ledPwr", "temp", "humi", "ledKey"

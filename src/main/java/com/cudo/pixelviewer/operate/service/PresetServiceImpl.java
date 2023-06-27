@@ -199,16 +199,6 @@ public class PresetServiceImpl implements PresetService {
         String localPort = "80";
         String baseUrl = "http://" + localIp + ":" + localPort + "/api-viewer/";
 
-        String agentUrl = "http://host:port/vieweragent/Preset/layer-placemen";
-
-
-        String screenIdQueryString = "screenId=" + param.get("screenId");
-        String presetIdQueryString = "presetId=" + param.get("presetId");
-
-//        String playInfoUrl = baseUrl + "playInfo?" + screenIdQueryString + "&" + presetIdQueryString;
-//        String updateCheckUrl = baseUrl + "updateAndHealthCheck?" + screenIdQueryString + "&" + presetIdQueryString;
-//        String previewImgUrl = baseUrl + "previewImg?" + screenIdQueryString;
-
         String playInfoUrl = baseUrl + "playInfo";
         String updateCheckUrl = baseUrl + "updateAndHealthCheck";
         String previewImgUrl = baseUrl + "previewImg";
@@ -217,18 +207,13 @@ public class PresetServiceImpl implements PresetService {
         requestBodyMap.put("updateCheckUrl", updateCheckUrl);
         requestBodyMap.put("previewImgUrl", previewImgUrl);
 
-//        Integer screenId = Integer.parseInt((String) param.get("screenId"));
-//        Integer presetId = Integer.parseInt((String) param.get("presetId"));
         String screenId = String.valueOf(param.get("screenId"));
         String presetId = String.valueOf(param.get("presetId"));
 
         // TODO : 파라미터 매칭해야함
         Map<String, Object> screenInfo = screenMapper.getScreen(screenId);
-//        List<LayerVo>  layerInfos = presetMapper.getPresetLayers(presetId);
         List<LayerToAgentVo>  layerInfos = presetMapper.getPresetLayersToAgent(presetId);
 
-//        Map<String, Object> screenInfo = screenMapper.getScreen((String) param.get("screenId"));
-//        List<LayerVo>  layerInfos = presetMapper.getPresetLayers((String) param.get("presetId"));
 
         log.info("test");
         requestBodyMap.put("presetId", param.get("presetId"));
