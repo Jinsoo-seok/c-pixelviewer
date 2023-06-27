@@ -48,7 +48,6 @@ public class PwrconController {
         return responseMap;
     }
 
-    // TODO : 필수값 체크
     @PostMapping
     public Map<String, Object> postPwrcon(HttpServletRequest request
                                         , @RequestBody Map<String, Object> param) {
@@ -59,9 +58,21 @@ public class PwrconController {
         Map<String, Object> responseMap = new HashMap<>();
         responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
 
+        String[] keyList = {"ip", "port", "modelNm", "serialNo"};
 
         try {
+            parameterValidation(param, keyList);
+            parameterString("ip", param.get("ip"), true, 0, null);
+            parameterInt("port", param.get("port"), true);
+            parameterString("modelNm", param.get("modelNm"), true, 0, null);
+            parameterString("serialNo", param.get("serialNo"), true, 0, null);
+
             responseMap = pwrconService.postPwrcon(param);
+        }
+        catch (ParamException paramException){
+            log.error("[paramException][postPwrcon] - {}", paramException.getMessage());
+            responseMap.put("code", paramException.getCode());
+            responseMap.put("message", paramException.getMessage());
         }
         catch (Exception exception) {
             log.error("[Exception][postPwrcon] - {}", exception.getMessage());
@@ -120,10 +131,11 @@ public class PwrconController {
         Map<String, Object> responseMap = new HashMap<>();
         responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
 
-        String[] keyList = {
-                "condeviceId", "ip", "port", "modelNm", "serialNo", "mpcmuCnt", "dpcmuCnt", "state",
-                "spec1", "spec2", "spec3", "ledPwr", "temp", "humi", "ledKey"
-        };
+//        String[] keyList = {
+//                "condeviceId", "ip", "port", "modelNm", "serialNo", "mpcmuCnt", "dpcmuCnt", "state",
+//                "spec1", "spec2", "spec3", "ledPwr", "temp", "humi", "ledKey"
+//        };
+        String[] keyList = {"condeviceId", "ip", "port", "modelNm", "serialNo"};
 
         try {
             parameterValidation(param, keyList);
@@ -132,17 +144,17 @@ public class PwrconController {
             parameterInt("port", param.get("port"), true);
             parameterString("modelNm", param.get("modelNm"), true, 0, null);
             parameterString("serialNo", param.get("serialNo"), true, 0, null);
-            parameterInt("mpcmuCnt", param.get("mpcmuCnt"), true);
-            parameterInt("dpcmuCnt", param.get("dpcmuCnt"), true);
+//            parameterInt("mpcmuCnt", param.get("mpcmuCnt"), true);
+//            parameterInt("dpcmuCnt", param.get("dpcmuCnt"), true);
 //            parameterInt("state", param.get("state"), true);
-            parameterString("state", param.get("state"), true, 0, null);
-            parameterString("spec1", param.get("spec1"), true, 0, null);
-            parameterString("spec2", param.get("spec2"), true, 0, null);
-            parameterString("spec3", param.get("spec3"), true, 0, null);
-            parameterInt("ledPwr", param.get("ledPwr"), true);
-            parameterInt("temp", param.get("temp"), true);
-            parameterInt("humi", param.get("humi"), true);
-            parameterString("ledKey", param.get("ledKey"), true, 0, null);
+//            parameterString("state", param.get("state"), true, 0, null);
+//            parameterString("spec1", param.get("spec1"), true, 0, null);
+//            parameterString("spec2", param.get("spec2"), true, 0, null);
+//            parameterString("spec3", param.get("spec3"), true, 0, null);
+//            parameterInt("ledPwr", param.get("ledPwr"), true);
+//            parameterInt("temp", param.get("temp"), true);
+//            parameterInt("humi", param.get("humi"), true);
+//            parameterString("ledKey", param.get("ledKey"), true, 0, null);
 
             responseMap = pwrconService.putPwrcon(param);
         }

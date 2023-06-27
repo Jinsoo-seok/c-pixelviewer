@@ -12,7 +12,7 @@
         SELECT count(led_controller_id)
         FROM LED_Controls
     </select>
-    <insert id="postLedcon" parameterType="Map" useGeneratedKeys="true" keyColumn="led_controller_id"
+    <insert id="postLedcon2" parameterType="Map" useGeneratedKeys="true" keyColumn="led_controller_id"
             keyProperty="ledControllerId">
         INSERT INTO LED_Controls
         (
@@ -37,6 +37,31 @@
             , #{hdrEn}, #{preset}, #{brightness}, #{colorTemp}
         )
     </insert>
+    <insert id="postLedcon" parameterType="Map" useGeneratedKeys="true" keyColumn="led_controller_id"
+            keyProperty="ledControllerId">
+        INSERT INTO LED_Controls
+        (
+            ip, port
+        , model_nm, version, serial_no, firmware_ver
+        , state, spec_1, spec_2, spec_3
+        , connect_fl
+        , use_dt, reg_dt, chg_dt, upd_dt
+        , videoinput_mode, input_resolution_width, input_resolution_height
+        , frame, color_depth, color_mode
+        , hdr_en, preset, brightness, color_temp
+        )
+        VALUES
+            (
+                #{ip}, #{port}
+            , #{modelNm}, "NULL", #{serialNo}, "NULL"
+            , 0, "NULL", "NULL", "NULL"
+            , 0
+            , NOW(), NOW(), NOW(), NOW()
+            , "NULL", "NULL", "NULL"
+            , 0, 0, "NULL"
+            , 0, 0, 0, 0
+            )
+    </insert>
 
     <select id="deleteLedconValid" resultType="int">
         SELECT COUNT(led_controller_id)
@@ -54,7 +79,7 @@
         FROM LED_Controls
         WHERE LED_Controls.led_controller_id = #{ledControllerId}
     </select>
-    <update id="putLedcon" parameterType="Map">
+    <update id="putLedcon2" parameterType="Map">
         UPDATE LED_Controls AS L
         SET
             ip = #{ip},
@@ -80,6 +105,34 @@
             preset = #{preset},
             brightness = #{brightness},
             color_temp = #{colorTemp}
+        WHERE led_controller_id = #{ledControllerId}
+    </update>
+    <update id="putLedcon" parameterType="Map">
+        UPDATE LED_Controls AS L
+        SET
+            ip = #{ip},
+            port = #{port},
+            model_nm = #{modelNm},
+            version = "NULL",
+            serial_no = #{serialNo},
+            firmware_ver = "NULL",
+            L.state = 0,
+            spec_1 = "NULL",
+            spec_2 = "NULL",
+            spec_3 = "NULL",
+            connect_fl = 0,
+            chg_dt = NOW(),
+            upd_dt = NOW(),
+            videoinput_mode = "NULL",
+            input_resolution_width = "NULL",
+            input_resolution_height = "NULL",
+            frame = 0,
+            color_depth = 0,
+            color_mode = "NULL",
+            hdr_en = 0,
+            preset = 0,
+            brightness = 0,
+            color_temp = 0
         WHERE led_controller_id = #{ledControllerId}
     </update>
 

@@ -13,7 +13,7 @@
         SELECT count(condevice_id)
         FROM Device_Controls
     </select>
-    <insert id="postPwrcon" parameterType="Map" useGeneratedKeys="true" keyColumn="condevice_id"
+    <insert id="postPwrcon2" parameterType="Map" useGeneratedKeys="true" keyColumn="condevice_id"
             keyProperty="condeviceId">
         INSERT INTO Device_Controls
         (
@@ -34,6 +34,27 @@
             , #{ledKey}
         )
     </insert>
+    <insert id="postPwrcon" parameterType="Map" useGeneratedKeys="true" keyColumn="condevice_id"
+            keyProperty="condeviceId">
+        INSERT INTO Device_Controls
+        (
+            ip, port, model_nm
+        , serial_no, mpcmu_cnt, dpcmu_cnt
+        , state, spec_1, spec_2, spec_3
+        , reg_dt, chg_dt, update_dt
+        , led_pwr, temp, humi
+        , led_key
+        )
+        VALUES
+            (
+                #{ip}, #{port}, #{modelNm}
+            , #{serialNo}, 0, 0
+            , "NULL", "NULL", "NULL", "NULL"
+            , NOW(), NOW(), NOW()
+            , 0, 0, 0
+            , "NULL"
+            )
+    </insert>
 
     <select id="deletePwrconValid" resultType="int">
         SELECT COUNT(condevice_id)
@@ -51,7 +72,7 @@
         FROM Device_Controls
         WHERE condevice_id = #{condeviceId}
     </select>
-    <update id="putPwrcon">
+    <update id="putPwrcon2">
         UPDATE Device_Controls AS D
         SET
             ip = #{ip},
@@ -72,5 +93,25 @@
             led_key = #{ledKey}
         WHERE D.condevice_id = #{condeviceId}
     </update>
-
+    <update id="putPwrcon">
+        UPDATE Device_Controls AS D
+        SET
+            ip = #{ip},
+            port = #{port},
+            model_nm = #{modelNm},
+            serial_no = #{serialNo},
+            mpcmu_cnt = 0,
+            dpcmu_cnt = 0,
+            D.state = "NULL",
+            spec_1 = "NULL",
+            spec_2 = "NULL",
+            spec_3 = "NULL",
+            chg_dt = NOW(),
+            update_dt = NOW(),
+            led_pwr = 0,
+            temp = 0,
+            humi = 0,
+            led_key = "NULL"
+        WHERE D.condevice_id = #{condeviceId}
+    </update>
 </mapper>
