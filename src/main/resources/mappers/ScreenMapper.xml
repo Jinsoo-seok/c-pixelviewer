@@ -10,7 +10,10 @@
 
 <!--    <select id="getScreen" resultType="com.cudo.pixelviewer.vo.ScreenVo">-->
     <select id="getScreen" resultType="Map">
-        SELECT screen_id AS screenId, screen_nm AS screennm, rowsize AS rowsize, columnsize AS columnsize
+        SELECT screen_id AS screenId, screen_nm AS screennm
+                , rowsize AS rowsize, columnsize AS columnsize
+                , pos_x AS posX, pos_y AS posY
+                , width AS width, height AS height
         FROM Screens
         WHERE Screens.screen_id = #{screenId}
     </select>
@@ -80,6 +83,11 @@
         SET screen_nm = #{screenNm}, rowsize = 0, columnsize = 0
           , pos_x = #{posX}, pos_y = #{posY}, width = #{width}, height = #{height}
         WHERE Screens.screen_id = #{screenId}
+    </update>
+    <update id="putScreenDeleteDisplays">
+        DELETE SD
+        FROM Screen_Displays AS SD
+        WHERE SD.screen_id = #{screenId}
     </update>
     <insert id="saveAllocateDisplays" parameterType="Map">
         INSERT INTO Screen_Displays

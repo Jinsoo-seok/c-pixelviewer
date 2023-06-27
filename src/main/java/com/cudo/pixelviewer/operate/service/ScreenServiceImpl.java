@@ -144,6 +144,10 @@ public class ScreenServiceImpl implements ScreenService {
             int putScreenResult = screenMapper.putScreen(param);
 
             if(putScreenResult == 1){ // Success : 1
+                // TODO : 예외처리
+                int deleteLayerResult = screenMapper.putScreenDeleteDisplays(param);
+
+                // TODO : 예외처리
                 int saveAllocateDisplaysResult = screenMapper.saveAllocateDisplays(param);
                 resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
             }

@@ -26,6 +26,7 @@ public interface ScreenMapper {
 
     int putScreenValid(Map<String, Object> param);
     int putScreen(Map<String, Object> param);
+    int putScreenDeleteDisplays(Map<String, Object> param);
     int saveAllocateDisplays(Map<String, Object> param);
 
 
