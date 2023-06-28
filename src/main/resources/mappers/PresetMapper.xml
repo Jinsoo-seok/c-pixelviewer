@@ -30,11 +30,11 @@
             keyProperty="presetId">
         INSERT INTO Presets
         (
-            screen_id, preset_nm, rowsize, columnsize, user_style_yn, preset_status
+            screen_id, preset_nm, rowsize, columnsize, user_style_yn, preset_status, update_date
         )
         VALUES
         (
-            #{screenId}, #{presetNm}, 0, 0, false, "WAIT"
+            #{screenId}, #{presetNm}, 0, 0, false, "WAIT", NOW()
         )
     </insert>
 
@@ -61,7 +61,7 @@
     </select>
     <update id="patchPresetName">
         UPDATE Presets
-        SET preset_nm = #{presetNm}
+        SET preset_nm = #{presetNm}, update_date = NOW()
         WHERE Presets.preset_id = #{presetId}
     </update>
 
@@ -78,11 +78,16 @@
           , columnsize = #{columnsize}
           , user_style_yn = #{userStyleYn}
           , preset_status = "WAIT"
+          , update_date = NOW()
         WHERE Presets.preset_id = #{presetId}
     </update>
     <update id="putPresetDeleteLayers">
-        DELETE L
+        DELETE L.*, LO.*, EV.*, EI.*, S.*
         FROM Layers AS L
+            LEFT JOIN LayerObjects as LO ON LO.preset_id = L.preset_id
+            LEFT JOIN ExternalVideo as EV ON EV.preset_id = L.preset_id
+            LEFT JOIN External_Info as EI ON EI.preset_id = L.preset_id
+            LEFT JOIN Subtitles as S ON S.preset_id = L.preset_id
         WHERE L.preset_id = #{presetId}
     </update>
     <insert id="saveLayer" parameterType="Map">
@@ -115,6 +120,12 @@
     <update id="patchPresetStatus">
         UPDATE Presets
         SET preset_status = #{presetStatus}
+        WHERE Presets.preset_id = #{presetId}
+    </update>
+
+    <update id="refreshPresetUpdateDate">
+        UPDATE Presets
+        SET update_date = NOW()
         WHERE Presets.preset_id = #{presetId}
     </update>
 

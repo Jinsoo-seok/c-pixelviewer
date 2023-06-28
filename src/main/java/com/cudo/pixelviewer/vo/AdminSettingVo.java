@@ -26,7 +26,7 @@ public class AdminSettingVo implements Serializable {
 
     private Boolean loginEn;
 
-    private String imgDefaultPlaytime;
+    private Integer imgDefaultPlaytime;
 
-    private Integer extenalinfoArea;
+    private String extenalinfoArea;
 }

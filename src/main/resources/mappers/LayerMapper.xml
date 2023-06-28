@@ -38,7 +38,7 @@
         WHERE object_id = #{objectId}
     </select>
     <select id="getLayerObjectExternalInfo" resultType="Map">
-        SELECT ord AS ord, underline AS underline, font_nm AS fontNm, font_size AS fontSize, forecolor AS forecolor, bold AS bold, type AS type, object_id AS objectId, italic AS italic, pos_y AS posY, ex_info_id AS exInfoId, pos_x AS posX, image_layout AS imageLayout, width AS width, height AS height, image_list AS imageList
+        SELECT ord AS ord, underline AS underline, font_nm AS fontNm, font_size AS fontSize, forecolor AS forecolor, bold AS bold, type AS type, object_id AS objectId, italic AS italic, pos_y AS posY, ex_info_id AS exInfoId, pos_x AS posX, image_layout AS imageLayout, width AS width, height AS height, image_list AS imageList, update_date AS updateDate
         FROM External_Info
         WHERE object_id = #{objectId}
     </select>

@@ -1,6 +1,7 @@
 package com.cudo.pixelviewer.operate.service;
 
 import com.cudo.pixelviewer.operate.mapper.LayerMapper;
+import com.cudo.pixelviewer.operate.mapper.PresetMapper;
 import com.cudo.pixelviewer.util.ParameterUtils;
 import com.cudo.pixelviewer.util.ResponseCode;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,8 @@ import java.util.Map;
 public class LayerServiceImpl implements LayerService {
 
     final LayerMapper layerMapper;
+
+    final PresetMapper presetMapper;
 
     @Override
     public Map<String, Object> getLayerList() {
@@ -179,6 +182,8 @@ public class LayerServiceImpl implements LayerService {
             int putLayerResult = layerMapper.putLayer(param);
 
             if(putLayerResult == 1){ // Success : 1
+                // TODO : 예외 처리
+                int refreshPresetUpdateDateResult = presetMapper.refreshPresetUpdateDate(param.get("presetId"));
                 resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
             }
             else{

@@ -2,8 +2,10 @@ package com.cudo.pixelviewer.viewer.service;
 
 import com.cudo.pixelviewer.operate.mapper.LayerMapper;
 import com.cudo.pixelviewer.operate.mapper.PlaylistMapper;
+import com.cudo.pixelviewer.operate.mapper.PresetMapper;
 import com.cudo.pixelviewer.util.ParameterUtils;
 import com.cudo.pixelviewer.util.ResponseCode;
+import com.cudo.pixelviewer.vo.PresetVo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
@@ -16,8 +18,10 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +30,8 @@ import java.util.Map;
 @Service
 @RequiredArgsConstructor
 public class ViewerServiceImpl implements ViewerService {
+
+    final PresetMapper presetMapper;
 
     final LayerMapper layerMapper;
 
@@ -61,10 +67,19 @@ public class ViewerServiceImpl implements ViewerService {
                             }
                             break;
                         case 20:
-//                            if(layerMap.get("weatherEn").equals(1)) {
-//                                Map<String, Object> weatherInfoTemp = layerMapper.getLayerObjectExternalInfo((Integer) lo.get("object_id"));
-//                                resultMap.put("weatherForm", weatherInfoTemp);
-//                            }
+                            if(layerMap.get("weatherEn").equals(1)) {
+                                Map<String, Object> weatherInfoTemp = layerMapper.getLayerObjectExternalInfo((Integer) lo.get("object_id"));
+                                String updateDate = convertTimestampToString(weatherInfoTemp.get("updateDate"));
+
+                                String deleteData = "updateDate";
+                                weatherInfoTemp.remove(deleteData);
+
+                                Map<String, Object> exInfoWeatherMap = new HashMap<>();
+                                exInfoWeatherMap.put("updateDate", updateDate);
+                                exInfoWeatherMap.put("weatherFormInfo", weatherInfoTemp);
+
+                                resultMap.put("weatherForm", exInfoWeatherMap);
+                            }
                             break;
                         case 30:
                             if(layerMap.get("subFirstEn").equals(1) || layerMap.get("subSecondEn").equals(1)) {
@@ -96,10 +111,19 @@ public class ViewerServiceImpl implements ViewerService {
                             }
                             break;
                         case 40:
-//                            if(layerMap.get("airEn").equals(1)) {
-//                                Map<String, Object> airInfoTemp = layerMapper.getLayerObjectExternalInfo((Integer) lo.get("object_id"));
-//                                resultMap.put("airForm", airInfoTemp);
-//                            }
+                            if(layerMap.get("airEn").equals(1)) {
+                                Map<String, Object> airInfoTemp = layerMapper.getLayerObjectExternalInfo((Integer) lo.get("object_id"));
+                                String updateDate = convertTimestampToString(airInfoTemp.get("updateDate"));
+
+                                String deleteData = "updateDate";
+                                airInfoTemp.remove(deleteData);
+
+                                Map<String, Object> exInfoAirMap = new HashMap<>();
+                                exInfoAirMap.put("updateDate", updateDate);
+                                exInfoAirMap.put("airFormInfo", airInfoTemp);
+
+                                resultMap.put("airForm", exInfoAirMap);
+                            }
                             break;
                         default:
                             log.info("[VIEWER PLAYINFO][UNSUPPORTED TYPE] - [{}]", type);
@@ -140,9 +164,22 @@ public class ViewerServiceImpl implements ViewerService {
     @Override
     public Map<String, Object> putUpdateAndHealthCheck(Map<String, Object> param) {
         Map<String, Object> resultMap = new HashMap<>();
+        Map<String, Object> dataMap = new HashMap<>();
+        String presetId = String.valueOf(param.get("presetId"));
+
+        PresetVo presetVo = presetMapper.getPreset(presetId);
 
         // TODO : 규격 확인 필요 >> 이후 진행
-        if(true){
+        if(presetVo != null){
+            Date presetUpdateDate = presetVo.getUpdateDate();
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
+            String dateString = formatter.format(presetUpdateDate);
+
+            dataMap.put("presetStatus", presetVo.getPresetStatus());
+            dataMap.put("updateDate", dateString);
+
+            // TODO : 날씨, 대기 정보 조회
+            resultMap.put("data", dataMap);
 
             resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
         }
