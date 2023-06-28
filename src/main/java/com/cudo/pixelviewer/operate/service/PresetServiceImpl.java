@@ -235,7 +235,7 @@ public class PresetServiceImpl implements PresetService {
 //        // WebClient 생성
 //        WebClient webClient = WebClient.builder()
 //                .clientConnector(new ReactorClientHttpConnector())
-//                .baseUrl("http://host:port/vieweragent/Preset/layer-placemen") // 요청 URL 설정
+//                .baseUrl("http://host:port/vieweragent/Preset/layer-placement") // 요청 URL 설정
 //                .build();
 //
 //        // 요청 헤더 설정
@@ -277,7 +277,7 @@ public class PresetServiceImpl implements PresetService {
     public Map<String, Object> patchPresetStop(Map<String, Object> param) {
         Map<String, Object> resultMap = new HashMap<>();
 
-        String agentUrl = "http://host:port/vieweragent/Preset/layer-placemen";
+        String agentUrl = "http://host:port/vieweragent/Preset/layer-placement";
 
         // TODO : Agent 연동
         /*

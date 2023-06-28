@@ -63,7 +63,7 @@ public class ViewerController {
         Map<String, Object> responseMap = new HashMap<>();
         responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
 
-        String[] keyList = {"screenId", "presetId", "layerId", "objectNm", "type", "posX", "posY", "width", "height", "ord"};
+        String[] keyList = {"screenId", "presetId", "layerId"};
 
         try {
             parameterValidation(param, keyList);

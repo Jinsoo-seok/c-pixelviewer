@@ -68,9 +68,9 @@
         VALUES (#{screenId}, #{presetId}, #{layerId}, #{type}, #{objectNm});
 
         INSERT INTO External_Info (screen_id, preset_id, layer_id, object_id, type, pos_x, pos_y, width, height, ord
-        , image_list, font_nm, font_size, bold, italic, underline, forecolor, image_layout)
+        , image_list, font_nm, font_size, bold, italic, underline, forecolor, image_layout, update_date)
         VALUES (#{screenId}, #{presetId}, #{layerId}, LAST_INSERT_ID(), #{type}, #{posX}, #{posY}, #{width}, #{height}, #{ord}
-        , #{imageList}, #{fontNm}, #{fontSize}, #{bold}, #{italic}, #{underline}, #{forecolor}, #{imageLayout});
+        , #{imageList}, #{fontNm}, #{fontSize}, #{bold}, #{italic}, #{underline}, #{forecolor}, #{imageLayout}, NOW());
     </insert>
     <update id="putExternalInfo" parameterType="Map">
         <selectKey keyProperty="externalId" resultType="int" order="AFTER">
@@ -93,7 +93,8 @@
             italic = #{italic},
             underline = #{underline},
             forecolor = #{forecolor},
-            image_layout = #{imageLayout}
+            image_layout = #{imageLayout},
+            update_date = NOW()
 
         WHERE object_id = #{objectId}
             AND type = #{type}

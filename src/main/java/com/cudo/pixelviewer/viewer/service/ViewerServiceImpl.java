@@ -2,8 +2,10 @@ package com.cudo.pixelviewer.viewer.service;
 
 import com.cudo.pixelviewer.operate.mapper.LayerMapper;
 import com.cudo.pixelviewer.operate.mapper.PlaylistMapper;
+import com.cudo.pixelviewer.operate.mapper.PresetMapper;
 import com.cudo.pixelviewer.util.ParameterUtils;
 import com.cudo.pixelviewer.util.ResponseCode;
+import com.cudo.pixelviewer.vo.PresetVo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
@@ -26,6 +28,8 @@ import java.util.Map;
 @Service
 @RequiredArgsConstructor
 public class ViewerServiceImpl implements ViewerService {
+
+    final PresetMapper presetMapper;
 
     final LayerMapper layerMapper;
 
@@ -61,10 +65,19 @@ public class ViewerServiceImpl implements ViewerService {
                             }
                             break;
                         case 20:
-//                            if(layerMap.get("weatherEn").equals(1)) {
-//                                Map<String, Object> weatherInfoTemp = layerMapper.getLayerObjectExternalInfo((Integer) lo.get("object_id"));
-//                                resultMap.put("weatherForm", weatherInfoTemp);
-//                            }
+                            if(layerMap.get("weatherEn").equals(1)) {
+                                Map<String, Object> weatherInfoTemp = layerMapper.getLayerObjectExternalInfo((Integer) lo.get("object_id"));
+                                String updateDate = convertTimestampToString(weatherInfoTemp.get("updateDate"));
+
+                                String deleteData = "updateDate";
+                                weatherInfoTemp.remove(deleteData);
+
+                                Map<String, Object> exInfoWeatherMap = new HashMap<>();
+                                exInfoWeatherMap.put("updateDate", updateDate);
+                                exInfoWeatherMap.put("weatherFormInfo", weatherInfoTemp);
+
+                                resultMap.put("weatherForm", exInfoWeatherMap);
+                            }
                             break;
                         case 30:
                             if(layerMap.get("subFirstEn").equals(1) || layerMap.get("subSecondEn").equals(1)) {
@@ -96,10 +109,19 @@ public class ViewerServiceImpl implements ViewerService {
                             }
                             break;
                         case 40:
-//                            if(layerMap.get("airEn").equals(1)) {
-//                                Map<String, Object> airInfoTemp = layerMapper.getLayerObjectExternalInfo((Integer) lo.get("object_id"));
-//                                resultMap.put("airForm", airInfoTemp);
-//                            }
+                            if(layerMap.get("airEn").equals(1)) {
+                                Map<String, Object> airInfoTemp = layerMapper.getLayerObjectExternalInfo((Integer) lo.get("object_id"));
+                                String updateDate = convertTimestampToString(airInfoTemp.get("updateDate"));
+
+                                String deleteData = "updateDate";
+                                airInfoTemp.remove(deleteData);
+
+                                Map<String, Object> exInfoAirMap = new HashMap<>();
+                                exInfoAirMap.put("updateDate", updateDate);
+                                exInfoAirMap.put("airFormInfo", airInfoTemp);
+
+                                resultMap.put("airForm", exInfoAirMap);
+                            }
                             break;
                         default:
                             log.info("[VIEWER PLAYINFO][UNSUPPORTED TYPE] - [{}]", type);
