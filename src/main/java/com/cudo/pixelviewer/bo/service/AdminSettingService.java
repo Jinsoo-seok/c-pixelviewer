@@ -6,6 +6,9 @@ public interface AdminSettingService {
 
     Map<String, Object> getAdminSettingList();
 
+    Map<String, Object> putAdminSetting(Map<String, Object> param);
+
+
     Map<String, Object> patchLayerTopMost(Map<String, Object> param);
 
     Map<String, Object> patchTempHumi(Map<String, Object> param);

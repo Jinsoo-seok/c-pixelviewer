@@ -42,6 +42,25 @@ public class AdminSettingServiceImpl implements AdminSettingService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    public Map<String, Object> putAdminSetting(Map<String, Object> param) {
+        Map<String, Object> resultMap = new HashMap<>();
+
+        int putAdminSettingResult = adminSettingMapper.putAdminSetting(param);
+
+        if (putAdminSettingResult == 1) { // Success : 1
+            resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
+        }
+        else {
+            // TODO : 예외 처리 수정
+            ResponseCode failCode = ResponseCode.FAIL_UPDATE_SETTING_VIEW_TOP_MOST_EN;
+            resultMap.put("code", failCode.getCode());
+            resultMap.put("message", failCode.getMessage());
+        }
+        return resultMap;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> patchLayerTopMost(Map<String, Object> param) {
         Map<String, Object> resultMap = new HashMap<>();
 

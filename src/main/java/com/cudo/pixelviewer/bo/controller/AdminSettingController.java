@@ -48,6 +48,61 @@ public class AdminSettingController {
         return responseMap;
     }
 
+
+    @PutMapping()
+    public Map<String, Object> putAdminSetting(HttpServletRequest request
+            , @RequestBody Map<String, Object> param) {
+        long startTime = System.currentTimeMillis();
+        String apiInfo = "["+ request.getRequestURI() + "] [" + request.getMethod() + "]";
+        log.info("{} [START] [{}] - {}", apiInfo, startTime, param);
+
+        Map<String, Object> responseMap = new HashMap<>();
+        responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
+
+        String[] keyList = {
+                "viewTopmostEn",
+                "viewTemphumiEn",
+                "ledCommType",
+                "ledPresetEn",
+                "ledInputSelectEn",
+                "ledPresetCount",
+                "loginEn",
+                "imgDefaultPlaytime",
+                "externalinfoArea"
+        };
+
+        try {
+            parameterValidation(param, keyList);
+            parameterBoolean("viewTopmostEn", param.get("viewTopmostEn"), true);
+            parameterBoolean("viewTemphumiEn", param.get("viewTemphumiEn"), true);
+            parameterBoolean("ledCommType", param.get("ledCommType"), true);
+            parameterBoolean("ledPresetEn", param.get("ledPresetEn"), true);
+            parameterBoolean("ledInputSelectEn", param.get("ledInputSelectEn"), true);
+            parameterInt("ledPresetCount", param.get("ledPresetCount"), true);
+            parameterBoolean("loginEn", param.get("loginEn"), true);
+            parameterInt("imgDefaultPlaytime", param.get("imgDefaultPlaytime"), true);
+            parameterString("externalinfoArea", param.get("externalinfoArea"), true, 0, null);
+
+            responseMap = adminSettingService.putAdminSetting(param);
+        }
+        catch (ParamException paramException){
+            log.error("[paramException][putAdminSetting] - {}", paramException.getMessage());
+            responseMap.put("code", paramException.getCode());
+            responseMap.put("message", paramException.getMessage());
+        }
+        catch (Exception exception) {
+            log.error("[Exception][putAdminSetting] - {}", exception.getMessage());
+            responseMap.put("exceptionMessage", exception.getMessage());
+        }
+
+        long endTime = System.currentTimeMillis();
+        long procTime = endTime-startTime;
+        log.info("{} [END] [{}] - {}", apiInfo, procTime, responseMap.get("code"));
+
+        return responseMap;
+    }
+
+
     @PatchMapping("/layer-topmost")
     public Map<String, Object> patchLayerTopMost(HttpServletRequest request
                                         , @RequestBody Map<String, Object> param) {

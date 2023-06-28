@@ -28,5 +28,14 @@ public class AdminSettingVo implements Serializable {
 
     private Integer imgDefaultPlaytime;
 
-    private String extenalinfoArea;
+    private String externalinfoArea;
+
+    private String weatherSunny;
+    private String weatherManyCloudy;
+    private String weatherCloudy;
+    private String weatherRainSnow;
+    private String weatherSnow;
+    private String weatherRain;
+    private String weatherShower;
+
 }

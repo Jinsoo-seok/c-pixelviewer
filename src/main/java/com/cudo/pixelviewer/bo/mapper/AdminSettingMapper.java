@@ -12,6 +12,8 @@ public interface AdminSettingMapper {
 
     List<AdminSettingVo> getAdminSettingList();
 
+    int putAdminSetting(Map<String, Object> param);
+
     int patchLayerTopMost(Map<String, Object> param);
 
     int patchTempHumi(Map<String, Object> param);
