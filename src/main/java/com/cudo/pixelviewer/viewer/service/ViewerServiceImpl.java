@@ -15,7 +15,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,19 +49,28 @@ public class ViewerServiceImpl implements ViewerService {
                         case 10:
                             if(layerMap.get("exVideoEn").equals(1)) {
                                 Map<String, Object> videoTemp = layerMapper.getLayerObjectExternalVideo((Integer) lo.get("object_id"));
-                                resultMap.put("externalVideo", videoTemp);
+                                String updateDate = convertTimestampToString(videoTemp.get("updateDate"));
+
+                                String deleteData = "updateDate";
+                                videoTemp.remove(deleteData);
+
+                                Map<String, Object> exVideoMap = new HashMap<>();
+                                exVideoMap.put("updateDate", updateDate);
+                                exVideoMap.put("externalVideoInfo", videoTemp);
+                                resultMap.put("externalVideo", exVideoMap);
                             }
                             break;
                         case 20:
-                            if(layerMap.get("weatherEn").equals(1)) {
-                                Map<String, Object> weatherInfoTemp = layerMapper.getLayerObjectExternalInfo((Integer) lo.get("object_id"));
-                                resultMap.put("weatherForm", weatherInfoTemp);
-                            }
+//                            if(layerMap.get("weatherEn").equals(1)) {
+//                                Map<String, Object> weatherInfoTemp = layerMapper.getLayerObjectExternalInfo((Integer) lo.get("object_id"));
+//                                resultMap.put("weatherForm", weatherInfoTemp);
+//                            }
                             break;
                         case 30:
                             if(layerMap.get("subFirstEn").equals(1) || layerMap.get("subSecondEn").equals(1)) {
                                 Map<String, Object> subtitleTemp = layerMapper.getLayerObjectExternalSubtitle((Integer) lo.get("object_id"));
                                 String temp = (String) subtitleTemp.get("subtitle_style");
+                                String updateDate = convertTimestampToString(subtitleTemp.get("update_date"));
 
                                 try {
                                     JSONParser parser = new JSONParser();
@@ -75,17 +86,20 @@ public class ViewerServiceImpl implements ViewerService {
                                     else{
                                         //둘 다 활성화
                                     }
-                                    resultMap.put("subtitleStyleArray", jsonArrayTemp);
+                                    Map<String, Object> subtitleMap = new HashMap<>();
+                                    subtitleMap.put("updateDate", updateDate);
+                                    subtitleMap.put("subtitleStyleArray", jsonArrayTemp);
+                                    resultMap.put("subtitle", subtitleMap);
                                 } catch (ParseException e) {
                                     e.printStackTrace();
                                 }
                             }
                             break;
                         case 40:
-                            if(layerMap.get("airEn").equals(1)) {
-                                Map<String, Object> airInfoTemp = layerMapper.getLayerObjectExternalInfo((Integer) lo.get("object_id"));
-                                resultMap.put("airForm", airInfoTemp);
-                            }
+//                            if(layerMap.get("airEn").equals(1)) {
+//                                Map<String, Object> airInfoTemp = layerMapper.getLayerObjectExternalInfo((Integer) lo.get("object_id"));
+//                                resultMap.put("airForm", airInfoTemp);
+//                            }
                             break;
                         default:
                             log.info("[VIEWER PLAYINFO][UNSUPPORTED TYPE] - [{}]", type);
@@ -96,12 +110,23 @@ public class ViewerServiceImpl implements ViewerService {
             Map<String, Object> playlist = playlistMapper.getPlaylist(layerId);
 
             if(playlist != null) {
+                Map<String, Object> playlistResultMap = new HashMap<>();
                 String contentIdList = (String) playlist.get("contentIdList");
                 String queryTemp = "(" + contentIdList + ")";
 
+                String updateDate = convertTimestampToString(playlist.get("updateDate"));
+
+                playlistResultMap.put("playlistId", playlist.get("playlistId"));
+                playlistResultMap.put("playlistNm", playlist.get("playlistNm"));
+                playlistResultMap.put("updateDate", updateDate);
+
                 List<Map<String, Object>> playlistContentList = playlistMapper.getPlaylistContentList(queryTemp);
                 if (playlistContentList.size() != 0) {
-                    resultMap.put("playlist", playlistContentList);
+                    playlistResultMap.put("playlistContents", playlistContentList);
+                    resultMap.put("playlist", playlistResultMap);
+                }
+                else{
+                    resultMap.put("playlist", playlistResultMap);
                 }
             }
             resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
@@ -152,5 +177,17 @@ public class ViewerServiceImpl implements ViewerService {
             resultMap.putAll(ParameterUtils.responseOption(ResponseCode.NO_CONTENT.getCodeName()));
         }
         return resultMap;
+    }
+
+    public static String convertTimestampToString(Object timestampObj) {
+        if (timestampObj instanceof Timestamp) {
+            Timestamp timestamp = (Timestamp) timestampObj;
+
+            LocalDateTime dateTime = timestamp.toLocalDateTime();
+
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
+            return dateTime.format(formatter);
+        }
+        return null;
     }
 }

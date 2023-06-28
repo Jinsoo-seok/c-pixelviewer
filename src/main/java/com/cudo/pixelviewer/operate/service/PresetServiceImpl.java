@@ -210,7 +210,7 @@ public class PresetServiceImpl implements PresetService {
         String screenId = String.valueOf(param.get("screenId"));
         String presetId = String.valueOf(param.get("presetId"));
 
-        // TODO : 파라미터 매칭해야함
+        // TODO : 파라미터 매칭해야함(screenInfo)
         Map<String, Object> screenInfo = screenMapper.getScreen(screenId);
         List<LayerToAgentVo>  layerInfos = presetMapper.getPresetLayersToAgent(presetId);
 

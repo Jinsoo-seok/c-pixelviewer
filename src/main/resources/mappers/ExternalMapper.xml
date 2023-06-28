@@ -27,8 +27,8 @@
         INSERT INTO LayerObjects (screen_id, preset_id, layer_id, type, object_nm)
         VALUES (#{screenId}, #{presetId}, #{layerId}, #{type}, #{objectNm});
 
-        INSERT INTO ExternalVideo (screen_id, preset_id, layer_id, object_id, type, pos_x, pos_y, width, height, ord, rtsp_url, video_nm, video_format)
-        VALUES (#{screenId}, #{presetId}, #{layerId}, LAST_INSERT_ID(), #{type}, #{posX}, #{posY}, #{width}, #{height}, #{ord}, #{rtspUrl}, #{videoNm}, #{videoFormat});
+        INSERT INTO ExternalVideo (screen_id, preset_id, layer_id, object_id, type, pos_x, pos_y, width, height, ord, rtsp_url, video_nm, video_format, update_date)
+        VALUES (#{screenId}, #{presetId}, #{layerId}, LAST_INSERT_ID(), #{type}, #{posX}, #{posY}, #{width}, #{height}, #{ord}, #{rtspUrl}, #{videoNm}, #{videoFormat}, NOW());
     </insert>
     <update id="putExternalVideo" parameterType="Map">
         <selectKey keyProperty="externalId" resultType="int" order="AFTER">
@@ -46,7 +46,8 @@
             ord = #{ord},
             rtsp_url = #{rtspUrl},
             video_nm = #{videoNm},
-            video_format = #{videoFormat}
+            video_format = #{videoFormat},
+            update_date = NOW()
         WHERE object_id = #{objectId}
             AND type = #{type}
     </update>

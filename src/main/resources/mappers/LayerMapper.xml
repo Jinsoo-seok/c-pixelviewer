@@ -33,7 +33,7 @@
         WHERE layer_id = #{layerId}
     </select>
     <select id="getLayerObjectExternalVideo" resultType="Map">
-        SELECT pos_x AS posX, pos_y AS posY, ord AS ord, rtsp_url AS rtspUrl,  video_nm AS videoNm, ex_video_id AS exVideoId, width AS width, video_format AS videoFormat, type AS type, object_id AS objectId, height AS height
+        SELECT pos_x AS posX, pos_y AS posY, ord AS ord, rtsp_url AS rtspUrl,  video_nm AS videoNm, ex_video_id AS exVideoId, width AS width, video_format AS videoFormat, type AS type, object_id AS objectId, height AS height, update_date AS updateDate
         FROM ExternalVideo
         WHERE object_id = #{objectId}
     </select>

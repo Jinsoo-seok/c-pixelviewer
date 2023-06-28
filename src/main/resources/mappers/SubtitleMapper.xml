@@ -17,8 +17,8 @@
         INSERT INTO LayerObjects (layer_id, preset_id, screen_id, type, object_nm)
         VALUES (#{layerId}, #{presetId}, #{screenId}, #{type}, #{objectNm});
 
-        INSERT INTO Subtitles (screen_id, preset_id, layer_id, object_id, subtitle_style)
-        VALUES (#{screenId}, #{presetId}, #{layerId}, LAST_INSERT_ID(), #{subtitleStyle});
+        INSERT INTO Subtitles (screen_id, preset_id, layer_id, object_id, subtitle_style, update_date)
+        VALUES (#{screenId}, #{presetId}, #{layerId}, LAST_INSERT_ID(), #{subtitleStyle}, NOW());
     </insert>
     <update id="putSubtitle" parameterType="Map">
         <selectKey keyProperty="subtitleId" resultType="int" order="AFTER">
@@ -28,7 +28,8 @@
         </selectKey>
         UPDATE Subtitles
         SET
-            subtitle_style = #{subtitleStyle}
+            subtitle_style = #{subtitleStyle},
+            update_date = NOW()
         WHERE object_id = #{objectId}
     </update>
     <update id="postSubtitleLayer" parameterType="Map">
@@ -87,7 +88,8 @@
     </select>
     <update id="patchSubtitleStyle">
         UPDATE Subtitles
-        SET subtitle_style = #{subtitleStyle}
+        SET subtitle_style = #{subtitleStyle},
+            update_date = NOW()
         WHERE subtitle_id = #{subtitleId}
     </update>
 
