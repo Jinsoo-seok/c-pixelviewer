@@ -94,12 +94,14 @@
             type
             , cts_nm, cts_path, playtime
             , weather_fl, air_info_fl, stretch
+            , thumbnail_image_nm
         )
         VALUES
             (
                 #{type}
                 , #{ctsNm}, #{ctsPath}, #{playtime}
                 , #{weatherFl}, #{airInfoFl}, #{stretch}
+                , #{thumbnailImageNm}
             )
     </insert>
 
