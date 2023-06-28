@@ -40,13 +40,17 @@ public class ParameterUtils {
 
     }
 
-    public static Double parameterDouble(String parameterKey, Object parameterValue, boolean required) throws ParamException {
+    public static Double parameterDouble(String parameterKey, Object parameterValue, boolean required, double maxValue) throws ParamException {
         if(required) {
             validationRequired(parameterKey, parameterValue);
         }
 
         if (parameterValue instanceof Double) {
             Double result = (Double) parameterValue;
+
+            if (maxValue > 0 && result > maxValue) {
+                throw new ParamException(ResponseCode.INVALID_PARAM_VALUE, parameterKey);
+            }
 
             return result;
         } else {
