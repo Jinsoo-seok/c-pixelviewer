@@ -1,5 +1,6 @@
 package com.cudo.pixelviewer.viewer.service;
 
+import com.cudo.pixelviewer.external.mapper.ExternalsMapper;
 import com.cudo.pixelviewer.operate.mapper.LayerMapper;
 import com.cudo.pixelviewer.operate.mapper.PlaylistMapper;
 import com.cudo.pixelviewer.operate.mapper.PresetMapper;
@@ -37,11 +38,14 @@ public class ViewerServiceImpl implements ViewerService {
 
     final PlaylistMapper playlistMapper;
 
+    final ExternalsMapper externalsMapper;
+
 //    final ViewerMapper viewerMapper;
 
     @Override
     public Map<String, Object> getPlayInfo(String screenId, String presetId, String layerId) {
         Map<String, Object> resultMap = new HashMap<>();
+        Map<String, Object> dataMap = new HashMap<>();
 
         Map<String, Object> layerMap = layerMapper.getLayer(layerId);
 
@@ -63,7 +67,7 @@ public class ViewerServiceImpl implements ViewerService {
                                 Map<String, Object> exVideoMap = new HashMap<>();
                                 exVideoMap.put("updateDate", updateDate);
                                 exVideoMap.put("externalVideoInfo", videoTemp);
-                                resultMap.put("externalVideo", exVideoMap);
+                                dataMap.put("externalVideo", exVideoMap);
                             }
                             break;
                         case 20:
@@ -78,7 +82,7 @@ public class ViewerServiceImpl implements ViewerService {
                                 exInfoWeatherMap.put("updateDate", updateDate);
                                 exInfoWeatherMap.put("weatherFormInfo", weatherInfoTemp);
 
-                                resultMap.put("weatherForm", exInfoWeatherMap);
+                                dataMap.put("weatherForm", exInfoWeatherMap);
                             }
                             break;
                         case 30:
@@ -104,7 +108,7 @@ public class ViewerServiceImpl implements ViewerService {
                                     Map<String, Object> subtitleMap = new HashMap<>();
                                     subtitleMap.put("updateDate", updateDate);
                                     subtitleMap.put("subtitleStyleArray", jsonArrayTemp);
-                                    resultMap.put("subtitle", subtitleMap);
+                                    dataMap.put("subtitle", subtitleMap);
                                 } catch (ParseException e) {
                                     e.printStackTrace();
                                 }
@@ -122,7 +126,7 @@ public class ViewerServiceImpl implements ViewerService {
                                 exInfoAirMap.put("updateDate", updateDate);
                                 exInfoAirMap.put("airFormInfo", airInfoTemp);
 
-                                resultMap.put("airForm", exInfoAirMap);
+                                dataMap.put("airForm", exInfoAirMap);
                             }
                             break;
                         default:
@@ -147,11 +151,14 @@ public class ViewerServiceImpl implements ViewerService {
                 List<Map<String, Object>> playlistContentList = playlistMapper.getPlaylistContentList(queryTemp);
                 if (playlistContentList.size() != 0) {
                     playlistResultMap.put("playlistContents", playlistContentList);
-                    resultMap.put("playlist", playlistResultMap);
+                    dataMap.put("playlist", playlistResultMap);
                 }
                 else{
-                    resultMap.put("playlist", playlistResultMap);
+                    dataMap.put("playlist", playlistResultMap);
                 }
+            }
+            if(dataMap != null){
+                resultMap.put("data", dataMap);
             }
             resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
         }
@@ -169,15 +176,38 @@ public class ViewerServiceImpl implements ViewerService {
 
         PresetVo presetVo = presetMapper.getPreset(presetId);
 
-        // TODO : 규격 확인 필요 >> 이후 진행
         if(presetVo != null){
             Date presetUpdateDate = presetVo.getUpdateDate();
             SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
             String dateString = formatter.format(presetUpdateDate);
 
             dataMap.put("presetStatus", presetVo.getPresetStatus());
-            dataMap.put("updateDate", dateString);
+            dataMap.put("playInfoVersion", dateString);
 
+            List<Map<String, Object>> externalInfos = externalsMapper.getExternalInfos();
+
+            if (externalInfos != null) {
+                for (Map<String, Object> externalInfo : externalInfos) {
+                    String externalType = (String) externalInfo.get("externalType");
+                    String externalData = (String) externalInfo.get("externalData");
+
+                    Object obj = new Object();
+                    try {
+                        JSONParser parser = new JSONParser();
+                        obj = parser.parse(externalData);
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+                    if(obj != null) {
+                        if (externalType.equals("날씨")) {
+                            dataMap.put("weatherInfo", obj);
+                        }
+                        else if (externalType.equals("대기")) {
+                            dataMap.put("airInfo", obj);
+                        }
+                    }
+                }
+            }
             // TODO : 날씨, 대기 정보 조회
             resultMap.put("data", dataMap);
 
