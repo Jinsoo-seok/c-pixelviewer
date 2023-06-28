@@ -1,5 +1,6 @@
 package com.cudo.pixelviewer.operate.service;
 
+import com.cudo.pixelviewer.operate.mapper.PresetMapper;
 import com.cudo.pixelviewer.operate.mapper.SubtitleMapper;
 import com.cudo.pixelviewer.util.ParameterUtils;
 import com.cudo.pixelviewer.util.ResponseCode;
@@ -17,6 +18,8 @@ import java.util.Map;
 public class SubtitleServiceImpl implements SubtitleService {
 
     final SubtitleMapper subtitleMapper;
+
+    final PresetMapper presetMapper;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -65,6 +68,8 @@ public class SubtitleServiceImpl implements SubtitleService {
             if(YN){
                 int postSubtitleLayerResult = subtitleMapper.postSubtitleLayer(param);
                 if (postSubtitleLayerResult == 1) { // Success : 1
+                    int refreshPresetUpdateDateResult = presetMapper.refreshPresetUpdateDate(param.get("presetId"));
+
                     dataMap.put("subtitleId", param.get("subtitleId"));
                     resultMap.put("data", dataMap);
                     resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));

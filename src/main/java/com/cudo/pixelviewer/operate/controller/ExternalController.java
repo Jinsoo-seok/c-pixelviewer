@@ -26,8 +26,8 @@ public class ExternalController {
 
     // LayerObject Type
     // type (10, 20, 30, 40)   (LayerObjects)
-    // 10 : 외부 영상(날씨)      (ExternalVideo)
-    // 20 : 외부 정보           (External_info)
+    // 10 : 외부 영상           (ExternalVideo)
+    // 20 : 외부 정보(날씨)      (External_info)
     // 30 : 자막               (Subtitles)
     // 40 : 외부 정보(미세 먼지) (External_info)
 

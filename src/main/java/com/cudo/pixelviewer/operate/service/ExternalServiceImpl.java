@@ -1,6 +1,7 @@
 package com.cudo.pixelviewer.operate.service;
 
 import com.cudo.pixelviewer.operate.mapper.ExternalMapper;
+import com.cudo.pixelviewer.operate.mapper.PresetMapper;
 import com.cudo.pixelviewer.util.ParameterUtils;
 import com.cudo.pixelviewer.util.ResponseCode;
 import com.cudo.pixelviewer.vo.ExternalVideoVo;
@@ -16,6 +17,8 @@ import java.util.Map;
 public class ExternalServiceImpl implements ExternalService {
 
     final ExternalMapper externalMapper;
+
+    final PresetMapper presetMapper;
 
 
     @Override
@@ -70,6 +73,7 @@ public class ExternalServiceImpl implements ExternalService {
                     resultMap.put("message", ResponseCode.FAIL_UPDATE_EXTERNAL_VIDEO.getMessage());
                 }
             }
+            int refreshPresetUpdateDateResult = presetMapper.refreshPresetUpdateDate(param.get("presetId"));
         }
         else{
             resultMap.put("code", ResponseCode.FAIL_UNSUPPORTED_TYPE_EXTERNAL_VIDEO.getCode());
@@ -114,6 +118,7 @@ public class ExternalServiceImpl implements ExternalService {
                     resultMap.put("message", ResponseCode.FAIL_UPDATE_EXTERNAL_INFO.getMessage());
                 }
             }
+            int refreshPresetUpdateDateResult = presetMapper.refreshPresetUpdateDate(param.get("presetId"));
         }
         else{
             resultMap.put("code", ResponseCode.FAIL_UNSUPPORTED_TYPE_EXTERNAL_INFO.getCode());
