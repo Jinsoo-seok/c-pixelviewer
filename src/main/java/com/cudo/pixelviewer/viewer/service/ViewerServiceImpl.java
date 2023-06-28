@@ -18,8 +18,10 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -162,9 +164,22 @@ public class ViewerServiceImpl implements ViewerService {
     @Override
     public Map<String, Object> putUpdateAndHealthCheck(Map<String, Object> param) {
         Map<String, Object> resultMap = new HashMap<>();
+        Map<String, Object> dataMap = new HashMap<>();
+        String presetId = String.valueOf(param.get("presetId"));
+
+        PresetVo presetVo = presetMapper.getPreset(presetId);
 
         // TODO : 규격 확인 필요 >> 이후 진행
-        if(true){
+        if(presetVo != null){
+            Date presetUpdateDate = presetVo.getUpdateDate();
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
+            String dateString = formatter.format(presetUpdateDate);
+
+            dataMap.put("presetStatus", presetVo.getPresetStatus());
+            dataMap.put("updateDate", dateString);
+
+            // TODO : 날씨, 대기 정보 조회
+            resultMap.put("data", dataMap);
 
             resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
         }
