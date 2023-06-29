@@ -2,7 +2,10 @@ package com.cudo.pixelviewer.util;
 
 import com.cudo.pixelviewer.config.ParamException;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -218,4 +221,99 @@ public class ParameterUtils {
         }
     }
 
+    public static boolean parameterDate(String parameterKey, Object parameterValue, boolean required) throws ParamException {
+        if(required) {
+            validationRequired(parameterKey, parameterValue);
+        }
+
+        try {
+            if (parameterValue instanceof String) {
+                SimpleDateFormat dateFormatParser = new SimpleDateFormat("yyyyMMdd");
+                dateFormatParser.setLenient(false);
+                dateFormatParser.parse(String.valueOf(parameterValue)); //대상 값 포맷에 적용되는지 확인
+
+                return true;
+            } else {
+                throw new ParamException(ResponseCode.INVALID_PARAM_TYPE, parameterKey);
+            }
+        } catch (Exception e) {
+            throw new ParamException(ResponseCode.INVALID_PARAM_VALUE, parameterKey);
+        }
+    }
+
+    public static boolean parameterTime(String parameterKey, Object parameterValue, boolean required) throws ParamException {
+        if(required) {
+            validationRequired(parameterKey, parameterValue);
+        }
+
+        try {
+            if (parameterValue instanceof String) {
+                SimpleDateFormat dateFormatParser = new SimpleDateFormat("HHmm");
+                dateFormatParser.setLenient(false);
+                dateFormatParser.parse(String.valueOf(parameterValue)); //대상 값 포맷에 적용되는지 확인
+
+                return true;
+            } else {
+                throw new ParamException(ResponseCode.INVALID_PARAM_TYPE, parameterKey);
+            }
+        } catch (Exception e) {
+            throw new ParamException(ResponseCode.INVALID_PARAM_VALUE, parameterKey);
+        }
+    }
+
+    public static boolean parameterDateTime(String parameterKey, Object parameterValue, boolean required) throws ParamException {
+        if(required) {
+            validationRequired(parameterKey, parameterValue);
+        }
+
+        try {
+            if (parameterValue instanceof String) {
+                SimpleDateFormat dateFormatParser = new SimpleDateFormat("yyyyMMddHHmm");
+                dateFormatParser.setLenient(false);
+                dateFormatParser.parse(String.valueOf(parameterValue)); //대상 값 포맷에 적용되는지 확인
+
+                return true;
+            } else {
+                throw new ParamException(ResponseCode.INVALID_PARAM_TYPE, parameterKey);
+            }
+        } catch (Exception e) {
+            throw new ParamException(ResponseCode.INVALID_PARAM_VALUE, parameterKey);
+        }
+    }
+
+    public static boolean parameterCompareDate(String startDateParamKey, String endDateParamKey, Object startDate, Object endDate) throws ParamException {
+
+        try {
+            SimpleDateFormat dateFormatParser = new SimpleDateFormat("yyyyMMdd");
+            return compareDate(startDateParamKey, endDateParamKey, startDate, endDate, dateFormatParser);
+        } catch (Exception e) {
+            throw new ParamException(ResponseCode.INVALID_PARAM_VALUE, startDateParamKey + ", " + endDateParamKey);
+        }
+
+    }
+
+    public static boolean parameterCompareDateTime(String startDateParamKey, String endDateParamKey, Object startDate, Object endDate) throws ParamException {
+
+        try {
+            SimpleDateFormat dateFormatParser = new SimpleDateFormat("yyyyMMddHHmm");
+            return compareDate(startDateParamKey, endDateParamKey, startDate, endDate, dateFormatParser);
+        } catch (Exception e) {
+            throw new ParamException(ResponseCode.INVALID_PARAM_VALUE, startDateParamKey + ", " + endDateParamKey);
+        }
+
+    }
+
+    private static boolean compareDate(String startDateParamKey, String endDateParamKey, Object startDate, Object endDate, SimpleDateFormat dateFormatParser) throws ParseException, ParamException {
+        dateFormatParser.setLenient(false);
+        Date start = dateFormatParser.parse(String.valueOf(startDate));
+        Date end = dateFormatParser.parse(String.valueOf(endDate));
+
+        int result = start.compareTo(end);
+
+        if (result > 0) {
+            throw new ParamException(ResponseCode.INVALID_PARAM_VALUE, startDateParamKey + ", " + endDateParamKey);
+        }
+
+        return true;
+    }
 }
