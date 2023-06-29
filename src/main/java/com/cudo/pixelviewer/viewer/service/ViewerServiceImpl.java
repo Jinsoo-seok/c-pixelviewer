@@ -234,7 +234,7 @@ public class ViewerServiceImpl implements ViewerService {
                 String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
                 String filePath = desktopPath + File.separator;
 
-                LocalDateTime localDateTime = LocalDateTime.parse("2022-02-02 10:10:10", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+                LocalDateTime localDateTime = LocalDateTime.now();
                 String formattedDateTime = localDateTime.format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
 
                 Boolean weatherType = false;
