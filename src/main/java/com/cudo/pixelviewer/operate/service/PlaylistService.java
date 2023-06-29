@@ -10,6 +10,8 @@ public interface PlaylistService {
 
     Map<String, Object> postPlaylist(Map<String, Object> param);
 
+    Map<String, Object> putPlaylist(Map<String, Object> param);
+
     Map<String, Object> deletePlaylist(Map<String, Object> param);
 
 

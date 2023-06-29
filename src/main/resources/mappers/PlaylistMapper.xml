@@ -67,7 +67,12 @@
     </select>
     <update id="putPlaylist">
         UPDATE Playlists
-        SET playlist_nm = #{playlistNm}, rowsize = #{rowsize}, columnsize = #{columnsize}, update_date = NOW()
+        SET content_id_list = #{contentIdList}, update_date = NOW()
+        WHERE Playlists.playlist_id = #{playlistId}
+    </update>
+    <update id="putPlaylist2">
+        UPDATE Playlists
+        SET playlist_nm = #{playlistNm}, content_id_list = #{contentIdList}, update_date = NOW()
         WHERE Playlists.playlist_id = #{playlistId}
     </update>
 
@@ -94,14 +99,14 @@
             type
             , cts_nm, cts_path, playtime
             , weather_fl, air_info_fl, stretch
-            , thumbnail_image_nm
+            , thumbnail_path
         )
         VALUES
             (
                 #{type}
                 , #{ctsNm}, #{ctsPath}, #{playtime}
                 , #{weatherFl}, #{airInfoFl}, #{stretch}
-                , #{thumbnailImageNm}
+                , #{thumbnailPath}
             )
     </insert>
 

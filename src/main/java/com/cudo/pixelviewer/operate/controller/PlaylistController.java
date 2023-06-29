@@ -113,6 +113,42 @@ public class PlaylistController {
         return responseMap;
     }
 
+    @PutMapping
+    public Map<String, Object> putPlaylist(HttpServletRequest request
+            , @RequestBody Map<String, Object> param) {
+        long startTime = System.currentTimeMillis();
+        String apiInfo = "["+ request.getRequestURI() + "] [" + request.getMethod() + "]";
+        log.info("{} [START] [{}] - {}", apiInfo, startTime, param);
+
+        Map<String, Object> responseMap = new HashMap<>();
+        responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
+
+        String[] keyList = {"playlistId", "contentIdList"};
+
+        try {
+            parameterValidation(param, keyList);
+            parameterInt("playlistId", param.get("playlistId"), true);
+            parameterArray("contentIdList", param.get("contentIdList"), true);
+
+            responseMap = playlistService.putPlaylist(param);
+        }
+        catch (ParamException paramException){
+            log.error("[paramException][putPlaylist] - {}", paramException.getMessage());
+            responseMap.put("code", paramException.getCode());
+            responseMap.put("message", paramException.getMessage());
+        }
+        catch (Exception exception) {
+            log.error("[Exception][putPlaylist] - {}", exception.getMessage());
+            responseMap.put("exceptionMessage", exception.getMessage());
+        }
+
+        long endTime = System.currentTimeMillis();
+        long procTime = endTime-startTime;
+        log.info("{} [END] [{}] - {}", apiInfo, procTime, responseMap.get("code"));
+
+        return responseMap;
+    }
+
     @DeleteMapping
     public Map<String, Object> deletePlaylist(HttpServletRequest request
                                         , @RequestBody Map<String, Object> param) {
@@ -285,7 +321,7 @@ public class PlaylistController {
         Map<String, Object> responseMap = new HashMap<>();
         responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
 
-        String[] keyList = {"playlistId", "ordNo", "type", "ctsNm", "ctsPath", "playtime", "weatherFl", "airInfoFl", "stretch"};
+        String[] keyList = {"playlistId", "ordNo", "type", "ctsNm", "ctsPath", "playtime", "weatherFl", "airInfoFl", "stretch", "thumbnailPath"};
 
         try {
             parameterValidation(param, keyList);
@@ -301,6 +337,7 @@ public class PlaylistController {
 //            parameterInt("weatherFl", param.get("weatherFl"), true);
 //            parameterInt("airInfoFl", param.get("airInfoFl"), true);
 //            parameterInt("airInfoFl", param.get("airInfoFl"), true);
+            parameterString("thumbnailPath", param.get("thumbnailPath"), true, 0, null);
 
             responseMap = playlistService.postPlaylistContents(param);
         }

@@ -5,7 +5,11 @@ import com.cudo.pixelviewer.util.ParameterUtils;
 import com.cudo.pixelviewer.util.ResponseCode;
 import com.cudo.pixelviewer.vo.PlaylistContentsVo;
 import com.cudo.pixelviewer.vo.PlaylistVo;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,7 +50,29 @@ public class PlaylistServiceImpl implements PlaylistService {
         if(playlist != null){
             String contentIdList = (String) playlist.get("contentIdList");
             String queryTemp = "(" + contentIdList + ")";
+            List<Map<String, Object>> tempContentIdList = new ArrayList<>();
+            try {
+                JSONParser parser = new JSONParser();
+                Object obj = parser.parse(contentIdList);
+                tempContentIdList = (List<Map<String, Object>>) obj;
 
+                StringBuilder contentIds = new StringBuilder();
+
+                if(tempContentIdList != null){
+                    for (Map<String, Object> item : tempContentIdList) {
+                        Long contentId = (Long) item.get("contentId");
+                        contentIds.append(contentId).append(",");
+                    }
+                }
+                if (contentIds.length() > 0) {
+                    contentIds.setLength(contentIds.length() - 1);
+                }
+                queryTemp = "(" + contentIds + ")";
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+            // TODO : Order By(order 기준)
             List<Map<String, Object>> playlistContentList = playlistMapper.getPlaylistContentList(queryTemp);
             if(playlistContentList.size() != 0){
                 playlist.put("contentArray", playlistContentList);
@@ -86,6 +112,42 @@ public class PlaylistServiceImpl implements PlaylistService {
         else{
             resultMap.put("code", ResponseCode.FAIL_DUPLICATE_PLAYLIST.getCode());
             resultMap.put("message", ResponseCode.FAIL_DUPLICATE_PLAYLIST.getMessage());
+        }
+        return resultMap;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Map<String, Object> putPlaylist(Map<String, Object> param) {
+        Map<String, Object> resultMap = new HashMap<>();
+        Map<String, Object> dataMap = new HashMap<>();
+
+        int playlistCheck = playlistMapper.putPlaylistValid(param);
+
+        if(playlistCheck == 1){ // Success : 1
+            try {
+                ObjectMapper mapper = new ObjectMapper();
+                String mapperJson = mapper.writeValueAsString(param.get("contentIdList"));
+                param.put("contentIdList", mapperJson);
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
+
+            int putPlaylistResult = playlistMapper.putPlaylist(param);
+
+            if(putPlaylistResult == 1){ // Success : 1
+                dataMap.put("playlistId", param.get("playlistId"));
+                resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
+                resultMap.put("data", dataMap);
+            }
+            else{
+                resultMap.put("code", ResponseCode.FAIL_UPDATE_PLAYLIST.getCode());
+                resultMap.put("message", ResponseCode.FAIL_UPDATE_PLAYLIST.getMessage());
+            }
+        }
+        else{
+            resultMap.put("code", ResponseCode.FAIL_NOT_EXIST_PLAYLIST.getCode());
+            resultMap.put("message", ResponseCode.FAIL_NOT_EXIST_PLAYLIST.getMessage());
         }
         return resultMap;
     }

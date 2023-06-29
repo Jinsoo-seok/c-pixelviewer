@@ -24,6 +24,6 @@ public class PlaylistContentsVo implements Serializable {
     private Boolean airInfoFl;
     private Boolean stretch;
 
-    private String thumbnailImageNm;
+    private String thumbnailImage;
 
 }
