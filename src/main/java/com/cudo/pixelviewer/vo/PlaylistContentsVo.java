@@ -11,8 +11,8 @@ public class PlaylistContentsVo implements Serializable {
     private static final long serialVersionUID = 6624135788238183579L;
 
     private Integer contentId;
-    @JsonIgnore
-    private Integer type;
+
+    private String type;
 
     private String ctsNm;
 
@@ -20,8 +20,11 @@ public class PlaylistContentsVo implements Serializable {
     private String ctsPath;
     private Integer playtime;
 
+    @JsonIgnore
     private Boolean weatherFl;
+    @JsonIgnore
     private Boolean airInfoFl;
+    @JsonIgnore
     private Boolean stretch;
 
     private String thumbnailPath;
