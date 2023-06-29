@@ -106,6 +106,7 @@
             (
                 #{type}
                 , #{ctsNm}, #{ctsPath}, #{playtime}
+                , false, false, false
                 , #{thumbnailPath}
             )
     </insert>
