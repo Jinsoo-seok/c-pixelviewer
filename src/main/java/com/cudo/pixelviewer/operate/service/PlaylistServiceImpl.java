@@ -79,8 +79,8 @@ public class PlaylistServiceImpl implements PlaylistService {
             if(playlistContentList.size() != 0){
                 List<Map<String, Object>> tempContentArray = new ArrayList<>();
 
-                for (int i = 0; i < playlistContentList.size(); i++) {
-                    for(int x = 0; x < playlistContentList.size(); x++) {
+                for (int i = 0; i < tempContentIdList.size(); i++) {
+                    for(int x = 0; x < tempContentIdList.size(); x++) {
                         Long tempOrder = (Long) tempContentIdList.get(x).get("order");
                         if (tempOrder == order) {
                             Long orderContentId = (Long) tempContentIdList.get(x).get("contentId");

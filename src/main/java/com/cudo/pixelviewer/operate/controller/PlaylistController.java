@@ -327,7 +327,8 @@ public class PlaylistController {
             parameterValidation(param, keyList);
             parameterInt("playlistId", param.get("playlistId"), true);
             parameterInt("ordNo", param.get("ordNo"), true);
-            parameterInt("type", param.get("type"), true);
+//            parameterInt("type", param.get("type"), true);
+            parameterString("type", param.get("type"), true, 0, null);
             parameterString("ctsNm", param.get("ctsNm"), true, 0, null);
             parameterString("ctsPath", param.get("ctsPath"), true, 0, null);
             parameterInt("playtime", param.get("playtime"), true);
