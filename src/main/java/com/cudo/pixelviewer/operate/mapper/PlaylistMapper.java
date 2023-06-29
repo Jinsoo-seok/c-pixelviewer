@@ -44,4 +44,6 @@ public interface PlaylistMapper {
     int patchContentsPlaytimeValid(Map<String, Object> param);
     int patchContentsPlaytime(Map<String, Object> param);
 
+    List<Map<String, Object>> getIncludedList(String idList);
+
 }

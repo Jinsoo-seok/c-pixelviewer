@@ -10,8 +10,7 @@
 
 <!--    <select id="getScreen" resultType="com.cudo.pixelviewer.vo.ScreenVo">-->
     <select id="getScreen" resultType="Map">
-        SELECT screen_id AS screenId, screen_nm AS screennm
-                , rowsize AS rowsize, columnsize AS columnsize
+        SELECT screen_id AS screenId, screen_nm AS screenNm
                 , pos_x AS posX, pos_y AS posY
                 , width AS width, height AS height
         FROM Screens
