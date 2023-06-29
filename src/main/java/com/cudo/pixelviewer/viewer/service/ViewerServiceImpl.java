@@ -237,16 +237,18 @@ public class ViewerServiceImpl implements ViewerService {
                 LocalDateTime localDateTime = LocalDateTime.now();
                 String formattedDateTime = localDateTime.format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
 
+                Boolean contentsType = false;
                 Boolean weatherType = false;
 
                 switch(type) {
-                    // Agent Capture Img ( Desktop )
+                    // Agent Capture Img
                     case "10": {
                         filePath += "agent" + File.separator + name + extension;
                         break;
                     }
                     // Contents Thumbnails
                     case "20": {
+                        contentsType = true;
                         filePath += "thumbnails"  + File.separator + filename + "_" + formattedDateTime + extension;
                         break;
                     }
@@ -268,10 +270,16 @@ public class ViewerServiceImpl implements ViewerService {
                 File destFile = new File(filePath);
                 FileUtils.copyInputStreamToFile(file.getInputStream(), destFile);
 
-                if(weatherType){
+                if(contentsType){
+                }
+                else if(weatherType){
                     // TODO : 예외 처리
                     int weatherImgResult = adminSettingMapper.patchWeatherImg(type, originalFilename);
                 }
+
+                Map<String, Object> dataMap = new HashMap<>();
+                dataMap.put("filePath", filePath);
+                resultMap.put("data", dataMap);
                 resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
             } catch (IOException ioException) {
                 ioException.printStackTrace();
