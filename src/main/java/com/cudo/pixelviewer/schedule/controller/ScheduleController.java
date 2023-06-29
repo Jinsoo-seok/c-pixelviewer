@@ -120,7 +120,7 @@ public class ScheduleController {
 
         responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
 
-        String[] keyList = {"preset", "playList", "scheduleName", "startDateTime", "endDateTime", "scheduleDay"};
+        String[] keyList = {"preset", "playList", "scheduleName", "startDate", "endDate", "startTime", "endTime", "scheduleDay"};
 
         try {
             parameterValidation(param, keyList);
@@ -128,9 +128,11 @@ public class ScheduleController {
             parameterInt("preset", param.get("preset"), true);
             parameterInt("playList", param.get("playList"), true);
             parameterString("scheduleName", param.get("scheduleName"), true, 0, null);
-            parameterDateTime("startDateTime", param.get("startDateTime"), true);
-            parameterDateTime("endDateTime", param.get("endDateTime"), true);
-            parameterCompareDateTime("startDateTime", "endDateTime", param.get("startDateTime"), param.get("endDateTime"));
+            parameterDate("startDate", param.get("startDate"), true);
+            parameterDate("endDate", param.get("endDate"), true);
+            parameterTime("startTime", param.get("startTime"), true);
+            parameterTime("endTime", param.get("endTime"), true);
+            parameterCompareDate("startDate", "endDate", param.get("startDate"), param.get("endDate"));
             parameterArray("scheduleDay", param.get("scheduleDay"), true);
 
             responseMap = scheduleService.setLedContent(param);
@@ -165,7 +167,7 @@ public class ScheduleController {
 
         responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
 
-        String[] keyList = {"scheduleId", "preset", "playList", "scheduleName", "startDateTime", "endDateTime", "scheduleDay"};
+        String[] keyList = {"scheduleId", "preset", "playList", "scheduleName", "startDate", "endDate","startTime", "endTime", "scheduleDay"};
 
         try {
             parameterValidation(param, keyList);
@@ -174,9 +176,11 @@ public class ScheduleController {
             parameterInt("preset", param.get("preset"), true);
             parameterInt("playList", param.get("playList"), true);
             parameterString("scheduleName", param.get("scheduleName"), true, 0, null);
-            parameterDateTime("startDateTime", param.get("startDateTime"), true);
-            parameterDateTime("endDateTime", param.get("endDateTime"), true);
-            parameterCompareDateTime("startDateTime", "endDateTime", param.get("startDateTime"), param.get("endDateTime"));
+            parameterDate("startDate", param.get("startDate"), true);
+            parameterDate("endDate", param.get("endDate"), true);
+            parameterTime("startTime", param.get("startTime"), true);
+            parameterTime("endTime", param.get("endTime"), true);
+            parameterCompareDate("startDate", "endDate", param.get("startDate"), param.get("endDate"));
             parameterArray("scheduleDay", param.get("scheduleDay"), true);
 
             responseMap = scheduleService.setLedContent(param);
@@ -249,15 +253,17 @@ public class ScheduleController {
 
         responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
 
-        String[] keyList = {"scheduleName", "startDateTime", "endDateTime", "scheduleDay"};
+        String[] keyList = {"scheduleName", "startDate", "endDate","startTime", "endTime", "scheduleDay"};
 
         try {
             parameterValidation(param, keyList);
 
             parameterString("scheduleName", param.get("scheduleName"), true, 0, null);
-            parameterDateTime("startDateTime", param.get("startDateTime"), true);
-            parameterDateTime("endDateTime", param.get("endDateTime"), true);
-            parameterCompareDateTime("startDateTime", "endDateTime", param.get("startDateTime"), param.get("endDateTime"));
+            parameterDate("startDate", param.get("startDate"), true);
+            parameterDate("endDate", param.get("endDate"), true);
+            parameterTime("startTime", param.get("startTime"), true);
+            parameterTime("endTime", param.get("endTime"), true);
+            parameterCompareDate("startDate", "endDate", param.get("startDate"), param.get("endDate"));
             parameterArray("scheduleDay", param.get("scheduleDay"), true);
 
             responseMap = scheduleService.setLedContent(param);
@@ -292,16 +298,18 @@ public class ScheduleController {
 
         responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
 
-        String[] keyList = {"scheduleId", "scheduleName", "startDateTime", "endDateTime", "scheduleDay"};
+        String[] keyList = {"scheduleId", "scheduleName", "startDate", "endDate","startTime", "endTime", "scheduleDay"};
 
         try {
             parameterValidation(param, keyList);
 
             parameterInt("scheduleId", param.get("scheduleId"), true);
             parameterString("scheduleName", param.get("scheduleName"), true, 0, null);
-            parameterDateTime("startDateTime", param.get("startDateTime"), true);
-            parameterDateTime("endDateTime", param.get("endDateTime"), true);
-            parameterCompareDateTime("startDateTime", "endDateTime", param.get("startDateTime"), param.get("endDateTime"));
+            parameterDate("startDate", param.get("startDate"), true);
+            parameterDate("endDate", param.get("endDate"), true);
+            parameterTime("startTime", param.get("startTime"), true);
+            parameterTime("endTime", param.get("endTime"), true);
+            parameterCompareDate("startDate", "endDate", param.get("startDate"), param.get("endDate"));
             parameterArray("scheduleDay", param.get("scheduleDay"), true);
 
             responseMap = scheduleService.setLedContent(param);

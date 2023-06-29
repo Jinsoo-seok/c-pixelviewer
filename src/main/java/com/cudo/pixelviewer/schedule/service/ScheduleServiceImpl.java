@@ -29,29 +29,37 @@ public class ScheduleServiceImpl implements ScheduleService{
         playList.add(PlayListPowerScheduleVo.builder()
                 .scheduleId(1L)
                 .scheduleName("플레이리스트1")
-                .startDateTime("202306010900")
-                .endDateTime("202306031800")
+                .startDate("20230601")
+                .endDate("20230603")
+                .startTime("09:00")
+                .endTime("18:00")
                 .build());
 
         playList.add(PlayListPowerScheduleVo.builder()
                 .scheduleId(2L)
                 .scheduleName("플레이리스트2")
-                .startDateTime("202306050900")
-                .endDateTime("202306061800")
+                .startDate("20230605")
+                .endDate("20230606")
+                .startTime("09:00")
+                .endTime("18:00")
                 .build());
 
         ledPower.add(PlayListPowerScheduleVo.builder()
                 .scheduleId(1L)
                 .scheduleName("LED 전원1")
-                .startDateTime("202306010900")
-                .endDateTime("202306031800")
+                .startDate("20230601")
+                .endDate("20230603")
+                .startTime("09:00")
+                .endTime("18:00")
                 .build());
 
         ledPower.add(PlayListPowerScheduleVo.builder()
                 .scheduleId(2L)
                 .scheduleName("LED 전원2")
-                .startDateTime("202306050900")
-                .endDateTime("202306061800")
+                .startDate("20230605")
+                .endDate("20230606")
+                .startTime("09:00")
+                .endTime("18:00")
                 .build());
 
         brightness.add(BrightnessScheduleVo.builder()
@@ -95,8 +103,10 @@ public class ScheduleServiceImpl implements ScheduleService{
                 .preset(2)
                 .playList(1)
                 .scheduleName("플레이리스트 1")
-                .startDateTime("202306010900")
-                .endDateTime("202306031800")
+                .startDate("20230601")
+                .endDate("20230603")
+                .startTime("09:00")
+                .endTime("18:00")
                 .scheduleDay(scheduleDay)
                 .build());
         resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));

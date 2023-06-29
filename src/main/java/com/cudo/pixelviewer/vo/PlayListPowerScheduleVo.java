@@ -12,6 +12,8 @@ import lombok.NoArgsConstructor;
 public class PlayListPowerScheduleVo {
     Long scheduleId;
     String scheduleName;
-    String startDateTime;
-    String endDateTime;
+    String startDate;
+    String endDate;
+    String startTime;
+    String endTime;
 }
