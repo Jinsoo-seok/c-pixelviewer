@@ -14,7 +14,7 @@ public class PlaylistContentsVo implements Serializable {
     private Integer contentId;
     @JsonIgnore
     private Integer type;
-    @JsonIgnore
+
     private String ctsNm;
 
 
