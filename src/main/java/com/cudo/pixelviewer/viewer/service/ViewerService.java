@@ -10,6 +10,6 @@ public interface ViewerService {
 
     Map<String, Object> putUpdateAndHealthCheck(Map<String, Object> param);
 
-    Map<String, Object> postPreviewImgUpload(String screenId, MultipartFile file);
+    Map<String, Object> postPreviewImgUpload(String type, String name, MultipartFile file);
 
 }

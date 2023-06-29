@@ -92,20 +92,21 @@ public class ViewerController {
         return responseMap;
     }
 
-    @PostMapping("/previewImg/{screenId}")
+    @PostMapping("/previewImg/{type}/{name}")
     public Map<String, Object> postPreviewImgUpload(HttpServletRequest request
-            , @PathVariable String screenId
+            , @PathVariable String type
+            , @PathVariable String name
             , MultipartFile file){
         long startTime = System.currentTimeMillis();
         String apiInfo = "["+ request.getRequestURI() + "] [" + request.getMethod() + "]";
-        log.info("{} [START] [{}] - {}", apiInfo, startTime, screenId);
+        log.info("{} [START] [{}] - type : {}, name : {}", apiInfo, startTime, type, name);
 
         Map<String, Object> responseMap = new HashMap<>();
         responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
 
 
         try {
-            responseMap = viewerService.postPreviewImgUpload(screenId, file);
+            responseMap = viewerService.postPreviewImgUpload(type, name, file);
         }
         catch (Exception exception) {
             log.error("[Exception][postPreviewImgUpload] - {}", exception.getMessage());

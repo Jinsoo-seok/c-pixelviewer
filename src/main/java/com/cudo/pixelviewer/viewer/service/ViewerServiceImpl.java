@@ -220,15 +220,44 @@ public class ViewerServiceImpl implements ViewerService {
     }
 
     @Override
-    public Map<String, Object> postPreviewImgUpload(String screenId, MultipartFile file) {
+    public Map<String, Object> postPreviewImgUpload(String type, String name, MultipartFile file) {
         Map<String, Object> resultMap = new HashMap<>();
 
         if (file != null && !file.isEmpty()) {
             try {
                 String desktopPath = System.getProperty("user.home") + File.separator + "Desktop";
                 String originalFilename = file.getOriginalFilename();
+                String filename = originalFilename.substring(0, originalFilename.lastIndexOf("."));
                 String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
-                String filePath = desktopPath + File.separator + screenId + extension;
+                String filePath = desktopPath + File.separator;
+
+                LocalDateTime localDateTime = LocalDateTime.parse("2022-02-02 10:10:10", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+                String formattedDateTime = localDateTime.format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
+
+                switch(type) {
+                    // Agent Capture Img ( Desktop )
+                    case "10": {
+                        filePath += "agent" + File.separator + name + extension;
+                        break;
+                    }
+                    // Contents Thumbnails
+                    case "20": {
+                        filePath += "thumbnails"  + File.separator + filename + "_" + formattedDateTime + extension;
+                        break;
+                    }
+                    // Weather Img
+                    case "30": case "40": case "50":
+                    case "60": case "70": case "80":
+                    case "90": case "100":
+                    {
+                        filePath += "weather"  + File.separator + originalFilename;
+                        break;
+                    }
+                    default: {
+                        // TODO : 예외처리
+                        break;
+                    }
+                }
 
                 File destFile = new File(filePath);
                 FileUtils.copyInputStreamToFile(file.getInputStream(), destFile);
