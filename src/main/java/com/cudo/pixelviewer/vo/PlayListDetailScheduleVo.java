@@ -16,7 +16,9 @@ public class PlayListDetailScheduleVo {
     Integer preset;
     Integer playList;
     String scheduleName;
-    String startDateTime;
-    String endDateTime;
+    String startDate;
+    String endDate;
+    String startTime;
+    String endTime;
     List<Integer> scheduleDay;
 }
