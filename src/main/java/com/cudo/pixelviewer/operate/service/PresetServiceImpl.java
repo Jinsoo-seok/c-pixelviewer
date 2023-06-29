@@ -201,7 +201,7 @@ public class PresetServiceImpl implements PresetService {
 
         String playInfoUrl = baseUrl + "playInfo";
         String updateCheckUrl = baseUrl + "updateAndHealthCheck";
-        String previewImgUrl = baseUrl + "previewImg";
+        String previewImgUrl = baseUrl + "previewImg/10";
 
         requestBodyMap.put("playInfoUrl", playInfoUrl);
         requestBodyMap.put("updateCheckUrl", updateCheckUrl);

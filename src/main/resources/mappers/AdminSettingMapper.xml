@@ -113,4 +113,36 @@
         WHERE display_id = #{displayId}
     </delete>
 
+
+    <update id="patchWeatherImg">
+        UPDATE Setting AS S
+        <set>
+            <choose>
+                <when test="type == '30'">
+                    weather_sunny = #{originalFilename}
+                </when>
+                <when test="type == '40'">
+                    weather_many_cloudy = #{originalFilename}
+                </when>
+                <when test="type == '50'">
+                    weather_cloudy = #{originalFilename}
+                </when>
+                <when test="type == '60'">
+                    weather_rain_snow = #{originalFilename}
+                </when>
+                <when test="type == '70'">
+                    weather_snow = #{originalFilename}
+                </when>
+                <when test="type == '80'">
+                    weather_rain = #{originalFilename}
+                </when>
+                <when test="type == '90'">
+                    weather_shower = #{originalFilename}
+                </when>
+            </choose>
+        </set>
+        WHERE S.program_id = 1
+    </update>
+
+
 </mapper>

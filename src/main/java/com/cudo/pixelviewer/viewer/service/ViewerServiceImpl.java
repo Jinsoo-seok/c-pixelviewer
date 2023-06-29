@@ -1,5 +1,6 @@
 package com.cudo.pixelviewer.viewer.service;
 
+import com.cudo.pixelviewer.bo.mapper.AdminSettingMapper;
 import com.cudo.pixelviewer.external.mapper.ExternalsMapper;
 import com.cudo.pixelviewer.operate.mapper.LayerMapper;
 import com.cudo.pixelviewer.operate.mapper.PlaylistMapper;
@@ -39,6 +40,8 @@ public class ViewerServiceImpl implements ViewerService {
     final PlaylistMapper playlistMapper;
 
     final ExternalsMapper externalsMapper;
+
+    final AdminSettingMapper adminSettingMapper;
 
 //    final ViewerMapper viewerMapper;
 
@@ -234,6 +237,8 @@ public class ViewerServiceImpl implements ViewerService {
                 LocalDateTime localDateTime = LocalDateTime.parse("2022-02-02 10:10:10", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
                 String formattedDateTime = localDateTime.format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
 
+                Boolean weatherType = false;
+
                 switch(type) {
                     // Agent Capture Img ( Desktop )
                     case "10": {
@@ -250,11 +255,12 @@ public class ViewerServiceImpl implements ViewerService {
                     case "60": case "70": case "80":
                     case "90": case "100":
                     {
+                        weatherType = true;
                         filePath += "weather"  + File.separator + originalFilename;
                         break;
                     }
                     default: {
-                        // TODO : 예외처리
+                        // TODO : 예외 처리
                         break;
                     }
                 }
@@ -262,6 +268,10 @@ public class ViewerServiceImpl implements ViewerService {
                 File destFile = new File(filePath);
                 FileUtils.copyInputStreamToFile(file.getInputStream(), destFile);
 
+                if(weatherType){
+                    // TODO : 예외 처리
+                    int weatherImgResult = adminSettingMapper.patchWeatherImg(type, originalFilename);
+                }
                 resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
             } catch (IOException ioException) {
                 ioException.printStackTrace();
