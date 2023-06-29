@@ -10,7 +10,6 @@ public class PlaylistContentsVo implements Serializable {
 
     private static final long serialVersionUID = 6624135788238183579L;
 
-    @JsonIgnore
     private Integer contentId;
     @JsonIgnore
     private Integer type;

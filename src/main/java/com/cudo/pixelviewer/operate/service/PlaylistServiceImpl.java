@@ -90,30 +90,30 @@ public class PlaylistServiceImpl implements PlaylistService {
         return resultMap;
     }
 
-//    @Override
-//    @Transactional(rollbackFor = Exception.class)
-//    public Map<String, Object> deletePlaylist(Map<String, Object> param) {
-//        Map<String, Object> resultMap = new HashMap<>();
-//
-//        int playlistCheck = playlistMapper.deletePlaylistValid(param);
-//
-//        if(playlistCheck == 1){  // Exist : 1
-//            int deletePlaylistResult = playlistMapper.deletePlaylist(param);
-//
-//            if(deletePlaylistResult == 1){ // Success : 1
-//                resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
-//            }
-//            else{
-//                resultMap.put("code", ResponseCode.FAIL_DELETE_PLAYLIST.getCode());
-//                resultMap.put("message", ResponseCode.FAIL_DELETE_PLAYLIST.getMessage());
-//            }
-//        }
-//        else{
-//            resultMap.put("code", ResponseCode.FAIL_NOT_EXIST_PLAYLIST.getCode());
-//            resultMap.put("message", ResponseCode.FAIL_NOT_EXIST_PLAYLIST.getMessage());
-//        }
-//        return resultMap;
-//    }
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Map<String, Object> deletePlaylist(Map<String, Object> param) {
+        Map<String, Object> resultMap = new HashMap<>();
+
+        int playlistCheck = playlistMapper.deletePlaylistValid(param);
+
+        if(playlistCheck == 1){  // Exist : 1
+            int deletePlaylistResult = playlistMapper.deletePlaylist(param);
+
+            if(deletePlaylistResult == 1){ // Success : 1
+                resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
+            }
+            else{
+                resultMap.put("code", ResponseCode.FAIL_DELETE_PLAYLIST.getCode());
+                resultMap.put("message", ResponseCode.FAIL_DELETE_PLAYLIST.getMessage());
+            }
+        }
+        else{
+            resultMap.put("code", ResponseCode.FAIL_NOT_EXIST_PLAYLIST.getCode());
+            resultMap.put("message", ResponseCode.FAIL_NOT_EXIST_PLAYLIST.getMessage());
+        }
+        return resultMap;
+    }
 //
 //    @Override
 //    @Transactional(rollbackFor = Exception.class)
