@@ -321,20 +321,20 @@ public class PlaylistController {
         Map<String, Object> responseMap = new HashMap<>();
         responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
 
-        String[] keyList = {"playlistId", "ordNo", "type", "ctsNm", "ctsPath", "playtime", "weatherFl", "airInfoFl", "stretch", "thumbnailPath"};
+        String[] keyList = {"type", "ctsNm", "ctsPath", "playtime", "thumbnailPath"};
 
         try {
             parameterValidation(param, keyList);
-            parameterInt("playlistId", param.get("playlistId"), true);
-            parameterInt("ordNo", param.get("ordNo"), true);
+//            parameterInt("playlistId", param.get("playlistId"), true);
+//            parameterInt("ordNo", param.get("ordNo"), true);
 //            parameterInt("type", param.get("type"), true);
             parameterString("type", param.get("type"), true, 0, null);
             parameterString("ctsNm", param.get("ctsNm"), true, 0, null);
             parameterString("ctsPath", param.get("ctsPath"), true, 0, null);
             parameterInt("playtime", param.get("playtime"), true);
-            parameterBoolean("weatherFl", param.get("weatherFl"), true);
-            parameterBoolean("airInfoFl", param.get("airInfoFl"), true);
-            parameterBoolean("stretch", param.get("stretch"), true);
+//            parameterBoolean("weatherFl", param.get("weatherFl"), true);
+//            parameterBoolean("airInfoFl", param.get("airInfoFl"), true);
+//            parameterBoolean("stretch", param.get("stretch"), true);
 //            parameterInt("weatherFl", param.get("weatherFl"), true);
 //            parameterInt("airInfoFl", param.get("airInfoFl"), true);
 //            parameterInt("airInfoFl", param.get("airInfoFl"), true);

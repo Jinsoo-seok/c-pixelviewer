@@ -106,7 +106,6 @@
             (
                 #{type}
                 , #{ctsNm}, #{ctsPath}, #{playtime}
-                , #{weatherFl}, #{airInfoFl}, #{stretch}
                 , #{thumbnailPath}
             )
     </insert>
