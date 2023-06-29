@@ -244,7 +244,7 @@ public class ScheduleController {
      * * 전원 스케줄 등록
      */
     @PostMapping("/power-reg")
-    public Map<String, Object> setPower(HttpServletRequest request, @RequestBody Map<String, Object> param) {
+    public Map<String, Object> postLedPower(HttpServletRequest request, @RequestBody Map<String, Object> param) {
         long startTime = System.currentTimeMillis();
         String apiInfo = "[" + request.getRequestURI() + "] [" + request.getMethod() + "]";
         log.info("{} [START] [{}]", apiInfo, startTime);
@@ -266,7 +266,7 @@ public class ScheduleController {
             parameterCompareDate("startDate", "endDate", param.get("startDate"), param.get("endDate"));
             parameterArray("scheduleDay", param.get("scheduleDay"), true);
 
-            responseMap = scheduleService.setLedContent(param);
+            responseMap = scheduleService.postLedPower(param);
         } catch (ParamException paramException) {
             log.error("[paramException][patchLayerTopMost] - {}", paramException.getMessage());
 
@@ -289,7 +289,7 @@ public class ScheduleController {
      * * 전원 스케줄 수정
      */
     @PatchMapping("/power-edit")
-    public Map<String, Object> editPower(HttpServletRequest request, @RequestBody Map<String, Object> param) {
+    public Map<String, Object> editLedPower(HttpServletRequest request, @RequestBody Map<String, Object> param) {
         long startTime = System.currentTimeMillis();
         String apiInfo = "[" + request.getRequestURI() + "] [" + request.getMethod() + "]";
         log.info("{} [START] [{}]", apiInfo, startTime);
