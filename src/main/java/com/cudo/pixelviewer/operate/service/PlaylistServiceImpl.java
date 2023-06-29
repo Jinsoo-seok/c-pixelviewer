@@ -54,6 +54,7 @@ public class PlaylistServiceImpl implements PlaylistService {
             try {
                 JSONParser parser = new JSONParser();
                 Object obj = parser.parse(contentIdList);
+                playlist.put("contentIdList", obj);
                 tempContentIdList = (List<Map<String, Object>>) obj;
 
                 StringBuilder contentIds = new StringBuilder();
@@ -74,8 +75,33 @@ public class PlaylistServiceImpl implements PlaylistService {
 
             // TODO : Order By(order 기준)
             List<Map<String, Object>> playlistContentList = playlistMapper.getPlaylistContentList(queryTemp);
+            Long order = 1L;
             if(playlistContentList.size() != 0){
-                playlist.put("contentArray", playlistContentList);
+                List<Map<String, Object>> tempContentArray = new ArrayList<>();
+
+                for (int i = 0; i < playlistContentList.size(); i++) {
+                    for(int x = 0; x < playlistContentList.size(); x++) {
+                        Long tempOrder = (Long) tempContentIdList.get(x).get("order");
+                        if (tempOrder == order) {
+                            Long orderContentId = (Long) tempContentIdList.get(x).get("contentId");
+                            for (Map<String, Object> playlistContent : playlistContentList) {
+                                Integer dbContentId = (Integer) playlistContent.get("contentId");
+                                if (orderContentId.equals(dbContentId.longValue())) {
+                                    System.out.println("orderContentId == dbContentId");
+                                    playlistContent.put("weatherFl", tempContentIdList.get(x).get("weatherFl"));
+                                    playlistContent.put("airInfoFl", tempContentIdList.get(x).get("airInfoFl"));
+                                    playlistContent.put("stretch", tempContentIdList.get(x).get("stretch"));
+                                    playlistContent.put("order", tempContentIdList.get(x).get("order"));
+                                    tempContentArray.add(playlistContent);
+                                }
+                            }
+                            order++;
+                        }
+                    }
+                }
+                playlist.put("contentArray", tempContentArray);
+                String removeKey = "contentIdList";
+                playlist.remove(removeKey);
             }
 
             resultMap.put("data", playlist);
