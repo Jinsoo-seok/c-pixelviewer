@@ -275,9 +275,37 @@ public class PlaylistServiceImpl implements PlaylistService {
 
         PlaylistContentsVo playlistVo = playlistMapper.getPlaylistContents(Id);
 
-        if(playlistVo != null){
-            resultMap.put("data", playlistVo);
-            resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
+        if(playlistVo!= null) {
+            Integer contentId = playlistVo.getContentId();
+            String checkContentId = "\"contentId\":" + contentId;
+
+            List<PlaylistVo> playlistVoList = playlistMapper.getPlaylistList();
+            StringBuilder playlistIds = new StringBuilder();
+
+            for (PlaylistVo tempPlaylistVo : playlistVoList) {
+                String tempContentIdList = tempPlaylistVo.getContentIdList();
+                if (tempContentIdList.contains(checkContentId)) {
+                    playlistIds.append(tempPlaylistVo.getPlaylistId()).append(",");
+                }
+            }
+            String playlistIdString = playlistIds.toString();
+            if (playlistIdString.endsWith(",")) {
+                playlistIdString = playlistIdString.substring(0, playlistIdString.length() - 1);
+            }
+
+            List<Map<String, Object>> includedList = new ArrayList<>();
+            if (!playlistIdString.equals("")) {
+                String queryIdList = "(" + playlistIdString + ")";
+                includedList = playlistMapper.getIncludedList(queryIdList);
+
+                resultMap.put("deleteYn", false);
+                resultMap.put("data", includedList);
+                resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
+            }
+            else{
+                resultMap.put("deleteYn", true);
+                resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
+            }
         }
         else{
             resultMap.putAll(ParameterUtils.responseOption(ResponseCode.NO_CONTENT.getCodeName()));

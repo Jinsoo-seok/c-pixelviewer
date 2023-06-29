@@ -18,10 +18,8 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.web.reactive.function.BodyInserters;
-import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
-
 
 import java.util.HashMap;
 import java.util.List;
@@ -212,6 +210,9 @@ public class PresetServiceImpl implements PresetService {
 
         // TODO : 파라미터 매칭해야함(screenInfo)
         Map<String, Object> screenInfo = screenMapper.getScreen(screenId);
+        String removeKey = "screenNm";
+        screenInfo.remove(removeKey);
+
         List<LayerToAgentVo>  layerInfos = presetMapper.getPresetLayersToAgent(presetId);
 
 
@@ -223,44 +224,44 @@ public class PresetServiceImpl implements PresetService {
         resultMap.put("data", requestBodyMap);
 
         // TODO : Agent 연동
-//        import org.springframework.http.HttpHeaders;
-//        import org.springframework.http.HttpMethod;
-//        import org.springframework.http.MediaType;
-//        import org.springframework.http.client.reactive.ReactorClientHttpConnector;
-//        import org.springframework.web.reactive.function.BodyInserters;
-//        import org.springframework.web.reactive.function.client.ClientResponse;
-//        import org.springframework.web.reactive.function.client.WebClient;
-//        import reactor.core.publisher.Mono;
 
-//        // WebClient 생성
-//        WebClient webClient = WebClient.builder()
-//                .clientConnector(new ReactorClientHttpConnector())
-//                .baseUrl("http://host:port/vieweragent/Preset/layer-placement") // 요청 URL 설정
-//                .build();
-//
-//        // 요청 헤더 설정
-//        HttpHeaders headers = new HttpHeaders();
-//        headers.setContentType(MediaType.APPLICATION_JSON);
-//
-//        // POST 요청 보내기
-//        Mono<ClientResponse> responseMono = webClient.method(HttpMethod.POST)
-//                .uri(agentUrl)
-//                .headers(httpHeaders -> httpHeaders.addAll(headers))
-//                .body(BodyInserters.fromValue(requestBodyMap))
+        String ip = "192.168.123.12";
+        String port = "8800";
+
+        String agentUrl = "http://" + ip + ":" + port + "/vieweragent/Preset/layer-placement";
+        // WebClient 생성
+        WebClient webClient = WebClient.builder()
+                .clientConnector(new ReactorClientHttpConnector())
+                .baseUrl(agentUrl)
+                .build();
+
+        // 요청 헤더 설정
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        // POST 요청 보내기
+        Mono<String> responseMono = webClient.method(HttpMethod.POST)
+                .uri(agentUrl)
+                .headers(httpHeaders -> httpHeaders.addAll(headers))
+                .body(BodyInserters.fromValue(requestBodyMap))
 //                .exchange()
-//                .flatMap(response -> response.bodyToMono(ClientResponse.class));
-//
-//        // 응답 처리
-//        responseMono.subscribe(response -> {
-//            int statusCode = response.rawStatusCode();
+//                .flatMap(response -> response.bodyToMono(String.class));
+                .retrieve()
+                .bodyToMono(String.class);
+//                            response.bodyToMono(byte[].class)
+
+        // 응답 처리
+        // TODO : 예외처리
+        responseMono.subscribe(response -> {
+            String data = response.toString();
+            System.out.println("data = " + data);
+//            int statusCode = Integer.parseInt(response);
 //            if (statusCode == 200) {
-//                // 성공적인 응답 처리
-//                log.info("요청이 성공적으로 처리되었습니다.");
+//                log.info("요청 성공");
 //            } else {
-//                // 응답 실패 처리
-//                log.info("요청이 실패했습니다. 상태 코드: {}", statusCode);
+//                log.info("요청 실패 상태 코드: {}", statusCode);
 //            }
-//        });
+        });
 
         // TODO : [DB] preset Status >> RUN
         Map<String, Object> queryMap = new HashMap<>();
@@ -277,7 +278,10 @@ public class PresetServiceImpl implements PresetService {
     public Map<String, Object> patchPresetStop(Map<String, Object> param) {
         Map<String, Object> resultMap = new HashMap<>();
 
-        String agentUrl = "http://host:port/vieweragent/Preset/layer-placement";
+        String ip = "192.168.123.12";
+        String port = "8800";
+
+        String agentUrl = "http://" + ip + ":" + port + "/vieweragent/Preset/layer-placement";
 
         // TODO : Agent 연동
         /*

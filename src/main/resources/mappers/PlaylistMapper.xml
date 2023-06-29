@@ -77,6 +77,17 @@
         WHERE Playlists.playlist_id = #{playlistId}
     </update>
 
+    <select id="getIncludedList" resultType="com.cudo.pixelviewer.vo.contentIncludedVo">
+        SELECT PL.playlist_id, PL.playlist_nm, P.preset_id, P.preset_nm, L.layer_id, L.layer_nm
+        FROM Playlists AS PL
+                 LEFT JOIN Presets AS P ON P.preset_id = PL.preset_id
+                 LEFT JOIN Layers AS L ON L.preset_id = PL.preset_id
+        WHERE playlist_id IN ${idList}
+        GROUP BY PL.playlist_id
+    </select>
+
+
+
 
     <select id="getPlaylistContentsList" resultType="com.cudo.pixelviewer.vo.PlaylistContentsVo">
         SELECT *
