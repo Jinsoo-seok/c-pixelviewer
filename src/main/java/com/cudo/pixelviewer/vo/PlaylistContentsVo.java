@@ -13,10 +13,7 @@ public class PlaylistContentsVo implements Serializable {
     private Integer contentId;
 
     private String type;
-
     private String ctsNm;
-
-
     private String ctsPath;
     private Integer playtime;
 
