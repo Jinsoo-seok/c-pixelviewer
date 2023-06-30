@@ -10,7 +10,8 @@ import java.util.Map;
 @Mapper
 public interface AdminSettingMapper {
 
-    List<AdminSettingVo> getAdminSettingList();
+//    List<AdminSettingVo> getAdminSettingList();
+    List<Map<String, Object>> getAdminSettingList();
 
     int putAdminSetting(Map<String, Object> param);
 

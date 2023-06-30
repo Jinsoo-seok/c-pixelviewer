@@ -28,10 +28,34 @@ public class AdminSettingServiceImpl implements AdminSettingService {
     public Map<String, Object> getAdminSettingList() {
         Map<String, Object> resultMap = new HashMap<>();
 
-        List<AdminSettingVo> adminSettingVoList = adminSettingMapper.getAdminSettingList();
+//        List<AdminSettingVo> adminSettingVoList = adminSettingMapper.getAdminSettingList();
+        List<Map<String, Object>> adminSettingVoList = adminSettingMapper.getAdminSettingList();
+        Map<String, Object> returnMap = new HashMap<>();
+
+
+        for (Map<String, Object> element : adminSettingVoList) {
+            String settingKey = (String) element.get("settingKey");
+            Object settingValue = element.get("settingValue");
+
+            if (settingKey.equals("imgDefaultPlaytime")) {
+                returnMap.put(settingKey, Integer.parseInt((String) settingValue));
+            }
+            else if (settingValue.equals("1") || settingValue.equals("0") ) {
+                if(settingValue.equals("1")){
+                    returnMap.put(settingKey, true);
+                }
+                else if(settingValue.equals("0")){
+                    returnMap.put(settingKey, false);
+                }
+            }
+            else {
+                returnMap.put(settingKey, settingValue.toString());
+            }
+        }
 
         if(adminSettingVoList.size() > 0){
-            resultMap.put("data", adminSettingVoList);
+            resultMap.put("data", returnMap);
+//            resultMap.put("data", adminSettingVoList);
             resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
         }
         else{

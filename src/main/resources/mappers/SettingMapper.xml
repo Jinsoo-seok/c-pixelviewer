@@ -10,9 +10,9 @@
     </select>
 
     <update id="patchSettingImageDefaultPlaytime" parameterType="Map">
-        UPDATE Setting
-        SET img_default_playtime = #{playtime}
-        WHERE program_id = 1
+        UPDATE Settings
+        SET setting_value = #{playtime}, update_date = NOW()
+        WHERE setting_key = "imgDefaultPlaytime";
     </update>
 
     <select id="getFontList" resultType="Map">

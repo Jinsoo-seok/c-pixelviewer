@@ -3,7 +3,11 @@
 
 <mapper namespace="com.cudo.pixelviewer.bo.mapper.AdminSettingMapper">
 
-    <select id="getAdminSettingList" resultType="com.cudo.pixelviewer.vo.AdminSettingVo">
+    <select id="getAdminSettingList" resultType="Map">
+        SELECT setting_key AS settingKey, setting_value AS settingValue
+        FROM Settings
+    </select>
+    <select id="getAdminSettingList2" resultType="com.cudo.pixelviewer.vo.AdminSettingVo">
         SELECT *
         FROM Setting
         WHERE program_id = 1
