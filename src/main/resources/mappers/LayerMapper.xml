@@ -43,7 +43,7 @@
         WHERE object_id = #{objectId}
     </select>
     <select id="getLayerObjectExternalSubtitle" resultType="Map">
-        SELECT *
+        SELECT subtitle_id AS subtitleId, screen_id AS screenId, preset_id AS presetId, layer_id AS layerId, object_id AS objectId, subtitle_style AS subtitleStyle, update_date AS updateDate
         FROM Subtitles
         WHERE object_id = #{objectId}
     </select>

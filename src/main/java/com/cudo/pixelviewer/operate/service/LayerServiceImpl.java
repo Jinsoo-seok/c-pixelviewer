@@ -77,7 +77,7 @@ public class LayerServiceImpl implements LayerService {
                         case 30:
                             System.out.println("type 30");
                             Map<String, Object> subtitleTemp = layerMapper.getLayerObjectExternalSubtitle((Integer) lo.get("object_id"));
-                            String temp = (String) subtitleTemp.get("subtitle_style");
+                            String temp = (String) subtitleTemp.get("subtitleStyle");
 
                             try {
                                 JSONParser parser = new JSONParser();
