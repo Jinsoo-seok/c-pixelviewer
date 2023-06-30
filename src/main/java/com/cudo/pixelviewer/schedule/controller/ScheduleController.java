@@ -37,20 +37,8 @@ public class ScheduleController {
 
         responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
 
-        String[] keyList = {"startDate", "endDate"};
-
         try {
-            parameterValidation(param, keyList);
-            parameterDate("startDate", param.get("startDate"), true);
-            parameterDate("endDate", param.get("endDate"), true);
-            parameterCompareDate("startDate", "endDate", param.get("startDate"), param.get("endDate"));
-
             responseMap = scheduleService.getCalenderStatus(param);
-        } catch (ParamException paramException) {
-            log.error("[paramException][patchLayerTopMost] - {}", paramException.getMessage());
-
-            responseMap.put("code", paramException.getCode());
-            responseMap.put("message", paramException.getMessage());
         } catch (Exception exception) {
             log.error("[Exception][getPlaylistList] - {}", exception.getMessage());
 

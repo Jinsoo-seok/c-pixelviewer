@@ -34,6 +34,7 @@ public class ScheduleServiceImpl implements ScheduleService {
                 .endDate("20230603")
                 .startTime("09:00")
                 .endTime("18:00")
+                .type("playlist")
                 .build());
 
         playList.add(PlayListPowerScheduleVo.builder()
@@ -43,6 +44,7 @@ public class ScheduleServiceImpl implements ScheduleService {
                 .endDate("20230606")
                 .startTime("09:00")
                 .endTime("18:00")
+                .type("playlist")
                 .build());
 
         ledPower.add(PlayListPowerScheduleVo.builder()
@@ -52,6 +54,7 @@ public class ScheduleServiceImpl implements ScheduleService {
                 .endDate("20230603")
                 .startTime("09:00")
                 .endTime("18:00")
+                .type("power")
                 .build());
 
         ledPower.add(PlayListPowerScheduleVo.builder()
@@ -61,6 +64,7 @@ public class ScheduleServiceImpl implements ScheduleService {
                 .endDate("20230606")
                 .startTime("09:00")
                 .endTime("18:00")
+                .type("power")
                 .build());
 
         brightness.add(BrightnessScheduleVo.builder()
@@ -68,6 +72,7 @@ public class ScheduleServiceImpl implements ScheduleService {
                 .scheduleName("밝기1")
                 .startDate("20230601")
                 .endDate("20230603")
+                .type("light")
                 .build());
 
         brightness.add(BrightnessScheduleVo.builder()
@@ -75,6 +80,7 @@ public class ScheduleServiceImpl implements ScheduleService {
                 .scheduleName("밝기2")
                 .startDate("20230601")
                 .endDate("20230603")
+                .type("light")
                 .build());
 
         resultMap.put("data", CalenderStatusVo.builder()
@@ -131,7 +137,7 @@ public class ScheduleServiceImpl implements ScheduleService {
         Map<String, Object> responseMap = new HashMap<>();
 
         param.put("startTime", Integer.parseInt(String.valueOf(param.get("startTime"))) * 100);
-        param.put("endTime", String.format("%-6s", param.get("endTime")).replace(" ", "0"));
+        param.put("endTime", Integer.parseInt(String.valueOf(param.get("endTime"))) * 100);
 
         String scheduleDay = "";
 
