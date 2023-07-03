@@ -192,7 +192,7 @@ public class ScreenController {
         responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
 
 //        String[] keyList = {"screenId", "screenNm", "rowsize", "columnsize", "posX", "posY", "width", "height"};
-        String[] keyList = {"screenId", "screenNm", "posX", "posY", "width", "height"};
+        String[] keyList = {"screenId", "screenNm", "posX", "posY", "width", "height", "deleteType"};
 
         try {
             parameterValidation(param, keyList);
@@ -204,6 +204,7 @@ public class ScreenController {
             parameterInt("posY", param.get("posY"), true);
             parameterInt("width", param.get("width"), true);
             parameterInt("height", param.get("height"), true);
+            parameterBoolean("deleteType", param.get("deleteType"), true);
 
             responseMap = screenService.putScreenSet(param);
         }

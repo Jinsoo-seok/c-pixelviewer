@@ -112,14 +112,12 @@ public class LayerServiceImpl implements LayerService {
         return resultMap;
     }
 
-    // TODO : POST 중복 체크
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> postLayer(Map<String, Object> param) {
         Map<String, Object> resultMap = new HashMap<>();
         Map<String, Object> dataMap = new HashMap<>();
 
-//        int layerCheck = layerMapper.postLayerValid(param);
         int layerCheck = 0;
 
         if(layerCheck == 0){ // Not Exist : 0
@@ -179,9 +177,16 @@ public class LayerServiceImpl implements LayerService {
             int putLayerResult = layerMapper.putLayer(param);
 
             if(putLayerResult == 1){ // Success : 1
-                // TODO : 예외 처리
+
+                //Preset Version UPDATE
                 int refreshPresetUpdateDateResult = presetMapper.refreshPresetUpdateDate(param.get("presetId"));
-                resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
+                if(refreshPresetUpdateDateResult > 0){
+                    resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
+                }
+                else{
+                    resultMap.put("code", ResponseCode.FAIL_UPDATE_PRESET.getCode());
+                    resultMap.put("message", ResponseCode.FAIL_UPDATE_PRESET.getMessage());
+                }
             }
             else{
                 resultMap.put("code", ResponseCode.FAIL_UPDATE_LAYER.getCode());

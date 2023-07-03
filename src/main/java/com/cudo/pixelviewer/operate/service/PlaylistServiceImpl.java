@@ -73,7 +73,7 @@ public class PlaylistServiceImpl implements PlaylistService {
                 e.printStackTrace();
             }
 
-            // TODO : Order By(order 기준)
+            // TODO : 중복 id 처리 시, 데이터 꼬임 현상 있음
             List<Map<String, Object>> playlistContentList = playlistMapper.getPlaylistContentList(queryTemp);
             Long order = 1L;
             if(playlistContentList.size() != 0){
@@ -202,56 +202,6 @@ public class PlaylistServiceImpl implements PlaylistService {
         }
         return resultMap;
     }
-//
-//    @Override
-//    @Transactional(rollbackFor = Exception.class)
-//    public Map<String, Object> patchPlaylistName(Map<String, Object> param) {
-//        Map<String, Object> resultMap = new HashMap<>();
-//
-//        int playlistCheck = playlistMapper.patchPlaylistNameValid(param);
-//
-//        if(playlistCheck == 1){  // Exist : 1
-//            int patchPlaylistNameResult = playlistMapper.patchPlaylistName(param);
-//
-//            if(patchPlaylistNameResult == 1){ // Success : 1
-//                resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
-//            }
-//            else{
-//                resultMap.put("code", ResponseCode.FAIL_UPDATE_PLAYLIST.getCode());
-//                resultMap.put("message", ResponseCode.FAIL_UPDATE_PLAYLIST.getMessage());
-//            }
-//        }
-//        else{
-//            resultMap.put("code", ResponseCode.FAIL_NOT_EXIST_PLAYLIST.getCode());
-//            resultMap.put("message", ResponseCode.FAIL_NOT_EXIST_PLAYLIST.getMessage());
-//        }
-//        return resultMap;
-//    }
-//
-//    @Override
-//    @Transactional(rollbackFor = Exception.class)
-//    public Map<String, Object> putPlaylistSet(Map<String, Object> param) {
-//        Map<String, Object> resultMap = new HashMap<>();
-//
-//        int playlistCheck = playlistMapper.putPlaylistValid(param);
-//
-//        if(playlistCheck == 1){  // Exist : 1
-//            int putPlaylistResult = playlistMapper.putPlaylist(param);
-//
-//            if(putPlaylistResult == 1){ // Success : 1
-//                resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
-//            }
-//            else{
-//                resultMap.put("code", ResponseCode.FAIL_UPDATE_PLAYLIST.getCode());
-//                resultMap.put("message", ResponseCode.FAIL_UPDATE_PLAYLIST.getMessage());
-//            }
-//        }
-//        else{
-//            resultMap.put("code", ResponseCode.FAIL_NOT_EXIST_PLAYLIST.getCode());
-//            resultMap.put("message", ResponseCode.FAIL_NOT_EXIST_PLAYLIST.getMessage());
-//        }
-//        return resultMap;
-//    }
 
     @Override
     public Map<String, Object> getPlaylistContentsList() {

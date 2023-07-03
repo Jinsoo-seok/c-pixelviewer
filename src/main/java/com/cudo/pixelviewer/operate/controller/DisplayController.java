@@ -102,8 +102,6 @@ public class DisplayController {
     }
 
 
-    // TODO : 스크린 아이디 받아서 하위 디스플레이에 각각 색상 정보 넣어서 led컨트롤러에 보내줘야함
-    // TODO : 각각의 디스플레이 테이블에 테스트패턴표시 y/n 수정 필요
     @PatchMapping("/testpattern")
     public Map<String, Object> patchDisplayTestpattern(HttpServletRequest request
                                         , @RequestBody Map<String, Object> param) {

@@ -277,7 +277,6 @@ public class ViewerServiceImpl implements ViewerService {
                         break;
                     }
                     default: {
-                        // TODO : 예외 처리
                         break;
                     }
                 }
@@ -285,11 +284,8 @@ public class ViewerServiceImpl implements ViewerService {
                 File destFile = new File(filePath);
                 FileUtils.copyInputStreamToFile(file.getInputStream(), destFile);
 
-                if(contentsType){
-                }
-                else if(weatherType){
-                    // TODO : 예외 처리
-
+                Boolean weatherImgDB = false;
+                if(weatherType){
                     String settingKey = "";
                     if (type.equals("30")) {
                         settingKey = "weatherSunny";
@@ -308,12 +304,21 @@ public class ViewerServiceImpl implements ViewerService {
                     }
 
                     int weatherImgResult = adminSettingMapper.patchWeatherImg(settingKey, originalFilename);
+                    if(weatherImgResult > 0){
+                        weatherImgDB = true;
+                    }
                 }
 
-                Map<String, Object> dataMap = new HashMap<>();
-                dataMap.put("filePath", filePath);
-                resultMap.put("data", dataMap);
-                resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
+                if(weatherImgDB) {
+                    Map<String, Object> dataMap = new HashMap<>();
+                    dataMap.put("filePath", filePath);
+                    resultMap.put("data", dataMap);
+                    resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
+                }
+                else{
+                    resultMap.put("code", ResponseCode.FAIL_UPDATE_ADMIN_SETTING_WEATHER_IMG.getCode());
+                    resultMap.put("message", ResponseCode.FAIL_UPDATE_ADMIN_SETTING_WEATHER_IMG.getMessage());
+                }
             } catch (IOException ioException) {
                 ioException.printStackTrace();
                 log.error("[paramException][postPreviewImgUpload] - {}", ioException.getMessage());
