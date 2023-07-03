@@ -129,6 +129,7 @@ public enum ResponseCode {
     FAIL_DELETE_DISPLAY_SETTING(4315, "FailedDeleteDisplaySetting", "Failed Delete Display Setting"),
     FAIL_NOT_EXIST_DISPLAY_SETTING(4316, "FailedNotExistDisplaySetting", "Failed Not Exist Display Setting"),
     FAIL_USED_DISPLAY_SETTING(4317, "FailedUsedDisplaySetting", "Failed Used Display Setting"),
+    FAIL_DISPLAY_SETTING_TO_AGENT(4317, "FailedDisplaySettingToAgent", "Failed Used Display Setting to Agent"),
 
     FAIL_UNSUPPORTED_TYPE_SETTING(4300, "FailedUnsupportedTypeSetting", "Failed Unsupported Type Setting");
 

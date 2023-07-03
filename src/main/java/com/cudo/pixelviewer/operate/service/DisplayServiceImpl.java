@@ -6,6 +6,7 @@ import com.cudo.pixelviewer.operate.mapper.ScreenMapper;
 import com.cudo.pixelviewer.util.ParameterUtils;
 import com.cudo.pixelviewer.util.ResponseCode;
 import com.cudo.pixelviewer.vo.DisplayVo;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -18,6 +19,7 @@ import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -92,9 +94,6 @@ public class DisplayServiceImpl implements DisplayService {
 
         if(displayCheck > 0){
 
-            // TODO : +TEST PATTERN LOGIC START
-            // TODO : 테스트 패턴에 대한 내용
-
             Map<String, Object> requestBodyMap = new HashMap<>();
             List<Map<String, Object>> displayArray = new ArrayList<>();
 
@@ -115,8 +114,8 @@ public class DisplayServiceImpl implements DisplayService {
                 tempMap.put("displayNm", display.get("displayNm"));
                 tempMap.put("bgColor", colorSplit[index]);
 
-                tempDataMap.put("posX", display.get("posX"));
-                tempDataMap.put("posY", display.get("posY"));
+                tempDataMap.put("x", display.get("posX"));
+                tempDataMap.put("y", display.get("posY"));
                 tempDataMap.put("width", display.get("width"));
                 tempDataMap.put("height", display.get("height"));
                 tempMap.put("position", tempDataMap);
@@ -125,13 +124,11 @@ public class DisplayServiceImpl implements DisplayService {
                 index = (index == colorSplit.length - 1) ? 0 : (index + 1);
             }
 
-            int currentTime = 1;
+            int currentTime = 8;
 
             requestBodyMap.put("patternInfo", displayArray);
             requestBodyMap.put("presentationTime", currentTime);
 
-            // TODO : Agent 연동 테스트 필요
-/*
             String ip = "192.168.123.12";
             String port = "8800";
 
@@ -154,30 +151,37 @@ public class DisplayServiceImpl implements DisplayService {
                     .retrieve()
                     .bodyToMono(String.class);
 
-            // 응답 처리
-            // TODO : 예외처리
+            // TODO : 디스플레이 상태 업데이트
             responseMono.subscribe(response -> {
                 String data = response.toString();
-                System.out.println("data = " + data);
-//            int statusCode = Integer.parseInt(response);
-//            if (statusCode == 200) {
-//                log.info("요청 성공");
-//            } else {
-//                log.info("요청 실패 상태 코드: {}", statusCode);
-//            }
+                Map<String, Object> responseMap = new HashMap<>();
+
+                try {
+                    ObjectMapper objectMapper = new ObjectMapper();
+                    responseMap = objectMapper.readValue(data, Map.class);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                if(responseMap.get("code").equals(200)){
+                    resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
+
+//                    int patchDisplayNameResult = displayMapper.patchDisplayTestpattern(param);
+//
+//                    if(patchDisplayNameResult == 1){ // Success : 1
+//                        resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
+//                    }
+//                    else{
+//                        resultMap.put("code", ResponseCode.FAIL_UPDATE_DISPLAY.getCode());
+//                        resultMap.put("message", ResponseCode.FAIL_UPDATE_DISPLAY.getMessage());
+//                    }
+                }
+                else{
+                    resultMap.put("code", ResponseCode.FAIL_DISPLAY_SETTING_TO_AGENT.getCode());
+                    resultMap.put("message", ResponseCode.FAIL_DISPLAY_SETTING_TO_AGENT.getMessage());
+
+                }
             });
 
- */
-//            int patchDisplayNameResult = displayMapper.patchDisplayTestpattern(param);
-
-//            if(patchDisplayNameResult == 1){ // Success : 1
-//                resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
-//            }
-//            else{
-//                resultMap.put("code", ResponseCode.FAIL_UPDATE_DISPLAY.getCode());
-//                resultMap.put("message", ResponseCode.FAIL_UPDATE_DISPLAY.getMessage());
-//            }
-            // TODO : TEST PATTERN LOGIC END
             resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
         }
         else{
