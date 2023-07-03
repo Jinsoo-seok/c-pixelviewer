@@ -115,7 +115,10 @@ public class ExternalController {
         Map<String, Object> responseMap = new HashMap<>();
         responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
 
-        String[] keyList = {"screenId", "presetId", "layerId", "objectNm", "type", "posX", "posY", "width", "height", "ord"};
+        String[] keyList = {"screenId", "presetId", "layerId", "objectNm", "type"
+                , "posX", "posY", "width", "height", "ord"
+                ,"forecolor", "fontNm", "fontFl", "fontSize", "fontColor"
+                ,"borderSize", "borderColor", "backColor"};
 
         try {
             parameterValidation(param, keyList);
@@ -129,6 +132,15 @@ public class ExternalController {
             parameterInt("width", param.get("width"), true);
             parameterInt("height", param.get("height"), true);
             parameterInt("ord", param.get("ord"), true);
+
+            parameterString("forecolor", param.get("forecolor"), true, 0, null);
+            parameterString("fontNm", param.get("fontNm"), true, 0, null);
+            parameterString("fontFl", param.get("fontFl"), true, 0, null);
+            parameterInt("fontSize", param.get("fontSize"), true);
+            parameterString("fontColor", param.get("fontColor"), true, 0, null);
+            parameterInt("borderSize", param.get("borderSize"), true);
+            parameterString("borderColor", param.get("borderColor"), true, 0, null);
+            parameterString("backColor", param.get("backColor"), true, 0, null);
 
             responseMap = externalService.postExternalInfo(param);
         }

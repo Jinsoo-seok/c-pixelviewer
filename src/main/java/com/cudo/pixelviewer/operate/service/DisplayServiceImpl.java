@@ -101,7 +101,6 @@ public class DisplayServiceImpl implements DisplayService {
             String testPatternColor = adminSettingMapper.getTestPattern();
             String[] colorSplit = testPatternColor.split(",");
             int index = 0;
-            System.out.println("testPatternColor = " + testPatternColor);
 
             Object tempScreenId = param.get("screenId");
             String screenId = tempScreenId.toString();
@@ -125,8 +124,6 @@ public class DisplayServiceImpl implements DisplayService {
                 displayArray.add(tempMap);
                 index = (index == colorSplit.length - 1) ? 0 : (index + 1);
             }
-
-            System.out.println("testPatternColor = " + testPatternColor);
 
             int currentTime = 1;
 

@@ -72,31 +72,12 @@ public class ViewerServiceImpl implements ViewerService {
                             break;
                         case 20:
                             if(layerMap.get("weatherEn").equals(1)) {
-                                Map<String, Object> tempMap = new HashMap<>();
-                                Map<String, Object> tempStyleMap = new HashMap<>();
-                                Map<String, Object> tempPositionMap = new HashMap<>();
-
                                 Map<String, Object> weatherInfoTemp = layerMapper.getLayerObjectExternalInfo((Integer) lo.get("object_id"));
                                 String updateDate = convertTimestampToString(weatherInfoTemp.get("updateDate"));
 
-                                tempStyleMap.put("fontNm", weatherInfoTemp.get("fontNm"));
-                                tempStyleMap.put("fontSize", weatherInfoTemp.get("fontSize"));
-                                tempStyleMap.put("forecolor", weatherInfoTemp.get("forecolor"));
-
-                                tempPositionMap.put("posX", weatherInfoTemp.get("posX"));
-                                tempPositionMap.put("posY", weatherInfoTemp.get("posY"));
-                                tempPositionMap.put("width", weatherInfoTemp.get("width"));
-                                tempPositionMap.put("height", weatherInfoTemp.get("height"));
-
-                                tempMap.put("ord", weatherInfoTemp.get("ord"));
-                                tempMap.put("type", weatherInfoTemp.get("type"));
-                                tempMap.put("position", tempPositionMap);
-                                tempMap.put("fontStyle", tempStyleMap);
-
-
                                 Map<String, Object> exInfoWeatherMap = new HashMap<>();
                                 exInfoWeatherMap.put("updateDate", updateDate);
-                                exInfoWeatherMap.put("weatherFormInfo", tempMap);
+                                exInfoWeatherMap.put("weatherFormInfo", createTempMap(weatherInfoTemp));
 
                                 dataMap.put("weatherForm", exInfoWeatherMap);
                             }
@@ -132,31 +113,12 @@ public class ViewerServiceImpl implements ViewerService {
                             break;
                         case 40:
                             if(layerMap.get("airEn").equals(1)) {
-                                Map<String, Object> tempMap = new HashMap<>();
-                                Map<String, Object> tempStyleMap = new HashMap<>();
-                                Map<String, Object> tempPositionMap = new HashMap<>();
-
                                 Map<String, Object> airInfoTemp = layerMapper.getLayerObjectExternalInfo((Integer) lo.get("object_id"));
                                 String updateDate = convertTimestampToString(airInfoTemp.get("updateDate"));
 
-                                tempStyleMap.put("fontNm", airInfoTemp.get("fontNm"));
-                                tempStyleMap.put("fontSize", airInfoTemp.get("fontSize"));
-                                tempStyleMap.put("forecolor", airInfoTemp.get("forecolor"));
-
-                                tempPositionMap.put("posX", airInfoTemp.get("posX"));
-                                tempPositionMap.put("posY", airInfoTemp.get("posY"));
-                                tempPositionMap.put("width", airInfoTemp.get("width"));
-                                tempPositionMap.put("height", airInfoTemp.get("height"));
-
-                                tempMap.put("ord", airInfoTemp.get("ord"));
-                                tempMap.put("type", airInfoTemp.get("type"));
-                                tempMap.put("position", tempPositionMap);
-                                tempMap.put("fontStyle", tempStyleMap);
-
-
                                 Map<String, Object> exInfoAirMap = new HashMap<>();
                                 exInfoAirMap.put("updateDate", updateDate);
-                                exInfoAirMap.put("airFormInfo", tempMap);
+                                exInfoAirMap.put("airFormInfo", createTempMap(airInfoTemp));
 
                                 dataMap.put("airForm", exInfoAirMap);
                             }
@@ -374,5 +336,27 @@ public class ViewerServiceImpl implements ViewerService {
             return dateTime.format(formatter);
         }
         return null;
+    }
+
+    private Map<String, Object> createTempMap(Map<String, Object> dataMap){
+        Map<String, Object> returnMap = new HashMap<>();
+        Map<String, Object> tempStyleMap = new HashMap<>();
+        Map<String, Object> tempPositionMap = new HashMap<>();
+
+        tempStyleMap.put("fontNm", dataMap.get("fontNm"));
+        tempStyleMap.put("fontSize", dataMap.get("fontSize"));
+        tempStyleMap.put("forecolor", dataMap.get("forecolor"));
+
+        tempPositionMap.put("posX", dataMap.get("posX"));
+        tempPositionMap.put("posY", dataMap.get("posY"));
+        tempPositionMap.put("width", dataMap.get("width"));
+        tempPositionMap.put("height", dataMap.get("height"));
+
+        returnMap.put("ord", dataMap.get("ord"));
+        returnMap.put("type", dataMap.get("type"));
+        returnMap.put("position", tempPositionMap);
+        returnMap.put("fontStyle", tempStyleMap);
+
+        return returnMap;
     }
 }

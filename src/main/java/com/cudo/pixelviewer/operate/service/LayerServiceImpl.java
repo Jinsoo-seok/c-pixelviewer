@@ -61,21 +61,18 @@ public class LayerServiceImpl implements LayerService {
 
                     switch (type) {
                         case 10:
-                            System.out.println("type 10");
                             Map<String, Object> videoTemp = layerMapper.getLayerObjectExternalVideo((Integer) lo.get("object_id"));
                             subMap.put("type", "외부영상");
                             subMap.put("data", videoTemp);
                             layerObjectList.add(subMap);
                             break;
                         case 20:
-                            System.out.println("type 20");
                             Map<String, Object> weatherInfoTemp = layerMapper.getLayerObjectExternalInfo((Integer) lo.get("object_id"));
                             subMap.put("type", "외부정보(날씨)");
                             subMap.put("data", weatherInfoTemp);
                             layerObjectList.add(subMap);
                             break;
                         case 30:
-                            System.out.println("type 30");
                             Map<String, Object> subtitleTemp = layerMapper.getLayerObjectExternalSubtitle((Integer) lo.get("object_id"));
                             String temp = (String) subtitleTemp.get("subtitleStyle");
 
