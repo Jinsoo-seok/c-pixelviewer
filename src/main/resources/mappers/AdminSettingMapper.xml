@@ -13,19 +13,14 @@
         WHERE program_id = 1
     </select>
 
-    <update id="putAdminSetting">
-        UPDATE Setting AS S
-        SET
-            view_topmost_en = #{viewTopmostEn},
-            view_temphumi_en = #{viewTemphumiEn},
-            led_comm_type = #{ledCommType},
-            led_preset_en = #{ledPresetEn},
-            led_input_select_en = #{ledInputSelectEn},
-            login_en = #{loginEn},
-            led_preset_count = #{ledPresetCount},
-            img_default_playtime = #{imgDefaultPlaytime},
-            externalinfo_area = #{externalinfoArea}
-        WHERE S.program_id = 1
+    <update id="putAdminSetting" >
+        <foreach collection="param" item="item" separator=";">
+            UPDATE Settings AS S
+            SET
+                setting_value = #{item.settingValue}
+                , update_date = NOW()
+            WHERE setting_key = #{item.settingKey}
+        </foreach>
     </update>
 
 

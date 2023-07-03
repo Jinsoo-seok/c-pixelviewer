@@ -13,19 +13,20 @@ public interface AdminSettingMapper {
 //    List<AdminSettingVo> getAdminSettingList();
     List<Map<String, Object>> getAdminSettingList();
 
-    int putAdminSetting(Map<String, Object> param);
+//    int putAdminSetting(Map<String, Object> param);
+    int putAdminSetting(List<Map<String, Object>> param);
 
-    int patchLayerTopMost(Map<String, Object> param);
-
-    int patchTempHumi(Map<String, Object> param);
-
-    int patchControlType(Map<String, Object> param);
-
-    int patchLedPresetEnable(Map<String, Object> param);
-
-    int patchLedPresetCount(Map<String, Object> param);
-
-    int patchLedInputEnable(Map<String, Object> param);
+//    int patchLayerTopMost(Map<String, Object> param);
+//
+//    int patchTempHumi(Map<String, Object> param);
+//
+//    int patchControlType(Map<String, Object> param);
+//
+//    int patchLedPresetEnable(Map<String, Object> param);
+//
+//    int patchLedPresetCount(Map<String, Object> param);
+//
+//    int patchLedInputEnable(Map<String, Object> param);
 
 
     List<DisplaySettingVo> getDisplayInfoList();
