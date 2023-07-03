@@ -72,15 +72,31 @@ public class ViewerServiceImpl implements ViewerService {
                             break;
                         case 20:
                             if(layerMap.get("weatherEn").equals(1)) {
+                                Map<String, Object> tempMap = new HashMap<>();
+                                Map<String, Object> tempStyleMap = new HashMap<>();
+                                Map<String, Object> tempPositionMap = new HashMap<>();
+
                                 Map<String, Object> weatherInfoTemp = layerMapper.getLayerObjectExternalInfo((Integer) lo.get("object_id"));
                                 String updateDate = convertTimestampToString(weatherInfoTemp.get("updateDate"));
 
-                                String deleteData = "updateDate";
-                                weatherInfoTemp.remove(deleteData);
+                                tempStyleMap.put("fontNm", weatherInfoTemp.get("fontNm"));
+                                tempStyleMap.put("fontSize", weatherInfoTemp.get("fontSize"));
+                                tempStyleMap.put("forecolor", weatherInfoTemp.get("forecolor"));
+
+                                tempPositionMap.put("posX", weatherInfoTemp.get("posX"));
+                                tempPositionMap.put("posY", weatherInfoTemp.get("posY"));
+                                tempPositionMap.put("width", weatherInfoTemp.get("width"));
+                                tempPositionMap.put("height", weatherInfoTemp.get("height"));
+
+                                tempMap.put("ord", weatherInfoTemp.get("ord"));
+                                tempMap.put("type", weatherInfoTemp.get("type"));
+                                tempMap.put("position", tempPositionMap);
+                                tempMap.put("fontStyle", tempStyleMap);
+
 
                                 Map<String, Object> exInfoWeatherMap = new HashMap<>();
                                 exInfoWeatherMap.put("updateDate", updateDate);
-                                exInfoWeatherMap.put("weatherFormInfo", weatherInfoTemp);
+                                exInfoWeatherMap.put("weatherFormInfo", tempMap);
 
                                 dataMap.put("weatherForm", exInfoWeatherMap);
                             }
@@ -116,15 +132,31 @@ public class ViewerServiceImpl implements ViewerService {
                             break;
                         case 40:
                             if(layerMap.get("airEn").equals(1)) {
+                                Map<String, Object> tempMap = new HashMap<>();
+                                Map<String, Object> tempStyleMap = new HashMap<>();
+                                Map<String, Object> tempPositionMap = new HashMap<>();
+
                                 Map<String, Object> airInfoTemp = layerMapper.getLayerObjectExternalInfo((Integer) lo.get("object_id"));
                                 String updateDate = convertTimestampToString(airInfoTemp.get("updateDate"));
 
-                                String deleteData = "updateDate";
-                                airInfoTemp.remove(deleteData);
+                                tempStyleMap.put("fontNm", airInfoTemp.get("fontNm"));
+                                tempStyleMap.put("fontSize", airInfoTemp.get("fontSize"));
+                                tempStyleMap.put("forecolor", airInfoTemp.get("forecolor"));
+
+                                tempPositionMap.put("posX", airInfoTemp.get("posX"));
+                                tempPositionMap.put("posY", airInfoTemp.get("posY"));
+                                tempPositionMap.put("width", airInfoTemp.get("width"));
+                                tempPositionMap.put("height", airInfoTemp.get("height"));
+
+                                tempMap.put("ord", airInfoTemp.get("ord"));
+                                tempMap.put("type", airInfoTemp.get("type"));
+                                tempMap.put("position", tempPositionMap);
+                                tempMap.put("fontStyle", tempStyleMap);
+
 
                                 Map<String, Object> exInfoAirMap = new HashMap<>();
                                 exInfoAirMap.put("updateDate", updateDate);
-                                exInfoAirMap.put("airFormInfo", airInfoTemp);
+                                exInfoAirMap.put("airFormInfo", tempMap);
 
                                 dataMap.put("airForm", exInfoAirMap);
                             }
