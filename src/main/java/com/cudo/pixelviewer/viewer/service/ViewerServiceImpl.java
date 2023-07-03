@@ -295,7 +295,25 @@ public class ViewerServiceImpl implements ViewerService {
                 }
                 else if(weatherType){
                     // TODO : 예외 처리
-                    int weatherImgResult = adminSettingMapper.patchWeatherImg(type, originalFilename);
+
+                    String settingKey = "";
+                    if (type.equals("30")) {
+                        settingKey = "weatherSunny";
+                    } else if (type.equals("40")) {
+                        settingKey = "weatherManyCloudy";
+                    } else if (type.equals("50")) {
+                        settingKey = "weatherCloudy";
+                    } else if (type.equals("60")) {
+                        settingKey = "weatherRainSnow";
+                    } else if (type.equals("70")) {
+                        settingKey = "weatherSnow";
+                    } else if (type.equals("80")) {
+                        settingKey = "weatherRain";
+                    } else if (type.equals("90")) {
+                        settingKey = "weatherShower";
+                    }
+
+                    int weatherImgResult = adminSettingMapper.patchWeatherImg(settingKey, originalFilename);
                 }
 
                 Map<String, Object> dataMap = new HashMap<>();
