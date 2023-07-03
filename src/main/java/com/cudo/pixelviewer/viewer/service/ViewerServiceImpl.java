@@ -23,10 +23,7 @@ import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -91,8 +88,8 @@ public class ViewerServiceImpl implements ViewerService {
                         case 30:
                             if(layerMap.get("subFirstEn").equals(1) || layerMap.get("subSecondEn").equals(1)) {
                                 Map<String, Object> subtitleTemp = layerMapper.getLayerObjectExternalSubtitle((Integer) lo.get("object_id"));
-                                String temp = (String) subtitleTemp.get("subtitle_style");
-                                String updateDate = convertTimestampToString(subtitleTemp.get("update_date"));
+                                String temp = (String) subtitleTemp.get("subtitleStyle");
+                                String updateDate = convertTimestampToString(subtitleTemp.get("updateDate"));
 
                                 try {
                                     JSONParser parser = new JSONParser();
@@ -144,6 +141,30 @@ public class ViewerServiceImpl implements ViewerService {
                 Map<String, Object> playlistResultMap = new HashMap<>();
                 String contentIdList = (String) playlist.get("contentIdList");
                 String queryTemp = "(" + contentIdList + ")";
+                List<Map<String, Object>> tempContentIdList = new ArrayList<>();
+
+                try {
+                    JSONParser parser = new JSONParser();
+                    Object obj = parser.parse(contentIdList);
+                    playlist.put("contentIdList", obj);
+                    tempContentIdList = (List<Map<String, Object>>) obj;
+
+                    StringBuilder contentIds = new StringBuilder();
+
+                    if(tempContentIdList != null){
+                        for (Map<String, Object> item : tempContentIdList) {
+                            Long contentId = (Long) item.get("contentId");
+                            contentIds.append(contentId).append(",");
+                        }
+                    }
+                    if (contentIds.length() > 0) {
+                        contentIds.setLength(contentIds.length() - 1);
+                    }
+                    queryTemp = "(" + contentIds + ")";
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+
 
                 String updateDate = convertTimestampToString(playlist.get("updateDate"));
 
@@ -274,7 +295,25 @@ public class ViewerServiceImpl implements ViewerService {
                 }
                 else if(weatherType){
                     // TODO : 예외 처리
-                    int weatherImgResult = adminSettingMapper.patchWeatherImg(type, originalFilename);
+
+                    String settingKey = "";
+                    if (type.equals("30")) {
+                        settingKey = "weatherSunny";
+                    } else if (type.equals("40")) {
+                        settingKey = "weatherManyCloudy";
+                    } else if (type.equals("50")) {
+                        settingKey = "weatherCloudy";
+                    } else if (type.equals("60")) {
+                        settingKey = "weatherRainSnow";
+                    } else if (type.equals("70")) {
+                        settingKey = "weatherSnow";
+                    } else if (type.equals("80")) {
+                        settingKey = "weatherRain";
+                    } else if (type.equals("90")) {
+                        settingKey = "weatherShower";
+                    }
+
+                    int weatherImgResult = adminSettingMapper.patchWeatherImg(settingKey, originalFilename);
                 }
 
                 Map<String, Object> dataMap = new HashMap<>();

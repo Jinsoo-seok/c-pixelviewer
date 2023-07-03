@@ -3,25 +3,24 @@
 
 <mapper namespace="com.cudo.pixelviewer.bo.mapper.AdminSettingMapper">
 
-    <select id="getAdminSettingList" resultType="com.cudo.pixelviewer.vo.AdminSettingVo">
+    <select id="getAdminSettingList" resultType="Map">
+        SELECT setting_key AS settingKey, setting_value AS settingValue
+        FROM Settings
+    </select>
+    <select id="getAdminSettingList2" resultType="com.cudo.pixelviewer.vo.AdminSettingVo">
         SELECT *
         FROM Setting
         WHERE program_id = 1
     </select>
 
-    <update id="putAdminSetting">
-        UPDATE Setting AS S
-        SET
-            view_topmost_en = #{viewTopmostEn},
-            view_temphumi_en = #{viewTemphumiEn},
-            led_comm_type = #{ledCommType},
-            led_preset_en = #{ledPresetEn},
-            led_input_select_en = #{ledInputSelectEn},
-            login_en = #{loginEn},
-            led_preset_count = #{ledPresetCount},
-            img_default_playtime = #{imgDefaultPlaytime},
-            externalinfo_area = #{externalinfoArea}
-        WHERE S.program_id = 1
+    <update id="putAdminSetting" >
+        <foreach collection="param" item="item" separator=";">
+            UPDATE Settings AS S
+            SET
+                setting_value = #{item.settingValue}
+                , update_date = NOW()
+            WHERE setting_key = #{item.settingKey}
+        </foreach>
     </update>
 
 
@@ -115,34 +114,14 @@
 
 
     <update id="patchWeatherImg">
-        UPDATE Setting AS S
-        <set>
-            <choose>
-                <when test="type == '30'">
-                    weather_sunny = #{originalFilename}
-                </when>
-                <when test="type == '40'">
-                    weather_many_cloudy = #{originalFilename}
-                </when>
-                <when test="type == '50'">
-                    weather_cloudy = #{originalFilename}
-                </when>
-                <when test="type == '60'">
-                    weather_rain_snow = #{originalFilename}
-                </when>
-                <when test="type == '70'">
-                    weather_snow = #{originalFilename}
-                </when>
-                <when test="type == '80'">
-                    weather_rain = #{originalFilename}
-                </when>
-                <when test="type == '90'">
-                    weather_shower = #{originalFilename}
-                </when>
-            </choose>
-        </set>
-        WHERE S.program_id = 1
+        UPDATE Settings AS S
+        SET
+            setting_value = #{originalFilename}
+            , update_date = NOW()
+        WHERE setting_key = #{settingKey}
     </update>
+
+
 
 
 </mapper>

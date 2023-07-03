@@ -105,6 +105,8 @@ public enum ResponseCode {
     FAIL_NOT_EXIST_LEDCON(4204, "FailedNotExistLedcon", "Failed Not Exist Ledcon"),
 
     // Setting : 4300
+    FAIL_UPDATE_SETTING_VALUES(4301, "FailedUpdateSettingValues", "Failed to Update Setting Values"),
+
     FAIL_UPDATE_SETTING_VIEW_TOP_MOST_EN(4301, "FailedUpdateSettingViewTopMostEn", "Failed to Update Setting View Top Most En"),
     FAIL_UPDATE_SETTING_VIEW_TEMP_HUMI_EN(4302, "FailedUpdateSettingViewTempHumiEn", "Failed to Update Setting View Temp Humi En"),
 
