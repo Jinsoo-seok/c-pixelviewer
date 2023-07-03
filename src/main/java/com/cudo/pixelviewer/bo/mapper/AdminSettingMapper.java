@@ -43,4 +43,6 @@ public interface AdminSettingMapper {
 
     int patchWeatherImg(String settingKey, String originalFilename);
 
+    String getTestPattern();
+
 }

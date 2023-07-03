@@ -121,7 +121,11 @@
         WHERE setting_key = #{settingKey}
     </update>
 
-
+    <select id="getTestPattern" resultType="String">
+        SELECT setting_value
+        FROM Settings
+        WHERE setting_key = "testPattern"
+    </select>
 
 
 </mapper>

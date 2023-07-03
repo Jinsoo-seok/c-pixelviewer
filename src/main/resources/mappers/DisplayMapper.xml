@@ -24,9 +24,9 @@
     </select>
 
     <select id="patchDisplayTestpatternValid" resultType="int">
-        SELECT COUNT(display_id)
-        FROM Displays
-        WHERE Displays.display_id = #{displayId}
+        SELECT COUNT(src_display_id)
+        FROM Screen_Displays
+        WHERE screen_id = #{screenId}
     </select>
     <update id="patchDisplayTestpattern">
         UPDATE Displays
