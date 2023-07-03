@@ -14,4 +14,5 @@ public class BrightnessScheduleVo {
     String scheduleName;
     String startDate;
     String endDate;
+    String type;
 }

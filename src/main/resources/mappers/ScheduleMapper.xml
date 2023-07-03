@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cudo.pixelviewer.schedule.mapper.ScheduleMapper">
+
+    <insert id="postLedPower" parameterType="Map">
+        INSERT INTO led_pwr_schedule (sch_nm, sch_start_date, sch_end_date, time_pwr_on, time_pwr_off, run_day_week)
+        VALUES (#{scheduleName}, #{startDate}, #{endDate}, #{startTime}, #{endTime}, #{scheduleDay});
+    </insert>
+</mapper>

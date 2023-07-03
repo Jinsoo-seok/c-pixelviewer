@@ -16,4 +16,5 @@ public class PlayListPowerScheduleVo {
     String endDate;
     String startTime;
     String endTime;
+    String type;
 }
