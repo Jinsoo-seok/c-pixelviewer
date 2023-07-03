@@ -8,6 +8,7 @@ import com.cudo.pixelviewer.util.ResponseCode;
 import com.cudo.pixelviewer.vo.LayerToAgentVo;
 import com.cudo.pixelviewer.vo.LayerVo;
 import com.cudo.pixelviewer.vo.PresetVo;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,7 @@ import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -254,21 +256,42 @@ public class PresetServiceImpl implements PresetService {
         // TODO : 예외처리
         responseMono.subscribe(response -> {
             String data = response.toString();
-            System.out.println("data = " + data);
-//            int statusCode = Integer.parseInt(response);
-//            if (statusCode == 200) {
-//                log.info("요청 성공");
-//            } else {
-//                log.info("요청 실패 상태 코드: {}", statusCode);
-//            }
+//            System.out.println("data = " + data);
+
+            Map<String, Object> responseMap = new HashMap<>();
+
+            try {
+                ObjectMapper objectMapper = new ObjectMapper();
+                responseMap = objectMapper.readValue(data, Map.class);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            if(responseMap.get("code").equals(200)){
+
+
+                // TODO : [DB] preset Status >> RUN
+                Map<String, Object> queryMap = new HashMap<>();
+                queryMap.put("presetId", param.get("presetId"));
+                queryMap.put("presetStatus", "RUN");
+                int patchPresetStatusResult = presetMapper.patchPresetStatus(queryMap);
+
+                if(patchPresetStatusResult > 0) {
+                    resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
+                }
+                else{
+                    // TODO : 예외 처리
+//                    resultMap.put("code", ResponseCode.FAIL_UPDATE_DISPLAY.getCode());
+//                    resultMap.put("message", ResponseCode.FAIL_UPDATE_DISPLAY.getMessage());
+                }
+            }
+            else{
+                resultMap.put("code", ResponseCode.FAIL_DISPLAY_SETTING_TO_AGENT.getCode());
+                resultMap.put("message", ResponseCode.FAIL_DISPLAY_SETTING_TO_AGENT.getMessage());
+
+            }
         });
 
-        // TODO : [DB] preset Status >> RUN
-        Map<String, Object> queryMap = new HashMap<>();
-        queryMap.put("presetId", param.get("presetId"));
-        queryMap.put("presetStatus", "RUN");
-         int patchPresetStatusResult = presetMapper.patchPresetStatus(queryMap);
-
+        // TODO : 삭제
         resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
         return resultMap;
     }
