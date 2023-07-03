@@ -45,7 +45,7 @@ public class ScheduleServiceImpl implements ScheduleService {
                 .build());
 
         playList.add(ScheduleVo.builder()
-                .scheduleId(1L)
+                .scheduleId(3L)
                 .scheduleName("LED 전원1")
                 .startDate("20230601")
                 .endDate("20230603")
@@ -55,7 +55,7 @@ public class ScheduleServiceImpl implements ScheduleService {
                 .build());
 
         playList.add(ScheduleVo.builder()
-                .scheduleId(2L)
+                .scheduleId(4L)
                 .scheduleName("LED 전원2")
                 .startDate("20230605")
                 .endDate("20230606")
@@ -65,7 +65,7 @@ public class ScheduleServiceImpl implements ScheduleService {
                 .build());
 
         playList.add(ScheduleVo.builder()
-                .scheduleId(1L)
+                .scheduleId(5L)
                 .scheduleName("밝기1")
                 .startDate("20230601")
                 .endDate("20230603")
@@ -73,7 +73,7 @@ public class ScheduleServiceImpl implements ScheduleService {
                 .build());
 
         playList.add(ScheduleVo.builder()
-                .scheduleId(2L)
+                .scheduleId(6L)
                 .scheduleName("밝기2")
                 .startDate("20230601")
                 .endDate("20230603")
