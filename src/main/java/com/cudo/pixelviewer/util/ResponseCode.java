@@ -20,8 +20,8 @@ public enum ResponseCode {
 
 
     // Login, SignUp : 2000
-//    INVALID_ACCOUNT_ID(2000, "InvalidAccountId", "Invalid Account ID"),
-//    INVALID_PASSWORD(2001, "InvalidPassword", "Invalid Password"),
+    FAIL_INVALID_USER_ID(2000, "InvalidUserId", "Invalid User ID"),
+    FAIL_INVALID_USER_PASSWORD(2001, "InvalidUserPassword", "Invalid User Password"),
 //    DUPLICATE_ID(2002, "DuplicateId", "Duplicate ID"),
 //    NOT_EXIST_ID(2003, "NotExistId", "Not Exist ID"),
 //    FAIL_CHANGE_PW(2004, "FailedChangePW", "Failed Change PW"),
