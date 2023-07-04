@@ -3,10 +3,9 @@ package com.cudo.pixelviewer.schedule.service;
 import com.cudo.pixelviewer.schedule.mapper.ScheduleMapper;
 import com.cudo.pixelviewer.util.ParameterUtils;
 import com.cudo.pixelviewer.util.ResponseCode;
-import com.cudo.pixelviewer.vo.BrightnessScheduleVo;
 import com.cudo.pixelviewer.vo.CalenderStatusVo;
 import com.cudo.pixelviewer.vo.PlayListDetailScheduleVo;
-import com.cudo.pixelviewer.vo.PlayListPowerScheduleVo;
+import com.cudo.pixelviewer.vo.ScheduleVo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,11 +22,9 @@ public class ScheduleServiceImpl implements ScheduleService {
         Map<String, Object> resultMap = new HashMap<>();
 
         // 하드 코딩용
-        List<PlayListPowerScheduleVo> playList = new ArrayList<>();
-        List<PlayListPowerScheduleVo> ledPower = new ArrayList<>();
-        List<BrightnessScheduleVo> brightness = new ArrayList<>();
+        List<ScheduleVo> playList = new ArrayList<>();
 
-        playList.add(PlayListPowerScheduleVo.builder()
+        playList.add(ScheduleVo.builder()
                 .scheduleId(1L)
                 .scheduleName("플레이리스트1")
                 .startDate("20230601")
@@ -37,7 +34,7 @@ public class ScheduleServiceImpl implements ScheduleService {
                 .type("playlist")
                 .build());
 
-        playList.add(PlayListPowerScheduleVo.builder()
+        playList.add(ScheduleVo.builder()
                 .scheduleId(2L)
                 .scheduleName("플레이리스트2")
                 .startDate("20230605")
@@ -47,8 +44,8 @@ public class ScheduleServiceImpl implements ScheduleService {
                 .type("playlist")
                 .build());
 
-        ledPower.add(PlayListPowerScheduleVo.builder()
-                .scheduleId(1L)
+        playList.add(ScheduleVo.builder()
+                .scheduleId(3L)
                 .scheduleName("LED 전원1")
                 .startDate("20230601")
                 .endDate("20230603")
@@ -57,8 +54,8 @@ public class ScheduleServiceImpl implements ScheduleService {
                 .type("power")
                 .build());
 
-        ledPower.add(PlayListPowerScheduleVo.builder()
-                .scheduleId(2L)
+        playList.add(ScheduleVo.builder()
+                .scheduleId(4L)
                 .scheduleName("LED 전원2")
                 .startDate("20230605")
                 .endDate("20230606")
@@ -67,16 +64,16 @@ public class ScheduleServiceImpl implements ScheduleService {
                 .type("power")
                 .build());
 
-        brightness.add(BrightnessScheduleVo.builder()
-                .scheduleId(1L)
+        playList.add(ScheduleVo.builder()
+                .scheduleId(5L)
                 .scheduleName("밝기1")
                 .startDate("20230601")
                 .endDate("20230603")
                 .type("light")
                 .build());
 
-        brightness.add(BrightnessScheduleVo.builder()
-                .scheduleId(2L)
+        playList.add(ScheduleVo.builder()
+                .scheduleId(6L)
                 .scheduleName("밝기2")
                 .startDate("20230601")
                 .endDate("20230603")
@@ -84,9 +81,7 @@ public class ScheduleServiceImpl implements ScheduleService {
                 .build());
 
         resultMap.put("data", CalenderStatusVo.builder()
-                .playList(playList)
-                .ledPower(ledPower)
-                .brightness(brightness)
+                .schedule(playList)
                 .build());
 
         resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));

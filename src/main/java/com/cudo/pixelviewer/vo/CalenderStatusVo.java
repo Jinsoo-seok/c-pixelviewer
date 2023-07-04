@@ -12,7 +12,5 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 public class CalenderStatusVo {
-    List<PlayListPowerScheduleVo> playList;
-    List<PlayListPowerScheduleVo> ledPower;
-    List<BrightnessScheduleVo> brightness;
+    List<ScheduleVo> schedule;
 }
