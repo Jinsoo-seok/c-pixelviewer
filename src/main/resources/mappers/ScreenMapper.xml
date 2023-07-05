@@ -90,18 +90,12 @@
     </update>
     <insert id="saveAllocateDisplays" parameterType="Map">
         INSERT INTO Screen_Displays
-        (src_display_id, screen_id, display_id, rowsize, columnsize)
+        (screen_id, display_id, rowsize, columnsize)
         VALUES
         <foreach collection="allocateDisplays" item="item" separator=",">
-            (#{item.srcDisplayId}, #{item.screenId}, #{item.displayId},
-            #{item.rowsize}, #{item.columnsize}
-            )
+            (#{item.screenId}, #{item.displayId},
+            #{item.rowsize}, #{item.columnsize})
         </foreach>
-        ON DUPLICATE KEY UPDATE
-        screen_id = VALUES(screen_id),
-        display_id = VALUES(display_id),
-        rowsize = VALUES(rowsize),
-        columnsize = VALUES(columnsize)
     </insert>
 
 </mapper>
