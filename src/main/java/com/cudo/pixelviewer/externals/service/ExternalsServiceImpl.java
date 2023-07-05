@@ -38,7 +38,9 @@ public class ExternalsServiceImpl implements ExternalsService {
         String[] coordsSplit = coords.split(",");
 
         String apisDataUrl = "http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst";
-        String serviceKey = "q77RhkytbzG8HvFIAtXpukhksHil87J9cVpObUMQbt%2BuJC98K9pAbt2VylRK4oQidtBVIe1wPTXbTaFBK1Y8NA%3D%3D";
+        String serviceKey3 = "q77RhkytbzG8HvFIAtXpukhksHil87J9cVpObUMQbt%2BuJC98K9pAbt2VylRK4oQidtBVIe1wPTXbTaFBK1Y8NA%3D%3D";
+        String serviceKey2 = "NA%2B2mZ6YHlKo2jNmEfOmsmrL2HY0ulBt9v3GUhfHtIV40HGjglABV1Zq1qCcjGJar4c1RAjcTuVI%2Blnx%2FTmkSw%3D%3D";
+        String serviceKey = "NA+2mZ6YHlKo2jNmEfOmsmrL2HY0ulBt9v3GUhfHtIV40HGjglABV1Zq1qCcjGJar4c1RAjcTuVI+lnx/TmkSw==";
         String pageNo = "1";
         String numOfRows = "1";
         String dataType = "JSON";
@@ -58,52 +60,40 @@ public class ExternalsServiceImpl implements ExternalsService {
                 "&nx=" + nx +
                 "&ny=" + ny;
 
-        String originalUrl = "http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst?" +
-                "ServiceKey=q77RhkytbzG8HvFIAtXpukhksHil87J9cVpObUMQbt%2BuJC98K9pAbt2VylRK4oQidtBVIe1wPTXbTaFBK1Y8NA%3D%3D" +
-                "&pageNo=1" +
-                "&numOfRows=1" +
-                "&dataType=JSON" +
-                "&base_date=20230705" +
-                "&base_time=0500" +
-                "&nx=60" +
-                "&ny=127";
+        String type = "날씨";
+        Map<String, Object> webClientResponseMap = webClientFunction(type, tempUrl);
 
-        // WebClient 생성
-        WebClient webClient = WebClient.builder()
-                .clientConnector(new ReactorClientHttpConnector())
-//                .baseUrl(tempUrl)
-                .baseUrl(originalUrl)
-                .build();
-
-        // 요청 헤더 설정
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
-        Mono<String> responseMono = webClient.method(HttpMethod.GET)
-                .headers(httpHeaders -> httpHeaders.addAll(headers))
-                .retrieve()
-                .bodyToMono(String.class);
-
-        responseMono.subscribe(response -> {
-            String data = response.toString();
-//            System.out.println("data = " + data);
-
-            Map<String, Object> responseMap = new HashMap<>();
-
-            try {
-                ObjectMapper objectMapper = new ObjectMapper();
-                responseMap = objectMapper.readValue(data, Map.class);
-            } catch (IOException e) {
-                e.printStackTrace();
+        if(webClientResponseMap != null){
+            System.out.println("[First]webClientResponseMap = " + webClientResponseMap);
+            if(webClientResponseMap.get("webClient").equals(false)){
+                tempUrl = apisDataUrl + "?" +
+                        "ServiceKey=" + serviceKey +
+                        "&pageNo=" + pageNo +
+                        "&numOfRows=" + numOfRows +
+                        "&dataType=" + dataType +
+                        "&base_date=" + baseDate +
+                        "&base_time=" + baseTime +
+                        "&nx=" + nx +
+                        "&ny=" + ny;
+                webClientResponseMap = webClientFunction(type, tempUrl);
+                System.out.println("[Second] webClientResponseMap = " + webClientResponseMap);
             }
-            System.out.println("responseMap = " + responseMap);
-//            if(responseMap.get("code").equals(200)){
-//                // TODO : success
-//            }
-//            else{
-//                // TODO : FAIL
-//            }
-        });
+            if(!webClientResponseMap.get("webClient").equals(false)) {
+                int putExternalsInfosResult = externalsMapper.putExternalsInfos(type, (String) webClientResponseMap.get("weatherInfo"));
+                if (putExternalsInfosResult > 0) {
+                    resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
+                } else {
+                    resultMap.put("code", ResponseCode.FAIL_INSERT_EXTERNALS_WEATHER.getCode());
+                    resultMap.put("message", ResponseCode.FAIL_INSERT_EXTERNALS_WEATHER.getMessage());
+                }
+                System.out.println("[success]webClientResponseMap = " + webClientResponseMap);
+            }
+            else{
+                System.out.println("[fail]webClientResponseMap = " + webClientResponseMap);
+                resultMap.put("code", ResponseCode.FAIL_EXTERNALS_WEATHER.getCode());
+                resultMap.put("message", ResponseCode.FAIL_EXTERNALS_WEATHER.getMessage());
+            }
+        }
 
         resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
         return resultMap;
@@ -193,25 +183,50 @@ public class ExternalsServiceImpl implements ExternalsService {
 
         Map<String, Object> responseJsonMap = (Map<String, Object>) responseMap.get("response");
         Map<String, Object> responseBody = (Map<String, Object>) responseJsonMap.get("body");
-        List<Map<String, Object>> responseBodyItems = (List<Map<String, Object>>) responseBody.get("items");
-        Map<String, Object> airInfoLatest = responseBodyItems.get(0);
+        if(type.equals("대기")) {
+            List<Map<String, Object>> responseBodyItems = (List<Map<String, Object>>) responseBody.get("items");
+            Map<String, Object> airInfoLatest = responseBodyItems.get(0);
 
-        String[] keyNames = {"coFlag", "pm10Flag", "pm25Flag", "no2Flag", "o3Flag", "so2Flag"
-                , "dataTime", "mangName"
-                , "khaiGrade", "khaiValue"
-                , "pm10Value24", "pm25Value24", "pm10Grade1h", "pm25Grade1h", };
+            String[] keyNames = {"coFlag", "pm10Flag", "pm25Flag", "no2Flag", "o3Flag", "so2Flag"
+                    , "dataTime", "mangName"
+                    , "khaiGrade", "khaiValue"
+                    , "pm10Value24", "pm25Value24", "pm10Grade1h", "pm25Grade1h",};
 
-        for (String key : keyNames) {
-            airInfoLatest.remove(key);
+            for (String key : keyNames) {
+                airInfoLatest.remove(key);
+            }
+            String mapperJson = "";
+            try {
+                ObjectMapper mapper = new ObjectMapper();
+                mapperJson = mapper.writeValueAsString(airInfoLatest);
+                returnMap.put("webClient", true);
+                returnMap.put("airInfo", mapperJson);
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
         }
-        String mapperJson = "";
-        try {
-            ObjectMapper mapper = new ObjectMapper();
-            mapperJson = mapper.writeValueAsString(airInfoLatest);
-            returnMap.put("webClient", true);
-            returnMap.put("airInfo", mapperJson);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
+        else if(type.equals("날씨")){
+            Map<String, Object> responseBodyItems = (Map<String, Object>) responseBody.get("items");
+            List<Map<String, Object>> responseBodyItem = (List<Map<String, Object>>) responseBodyItems.get("item");
+            Map<String, Object> weatherInfoLatest = responseBodyItem.get(0);
+
+            String[] keyNames = {"coFlag", "pm10Flag", "pm25Flag", "no2Flag", "o3Flag", "so2Flag"
+                    , "dataTime", "mangName"
+                    , "khaiGrade", "khaiValue"
+                    , "pm10Value24", "pm25Value24", "pm10Grade1h", "pm25Grade1h",};
+
+            for (String key : keyNames) {
+                weatherInfoLatest.remove(key);
+            }
+            String mapperJson = "";
+            try {
+                ObjectMapper mapper = new ObjectMapper();
+                mapperJson = mapper.writeValueAsString(weatherInfoLatest);
+                returnMap.put("webClient", true);
+                returnMap.put("weatherInfo", mapperJson);
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
         }
 
         return returnMap;

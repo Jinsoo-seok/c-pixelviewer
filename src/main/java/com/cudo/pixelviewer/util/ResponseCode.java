@@ -139,8 +139,16 @@ public enum ResponseCode {
     FAIL_UNSUPPORTED_TYPE_SETTING(4300, "FailedUnsupportedTypeSetting", "Failed Unsupported Type Setting"),
 
     // Externals : 4400
-    FAIL_INSERT_EXTERNALS_AIR(4400, "FailedInsertExternalsAir", "Failed Insert Externals Air"),
-    FAIL_EXTERNALS_AIR(4400, "FailedExternalsAir", "Failed Externals Air");
+    FAIL_INSERT_EXTERNALS_AIR(4401, "FailedInsertExternalsAir", "Failed Insert Externals Air"),
+    FAIL_EXTERNALS_AIR(4402, "FailedExternalsAir", "Failed Externals Air"),
+    FAIL_INSERT_EXTERNALS_WEATHER(4403, "FailedInsertExternalsWeather", "Failed Insert Externals Weather"),
+    FAIL_EXTERNALS_WEATHER(4404, "FailedExternalsWeather", "Failed Externals Weather");
+
+
+
+
+
+
 
     private int code;
     private String codeName;
