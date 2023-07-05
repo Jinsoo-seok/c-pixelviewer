@@ -136,9 +136,11 @@ public enum ResponseCode {
     FAIL_DISPLAY_SETTING_TO_AGENT(4317, "FailedDisplaySettingToAgent", "Failed Used Display Setting to Agent"),
     FAIL_UPDATE_ADMIN_SETTING_WEATHER_IMG(4318, "FailedUpdateAdminSettingWeatherImage", "Failed Update AdminSetting Weather Image"),
 
-    FAIL_UNSUPPORTED_TYPE_SETTING(4300, "FailedUnsupportedTypeSetting", "Failed Unsupported Type Setting");
+    FAIL_UNSUPPORTED_TYPE_SETTING(4300, "FailedUnsupportedTypeSetting", "Failed Unsupported Type Setting"),
 
-
+    // Externals : 4400
+    FAIL_INSERT_EXTERNALS_AIR(4400, "FailedInsertExternalsAir", "Failed Insert Externals Air"),
+    FAIL_EXTERNALS_AIR(4400, "FailedExternalsAir", "Failed Externals Air");
 
     private int code;
     private String codeName;
