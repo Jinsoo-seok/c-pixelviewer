@@ -1,6 +1,5 @@
 package com.cudo.pixelviewer.setting.controller;
 
-import com.cudo.pixelviewer.component.TcpSender;
 import com.cudo.pixelviewer.config.ParamException;
 import com.cudo.pixelviewer.setting.service.SettingService;
 import com.cudo.pixelviewer.util.ParameterUtils;
@@ -23,8 +22,6 @@ public class SettingController {
 
     final SettingService settingService;
 
-    final TcpSender tcpSender;
-
     /**
      * setting >> service Key-Value
      *
@@ -37,11 +34,6 @@ public class SettingController {
         log.info("{} [START] [{}]", apiInfo, startTime);
 
         Map<String, Object> responseMap = new HashMap<>();
-
-
-        byte[] payload = {01, 02, 03};
-        tcpSender.sendMessage(payload);
-
 
         try {
             responseMap = settingService.serviceGetValue();
