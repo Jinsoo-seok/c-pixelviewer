@@ -8,4 +8,9 @@
         FROM ExternalData
     </select>
 
+    <update id="putExternalsInfos">
+        UPDATE ExternalData
+        SET external_data = #{info}, external_update_date = NOW()
+        WHERE external_type = #{type}
+    </update>
 </mapper>

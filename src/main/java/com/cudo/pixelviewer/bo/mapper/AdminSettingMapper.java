@@ -46,4 +46,6 @@ public interface AdminSettingMapper {
 
     String getTestPattern();
 
+    String getValue(String key);
+
 }

@@ -10,4 +10,6 @@ public interface ExternalsMapper {
 
     List<Map<String, Object>> getExternalInfos ();
 
+    int putExternalsInfos(String type, String info);
+
 }
