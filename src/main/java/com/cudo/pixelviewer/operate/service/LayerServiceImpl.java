@@ -51,6 +51,25 @@ public class LayerServiceImpl implements LayerService {
 //        LayerVo layerVo = layerMapper.getLayer(layerId);
         Map<String, Object> layerMap = layerMapper.getLayer(layerId);
 
+        for (String key : layerMap.keySet()) {
+            if (key.endsWith("En")) {
+                Object value = layerMap.get(key);
+                if (value instanceof String) {
+                    String strValue = (String) value;
+                    if (strValue.equals("1") || strValue.equals("0")) {
+                        boolean booleanValue = strValue.equals("1");
+                        layerMap.put(key, booleanValue);
+                    }
+                } else if (value instanceof Integer) {
+                    int intValue = (int) value;
+                    if (intValue == 1 || intValue == 0) {
+                        boolean booleanValue = intValue == 1;
+                        layerMap.put(key, booleanValue);
+                    }
+                }
+            }
+        }
+
         if(layerMap != null){
             List<Map<String, Object>> layerObject = layerMapper.getLayerLayerObject(layerId);
             if (layerObject != null) {
