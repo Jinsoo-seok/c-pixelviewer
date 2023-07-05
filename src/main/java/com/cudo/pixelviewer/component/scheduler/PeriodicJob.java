@@ -62,7 +62,7 @@ public class PeriodicJob implements Job {
 
                     powerOffDataMap.put(POWER_OFF.getCode(), POWER_OFF.getValue());
 
-                    setPowerSchedule(nowDate, powerInfo, powerOnTime, powerOffDataMap);
+                    setPowerSchedule(nowDate, powerInfo, powerOffTime, powerOffDataMap);
                 }
             }
         }
@@ -86,6 +86,8 @@ public class PeriodicJob implements Job {
                 .build();
 
         scheduler.scheduleJob(powerJob, powerTrigger);
+
+        log.info("Schedule Register Id : {}", String.valueOf(powerDataMap.get(DATA_MAP_KEY.getCode())) + powerInfo.getScheduleId());
     }
 
     /**

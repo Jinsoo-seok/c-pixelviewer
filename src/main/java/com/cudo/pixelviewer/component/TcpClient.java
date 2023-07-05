@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import java.util.concurrent.TimeUnit;
 
 @Component
 @Slf4j
@@ -22,22 +23,33 @@ public class TcpClient {
     @PostConstruct
     public void start() throws Exception {
         group = new NioEventLoopGroup();
-        Bootstrap bootstrap = new Bootstrap()
-                .group(group)
+
+        connect(new Bootstrap(), group);
+    }
+
+    private void connect(Bootstrap bootstrap, EventLoopGroup eventLoop) {
+        bootstrap.group(eventLoop)
                 .channel(NioSocketChannel.class)
                 .handler(new ChannelInitializer<Channel>() {
                     @Override
                     protected void initChannel(Channel ch) {
                         ChannelPipeline pipeline = ch.pipeline();
-
                         pipeline.addLast(new TcpClientHandler());
                     }
                 });
 
-        ChannelFuture future = bootstrap.connect("192.168.0.15", 6001).sync();
-        channel = future.channel();
 
-        log.info("Connected to TCP server");
+        bootstrap.connect("192.168.0.15", 6001).addListener((ChannelFuture future) -> {
+            if (future.isSuccess()) {
+                log.info("Connected to TCP server");
+
+                channel = future.channel();
+            } else {
+                log.info("Failed to connect. Retrying in 10 seconds...");
+
+                future.channel().eventLoop().schedule(() -> connect(bootstrap, eventLoop), 10, TimeUnit.SECONDS);
+            }
+        });
     }
 
     public void sendMessage(byte[] message) {
@@ -51,6 +63,8 @@ public class TcpClient {
                 if (!future1.isSuccess()) {
                     Throwable cause = future1.cause();
                     log.error("SEND PACKET TO TCP SERVER FAIL", cause);
+                } else {
+                    log.info("SEND PACKET {} TO TCP SERVER SUCCESS", message);
                 }
             });
         } else {
@@ -69,10 +83,12 @@ public class TcpClient {
         }
     }
 
-    /**
-     * * TCP 통신 후 Response 값 처리
-     */
-    private static class TcpClientHandler extends SimpleChannelInboundHandler<ByteBuf> {
+
+    private class TcpClientHandler extends SimpleChannelInboundHandler<ByteBuf> {
+
+        /**
+         * * TCP 통신 후 Response 값 처리
+         */
         @Override
         protected void channelRead0(ChannelHandlerContext ctx, ByteBuf msg) {
 
@@ -83,6 +99,13 @@ public class TcpClient {
 
             // Send a response back to the client
             ctx.writeAndFlush(responseByte);
+        }
+
+        @Override
+        public void channelInactive(ChannelHandlerContext ctx) {
+            log.error("Lost connection to server. Reconnecting...");
+
+            connect(new Bootstrap(), ctx.channel().eventLoop().parent());
         }
     }
 }
