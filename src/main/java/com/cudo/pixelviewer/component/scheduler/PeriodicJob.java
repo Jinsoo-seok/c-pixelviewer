@@ -10,6 +10,7 @@ import org.quartz.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.*;
 
 import static com.cudo.pixelviewer.component.scheduler.ScheduleCode.*;
@@ -43,6 +44,7 @@ public class PeriodicJob implements Job {
      */
     private void powerSchedule(List<PowerScheduleVo> powerSchedule, String nowDate) throws SchedulerException {
         for (PowerScheduleVo powerInfo : powerSchedule) {
+
             if (checkDay(nowDate, powerInfo.getRunDayWeek())) {
                 List<String> powerOnTime = Arrays.asList(powerInfo.getTimePwrOn().split(":")),
                         powerOffTime = Arrays.asList(powerInfo.getTimePwrOff().split(":"));
@@ -52,7 +54,6 @@ public class PeriodicJob implements Job {
                     JobDataMap powerOnDataMap = new JobDataMap();
 
                     powerOnDataMap.put(POWER_ON.getCode(), POWER_ON.getValue());
-
                     setPowerSchedule(nowDate, powerInfo, powerOnTime, powerOnDataMap);
                 }
 
@@ -73,21 +74,28 @@ public class PeriodicJob implements Job {
      * * 전원 스케줄 job, trigger 설정
      */
     private void setPowerSchedule(String nowDate, PowerScheduleVo powerInfo, List<String> powerTime, JobDataMap powerDataMap) throws SchedulerException {
-        JobDetail powerJob = JobBuilder.newJob(ScheduleJob.class)
-                .withIdentity(String.valueOf(powerDataMap.get(DATA_MAP_KEY.getCode())) + powerInfo.getScheduleId())
-                .usingJobData(powerDataMap)
-                .requestRecovery(true)
-                .build();
+        LocalTime powerOnOffTime = LocalTime.of(Integer.parseInt(powerTime.get(0)), Integer.parseInt(powerTime.get(1)), Integer.parseInt(powerTime.get(2)));
+        LocalTime nowTime = LocalTime.now();
 
-        Trigger powerTrigger = TriggerBuilder.newTrigger()
-                .withIdentity(String.valueOf(powerDataMap.get(DATA_MAP_KEY.getCode())) + powerInfo.getScheduleId())
-                .withSchedule(CronScheduleBuilder
-                        .cronSchedule(cronExpression(nowDate, powerTime)))
-                .build();
+        if (powerOnOffTime.isAfter(nowTime)) {
+            JobDetail powerJob = JobBuilder.newJob(ScheduleJob.class)
+                    .withIdentity(String.valueOf(powerDataMap.get(DATA_MAP_KEY.getCode())) + powerInfo.getScheduleId())
+                    .usingJobData(powerDataMap)
+                    .requestRecovery(true)
+                    .build();
 
-        scheduler.scheduleJob(powerJob, powerTrigger);
+            Trigger powerTrigger = TriggerBuilder.newTrigger()
+                    .withIdentity(String.valueOf(powerDataMap.get(DATA_MAP_KEY.getCode())) + powerInfo.getScheduleId())
+                    .withSchedule(CronScheduleBuilder
+                            .cronSchedule(cronExpression(nowDate, powerTime)))
+                    .build();
 
-        log.info("Schedule Register Id : {}", String.valueOf(powerDataMap.get(DATA_MAP_KEY.getCode())) + powerInfo.getScheduleId());
+            scheduler.scheduleJob(powerJob, powerTrigger);
+
+            log.info("Schedule Register Id : {}", String.valueOf(powerDataMap.get(DATA_MAP_KEY.getCode())) + powerInfo.getScheduleId());
+        } else {
+            log.info("This is the time when schedule registration is not possible");
+        }
     }
 
     /**
