@@ -192,7 +192,7 @@ public class PresetController {
         Map<String, Object> responseMap = new HashMap<>();
         responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
 
-        String[] keyList = {"presetId", "presetNm", "rowsize", "columnsize", "layerList"};
+        String[] keyList = {"presetId", "presetNm", "rowsize", "columnsize", "layerList", "deleteType"};
 
         try {
             parameterValidation(param, keyList);
@@ -201,6 +201,7 @@ public class PresetController {
             parameterInt("rowsize", param.get("rowsize"), true);
             parameterInt("columnsize", param.get("columnsize"), true);
             parameterArray("layerList", param.get("layerList"), true);
+            parameterBoolean("deleteType", param.get("deleteType"), true);
 
             responseMap = presetService.putPreset(param);
         }

@@ -183,80 +183,6 @@ public class PlaylistController {
 
         return responseMap;
     }
-//
-//    @PatchMapping("/name")
-//    public Map<String, Object> patchScreenName(HttpServletRequest request
-//                                        , @RequestBody Map<String, Object> param) {
-//        long startTime = System.currentTimeMillis();
-//        String apiInfo = "["+ request.getRequestURI() + "] [" + request.getMethod() + "]";
-//        log.info("{} [START] [{}] - {}", apiInfo, startTime, param);
-//
-//        Map<String, Object> responseMap = new HashMap<>();
-//        responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
-//
-//        String[] keyList = {"screenId", "screenNm"};
-//
-//        try {
-//            parameterValidation(param, keyList);
-//            parameterInt("screenId", param.get("screenId"), true);
-//            parameterString("screenNm", param.get("screenNm"), true, 0, null);
-//
-//            responseMap = screenService.patchScreenName(param);
-//        }
-//        catch (ParamException paramException){
-//            log.error("[paramException][patchScreenName] - {}", paramException.getMessage());
-//            responseMap.put("code", paramException.getCode());
-//            responseMap.put("message", paramException.getMessage());
-//        }
-//        catch (Exception exception) {
-//            log.error("[Exception][patchScreenName] - {}", exception.getMessage());
-//            responseMap.put("exceptionMessage", exception.getMessage());
-//        }
-//
-//        long endTime = System.currentTimeMillis();
-//        long procTime = endTime-startTime;
-//        log.info("{} [END] [{}] - {}", apiInfo, procTime, responseMap.get("code"));
-//
-//        return responseMap;
-//    }
-//
-//    @PutMapping
-//    public Map<String, Object> putScreenSet(HttpServletRequest request
-//                                        , @RequestBody Map<String, Object> param) {
-//        long startTime = System.currentTimeMillis();
-//        String apiInfo = "["+ request.getRequestURI() + "] [" + request.getMethod() + "]";
-//        log.info("{} [START] [{}] - {}", apiInfo, startTime, param);
-//
-//        Map<String, Object> responseMap = new HashMap<>();
-//        responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
-//
-//        String[] keyList = {"screenId", "screenNm", "rowsize", "columnsize"};
-//
-//        try {
-//            parameterValidation(param, keyList);
-//            parameterInt("screenId", param.get("screenId"), true);
-//            parameterString("screenNm", param.get("screenNm"), true, 0, null);
-//            parameterInt("rowsize", param.get("rowsize"), true);
-//            parameterInt("columnsize", param.get("columnsize"), true);
-//
-//            responseMap = screenService.putScreenSet(param);
-//        }
-//        catch (ParamException paramException){
-//            log.error("[paramException][putScreenSet] - {}", paramException.getMessage());
-//            responseMap.put("code", paramException.getCode());
-//            responseMap.put("message", paramException.getMessage());
-//        }
-//        catch (Exception exception) {
-//            log.error("[Exception][putScreenSet] - {}", exception.getMessage());
-//            responseMap.put("exceptionMessage", exception.getMessage());
-//        }
-//
-//        long endTime = System.currentTimeMillis();
-//        long procTime = endTime-startTime;
-//        log.info("{} [END] [{}] - {}", apiInfo, procTime, responseMap.get("code"));
-//
-//        return responseMap;
-//    }
 
 /////////////////////////////////////////////////////////////////////////////////contents
     @GetMapping("/contents")
@@ -325,19 +251,10 @@ public class PlaylistController {
 
         try {
             parameterValidation(param, keyList);
-//            parameterInt("playlistId", param.get("playlistId"), true);
-//            parameterInt("ordNo", param.get("ordNo"), true);
-//            parameterInt("type", param.get("type"), true);
             parameterString("type", param.get("type"), true, 0, null);
             parameterString("ctsNm", param.get("ctsNm"), true, 0, null);
             parameterString("ctsPath", param.get("ctsPath"), true, 0, null);
             parameterInt("playtime", param.get("playtime"), true);
-//            parameterBoolean("weatherFl", param.get("weatherFl"), true);
-//            parameterBoolean("airInfoFl", param.get("airInfoFl"), true);
-//            parameterBoolean("stretch", param.get("stretch"), true);
-//            parameterInt("weatherFl", param.get("weatherFl"), true);
-//            parameterInt("airInfoFl", param.get("airInfoFl"), true);
-//            parameterInt("airInfoFl", param.get("airInfoFl"), true);
             parameterString("thumbnailPath", param.get("thumbnailPath"), true, 0, null);
 
             responseMap = playlistService.postPlaylistContents(param);
@@ -429,6 +346,7 @@ public class PlaylistController {
 
         return responseMap;
     }
+
     @PatchMapping("/contents/playtime")
     public Map<String, Object> patchContentsPlaytime(HttpServletRequest request
             , @RequestBody Map<String, Object> param) {

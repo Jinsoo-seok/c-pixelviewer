@@ -39,8 +39,11 @@ public interface AdminSettingMapper {
     int putDisplayInfo(Map<String, Object> param);
 
     int deleteDisplayInfoValid(Map<String, Object> param);
+    String displayUsedCheck(Map<String, Object> param);
     int deleteDisplayInfo(Map<String, Object> param);
 
     int patchWeatherImg(String settingKey, String originalFilename);
+
+    String getTestPattern();
 
 }

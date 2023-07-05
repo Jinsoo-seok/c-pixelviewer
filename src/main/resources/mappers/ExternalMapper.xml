@@ -67,10 +67,14 @@
         INSERT INTO LayerObjects (screen_id, preset_id, layer_id, type, object_nm)
         VALUES (#{screenId}, #{presetId}, #{layerId}, #{type}, #{objectNm});
 
-        INSERT INTO External_Info (screen_id, preset_id, layer_id, object_id, type, pos_x, pos_y, width, height, ord
-        , font_nm, font_size, forecolor, update_date)
-        VALUES (#{screenId}, #{presetId}, #{layerId}, LAST_INSERT_ID(), #{type}, #{posX}, #{posY}, #{width}, #{height}, #{ord}
-        , #{fontNm}, #{fontSize}, #{forecolor}, NOW());
+        INSERT INTO External_Info (screen_id, preset_id, layer_id, object_id, type
+        , pos_x, pos_y, width, height, ord
+        , forecolor, font_nm, font_size, font_color, font_fl
+        , border_size, border_color, back_color, update_date)
+        VALUES (#{screenId}, #{presetId}, #{layerId}, LAST_INSERT_ID(), #{type}
+        , #{posX}, #{posY}, #{width}, #{height}, #{ord}
+        , #{forecolor}, #{fontNm}, #{fontSize}, #{fontColor}, #{fontFl}
+        , #{borderSize}, #{borderColor}, #{backColor}, NOW());
     </insert>
     <update id="putExternalInfo" parameterType="Map">
         <selectKey keyProperty="externalId" resultType="int" order="AFTER">
@@ -86,9 +90,14 @@
             width = #{width},
             height = #{height},
             ord = #{ord},
-            font_nm = #{fontNm},
-            font_size = #{fontSize},
             forecolor = #{forecolor},
+            font_nm = #{fontNm},
+            font_fl = #{fontFl},
+            font_size = #{fontSize},
+            font_color = #{fontColor},
+            border_size = #{borderSize},
+            border_color = #{borderColor},
+            back_color = #{backColor},
             update_date = NOW()
 
         WHERE object_id = #{objectId}

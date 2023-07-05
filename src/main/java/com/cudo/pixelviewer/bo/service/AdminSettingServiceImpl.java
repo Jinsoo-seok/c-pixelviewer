@@ -340,16 +340,26 @@ public class AdminSettingServiceImpl implements AdminSettingService {
     public Map<String, Object> deleteDisplayInfo(Map<String, Object> param) {
         Map<String, Object> resultMap = new HashMap<>();
 
-        int putDisplayInfoValid = adminSettingMapper.deleteDisplayInfoValid(param);
+        int deleteDisplayInfoValid = adminSettingMapper.deleteDisplayInfoValid(param);
 
-        if(putDisplayInfoValid == 1) {
-            int patchLayerTopMostResult = adminSettingMapper.deleteDisplayInfo(param);
+        if(deleteDisplayInfoValid == 1) {
+            String displayUsedCheck = adminSettingMapper.displayUsedCheck(param);
 
-            if (patchLayerTopMostResult == 1) { // Success : 1
-                resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
+            if(displayUsedCheck == null){
+                int patchLayerTopMostResult = adminSettingMapper.deleteDisplayInfo(param);
 
-            } else {
-                ResponseCode failCode = ResponseCode.FAIL_DELETE_DISPLAY_SETTING;
+                if (patchLayerTopMostResult == 1) { // Success : 1
+                    resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
+
+                } else {
+                    ResponseCode failCode = ResponseCode.FAIL_DELETE_DISPLAY_SETTING;
+                    resultMap.put("code", failCode.getCode());
+                    resultMap.put("message", failCode.getMessage());
+                }
+            }
+            else{
+                resultMap.put("data", displayUsedCheck);
+                ResponseCode failCode = ResponseCode.FAIL_USED_DISPLAY_SETTING;
                 resultMap.put("code", failCode.getCode());
                 resultMap.put("message", failCode.getMessage());
             }

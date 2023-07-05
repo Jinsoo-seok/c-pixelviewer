@@ -20,8 +20,8 @@ public enum ResponseCode {
 
 
     // Login, SignUp : 2000
-//    INVALID_ACCOUNT_ID(2000, "InvalidAccountId", "Invalid Account ID"),
-//    INVALID_PASSWORD(2001, "InvalidPassword", "Invalid Password"),
+    FAIL_INVALID_USER_ID(2000, "InvalidUserId", "Invalid User ID"),
+    FAIL_INVALID_USER_PASSWORD(2001, "InvalidUserPassword", "Invalid User Password"),
 //    DUPLICATE_ID(2002, "DuplicateId", "Duplicate ID"),
 //    NOT_EXIST_ID(2003, "NotExistId", "Not Exist ID"),
 //    FAIL_CHANGE_PW(2004, "FailedChangePW", "Failed Change PW"),
@@ -38,6 +38,8 @@ public enum ResponseCode {
     FAIL_DUPLICATE_SCREEN(3102, "FailedDuplicateScreen", "Failed Duplicate Screen"),
     FAIL_DELETE_SCREEN(3103, "FailedDeleteScreen", "Failed Delete Screen"),
     FAIL_NOT_EXIST_SCREEN(3104, "FailedNotExistScreen", "Failed Not Exist Screen"),
+    FAIL_DELETE_SCREEN_ALLOCATE_DISPLAY(3105, "FailedDeleteScreenAllocateDisplays", "Failed Delete Screen Allocate Displays"),
+    FAIL_INSERT_SCREEN_ALLOCATE_DISPLAYS(3106, "FailedInsertScreenAllocateDisplays", "Failed Insert Screen Allocate Displays"),
 
     // Display : 3200
     FAIL_UPDATE_DISPLAY(3200, "FailedUpdateDisplay", "Failed Update Display"),
@@ -49,6 +51,8 @@ public enum ResponseCode {
     FAIL_DUPLICATE_PRESET(3302, "FailedDuplicatePreset", "Failed Duplicate Preset"),
     FAIL_DELETE_PRESET(3303, "FailedDeletePreset", "Failed Delete Preset"),
     FAIL_NOT_EXIST_PRESET(3304, "FailedNotExistPreset", "Failed Not Exist Preset"),
+    FAIL_DELETE_PRESET_ALLOCATE_LAYERS(3305, "FailedDeletePresetAllocateLayers", "Failed Delete Preset Allocate Layers"),
+    FAIL_INSERT_PRESET_ALLOCATE_LAYERS(3306, "FailedInsertPresetAllocateLayers", "Failed Insert Preset Allocate Layers"),
 
     // Layer : 3400
     FAIL_INSERT_LAYER(3400, "FailedInsertLayer", "Failed Insert Layer"),
@@ -128,6 +132,9 @@ public enum ResponseCode {
     FAIL_DUPLICATE_DISPLAY_SETTING(4314, "FailedDuplicateDisplaySetting", "Failed Duplicate Display Setting"),
     FAIL_DELETE_DISPLAY_SETTING(4315, "FailedDeleteDisplaySetting", "Failed Delete Display Setting"),
     FAIL_NOT_EXIST_DISPLAY_SETTING(4316, "FailedNotExistDisplaySetting", "Failed Not Exist Display Setting"),
+    FAIL_USED_DISPLAY_SETTING(4317, "FailedUsedDisplaySetting", "Failed Used Display Setting"),
+    FAIL_DISPLAY_SETTING_TO_AGENT(4317, "FailedDisplaySettingToAgent", "Failed Used Display Setting to Agent"),
+    FAIL_UPDATE_ADMIN_SETTING_WEATHER_IMG(4318, "FailedUpdateAdminSettingWeatherImage", "Failed Update AdminSetting Weather Image"),
 
     FAIL_UNSUPPORTED_TYPE_SETTING(4300, "FailedUnsupportedTypeSetting", "Failed Unsupported Type Setting");
 

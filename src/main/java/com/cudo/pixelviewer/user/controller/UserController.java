@@ -1,22 +1,24 @@
 package com.cudo.pixelviewer.user.controller;
 
+import com.cudo.pixelviewer.config.ParamException;
 import com.cudo.pixelviewer.user.service.UserService;
 import com.cudo.pixelviewer.util.ParameterUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.cudo.pixelviewer.util.ParameterUtils.parameterString;
+import static com.cudo.pixelviewer.util.ParameterUtils.parameterValidation;
+
 @Slf4j
-@RestController("/api-manager/user")
+@RestController
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*")
+@RequestMapping("/api-manager/user")
 public class UserController {
 
     final UserService userService;
@@ -30,18 +32,20 @@ public class UserController {
 
         Map<String, Object> responseMap = new HashMap<>();
 
-        String[] keyList = {"", ""};
+        String[] keyList = {"userId", "userPw"};
 
         try {
-//            parameterValidation(param, keyList);
-//            parameterString("", param.get(""), true, 0, null);
-//            responseMap = settingService.serviceGetValue();
+            parameterValidation(param, keyList);
+            parameterString("userId", param.get("userId"), true, 0, null);
+            parameterString("userPw", param.get("userPw"), true, 0, null);
+
+            responseMap = userService.postLogin(param);
         }
-//        catch (ParamException paramException){
-//            log.error("[paramException][postLogin] - {}", paramException.getMessage());
-//            responseMap.put("code", paramException.getCode());
-//            responseMap.put("message", paramException.getMessage());
-//        }
+        catch (ParamException paramException){
+            log.error("[paramException][postLogin] - {}", paramException.getMessage());
+            responseMap.put("code", paramException.getCode());
+            responseMap.put("message", paramException.getMessage());
+        }
         catch (Exception exception) {
             log.error("[Exception][postLogin] - {}", exception.getMessage());
             responseMap.putAll(ParameterUtils.responseOption("FAIL"));

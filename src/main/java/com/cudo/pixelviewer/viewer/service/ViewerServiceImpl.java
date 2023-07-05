@@ -75,12 +75,9 @@ public class ViewerServiceImpl implements ViewerService {
                                 Map<String, Object> weatherInfoTemp = layerMapper.getLayerObjectExternalInfo((Integer) lo.get("object_id"));
                                 String updateDate = convertTimestampToString(weatherInfoTemp.get("updateDate"));
 
-                                String deleteData = "updateDate";
-                                weatherInfoTemp.remove(deleteData);
-
                                 Map<String, Object> exInfoWeatherMap = new HashMap<>();
                                 exInfoWeatherMap.put("updateDate", updateDate);
-                                exInfoWeatherMap.put("weatherFormInfo", weatherInfoTemp);
+                                exInfoWeatherMap.put("weatherFormInfo", createTempMap(weatherInfoTemp));
 
                                 dataMap.put("weatherForm", exInfoWeatherMap);
                             }
@@ -119,12 +116,9 @@ public class ViewerServiceImpl implements ViewerService {
                                 Map<String, Object> airInfoTemp = layerMapper.getLayerObjectExternalInfo((Integer) lo.get("object_id"));
                                 String updateDate = convertTimestampToString(airInfoTemp.get("updateDate"));
 
-                                String deleteData = "updateDate";
-                                airInfoTemp.remove(deleteData);
-
                                 Map<String, Object> exInfoAirMap = new HashMap<>();
                                 exInfoAirMap.put("updateDate", updateDate);
-                                exInfoAirMap.put("airFormInfo", airInfoTemp);
+                                exInfoAirMap.put("airFormInfo", createTempMap(airInfoTemp));
 
                                 dataMap.put("airForm", exInfoAirMap);
                             }
@@ -283,7 +277,6 @@ public class ViewerServiceImpl implements ViewerService {
                         break;
                     }
                     default: {
-                        // TODO : 예외 처리
                         break;
                     }
                 }
@@ -291,11 +284,8 @@ public class ViewerServiceImpl implements ViewerService {
                 File destFile = new File(filePath);
                 FileUtils.copyInputStreamToFile(file.getInputStream(), destFile);
 
-                if(contentsType){
-                }
-                else if(weatherType){
-                    // TODO : 예외 처리
-
+                Boolean weatherImgDB = false;
+                if(weatherType){
                     String settingKey = "";
                     if (type.equals("30")) {
                         settingKey = "weatherSunny";
@@ -314,12 +304,21 @@ public class ViewerServiceImpl implements ViewerService {
                     }
 
                     int weatherImgResult = adminSettingMapper.patchWeatherImg(settingKey, originalFilename);
+                    if(weatherImgResult > 0){
+                        weatherImgDB = true;
+                    }
                 }
 
-                Map<String, Object> dataMap = new HashMap<>();
-                dataMap.put("filePath", filePath);
-                resultMap.put("data", dataMap);
-                resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
+                if(weatherImgDB) {
+                    Map<String, Object> dataMap = new HashMap<>();
+                    dataMap.put("filePath", filePath);
+                    resultMap.put("data", dataMap);
+                    resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
+                }
+                else{
+                    resultMap.put("code", ResponseCode.FAIL_UPDATE_ADMIN_SETTING_WEATHER_IMG.getCode());
+                    resultMap.put("message", ResponseCode.FAIL_UPDATE_ADMIN_SETTING_WEATHER_IMG.getMessage());
+                }
             } catch (IOException ioException) {
                 ioException.printStackTrace();
                 log.error("[paramException][postPreviewImgUpload] - {}", ioException.getMessage());
@@ -342,5 +341,27 @@ public class ViewerServiceImpl implements ViewerService {
             return dateTime.format(formatter);
         }
         return null;
+    }
+
+    private Map<String, Object> createTempMap(Map<String, Object> dataMap){
+        Map<String, Object> returnMap = new HashMap<>();
+        Map<String, Object> tempStyleMap = new HashMap<>();
+        Map<String, Object> tempPositionMap = new HashMap<>();
+
+        tempStyleMap.put("fontNm", dataMap.get("fontNm"));
+        tempStyleMap.put("fontSize", dataMap.get("fontSize"));
+        tempStyleMap.put("forecolor", dataMap.get("forecolor"));
+
+        tempPositionMap.put("posX", dataMap.get("posX"));
+        tempPositionMap.put("posY", dataMap.get("posY"));
+        tempPositionMap.put("width", dataMap.get("width"));
+        tempPositionMap.put("height", dataMap.get("height"));
+
+        returnMap.put("ord", dataMap.get("ord"));
+        returnMap.put("type", dataMap.get("type"));
+        returnMap.put("position", tempPositionMap);
+        returnMap.put("fontStyle", tempStyleMap);
+
+        return returnMap;
     }
 }

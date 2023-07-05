@@ -144,12 +144,32 @@ public class ScreenServiceImpl implements ScreenService {
             int putScreenResult = screenMapper.putScreen(param);
 
             if(putScreenResult == 1){ // Success : 1
-                // TODO : 예외처리
-                int deleteLayerResult = screenMapper.putScreenDeleteDisplays(param);
 
-                // TODO : 예외처리
-                int saveAllocateDisplaysResult = screenMapper.saveAllocateDisplays(param);
-                resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
+                Boolean displayClearYn = false;
+                if(param.get("deleteType").equals(true)){
+                    int deleteDisplaysResult = screenMapper.putScreenDeleteDisplays(param);
+                    if(deleteDisplaysResult > 0){
+                        displayClearYn = true;
+                    }
+                    else{
+                        resultMap.put("code", ResponseCode.FAIL_DELETE_SCREEN_ALLOCATE_DISPLAY.getCode());
+                        resultMap.put("message", ResponseCode.FAIL_DELETE_SCREEN_ALLOCATE_DISPLAY.getMessage());
+                    }
+                }
+                else{
+                    displayClearYn = true;
+                }
+
+                if(displayClearYn) {
+                    int saveAllocateDisplaysResult = screenMapper.saveAllocateDisplays(param);
+                    if(saveAllocateDisplaysResult > 0){
+                        resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
+                    }
+                    else{
+                        resultMap.put("code", ResponseCode.FAIL_INSERT_SCREEN_ALLOCATE_DISPLAYS.getCode());
+                        resultMap.put("message", ResponseCode.FAIL_INSERT_SCREEN_ALLOCATE_DISPLAYS.getMessage());
+                    }
+                }
             }
             else{
                 resultMap.put("code", ResponseCode.FAIL_UPDATE_SCREEN.getCode());

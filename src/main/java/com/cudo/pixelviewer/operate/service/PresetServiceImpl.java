@@ -8,6 +8,7 @@ import com.cudo.pixelviewer.util.ResponseCode;
 import com.cudo.pixelviewer.vo.LayerToAgentVo;
 import com.cudo.pixelviewer.vo.LayerVo;
 import com.cudo.pixelviewer.vo.PresetVo;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,7 @@ import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -74,14 +76,12 @@ public class PresetServiceImpl implements PresetService {
         return resultMap;
     }
 
-    // TODO : 중복체크, 에러코드
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> postPreset(Map<String, Object> param) {
         Map<String, Object> resultMap = new HashMap<>();
         Map<String, Object> dataMap = new HashMap<>();
 
-//        int presetCheck = presetMapper.postPresetValid(param);
         int presetCheck = 0;
 
         if(presetCheck == 0){ // Not Exist : 0
@@ -104,7 +104,6 @@ public class PresetServiceImpl implements PresetService {
         return resultMap;
     }
 
-    // TODO : 에러코드
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> deletePreset(Map<String, Object> param) {
@@ -167,22 +166,40 @@ public class PresetServiceImpl implements PresetService {
             int putPresetResult = presetMapper.putPreset(param);
 
             if(putPresetResult == 1){ // Success : 1
-                // TODO : 예외처리
-                int deleteLayerResult = presetMapper.putPresetDeleteLayers(param);
 
-                // TODO : 예외처리
-                int saveLayerResult = presetMapper.saveLayer(param);
-
-                resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
+                Boolean layerClearYn = false;
+                if(param.get("deleteType").equals(true)) {
+                    int deleteLayerResult = presetMapper.putPresetDeleteLayers(param);
+                    if(deleteLayerResult > 0){
+                        layerClearYn = true;
+                    }
+                    else{
+                        resultMap.put("code", ResponseCode.FAIL_DELETE_PRESET_ALLOCATE_LAYERS.getCode());
+                        resultMap.put("message", ResponseCode.FAIL_DELETE_PRESET_ALLOCATE_LAYERS.getMessage());
+                    }
+                }
+                else{
+                    layerClearYn = true;
+                }
+                if(layerClearYn){
+                    int saveLayerResult = presetMapper.saveLayer(param);
+                    if(saveLayerResult > 0){
+                        resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
+                    }
+                    else{
+                        resultMap.put("code", ResponseCode.FAIL_INSERT_PRESET_ALLOCATE_LAYERS.getCode());
+                        resultMap.put("message", ResponseCode.FAIL_INSERT_PRESET_ALLOCATE_LAYERS.getMessage());
+                    }
+                }
             }
             else{
-                resultMap.put("code", ResponseCode.FAIL_UPDATE_SCREEN.getCode());
-                resultMap.put("message", ResponseCode.FAIL_UPDATE_SCREEN.getMessage());
+                resultMap.put("code", ResponseCode.FAIL_UPDATE_PRESET.getCode());
+                resultMap.put("message", ResponseCode.FAIL_UPDATE_PRESET.getMessage());
             }
         }
         else{
-            resultMap.put("code", ResponseCode.FAIL_NOT_EXIST_SCREEN.getCode());
-            resultMap.put("message", ResponseCode.FAIL_NOT_EXIST_SCREEN.getMessage());
+            resultMap.put("code", ResponseCode.FAIL_NOT_EXIST_PRESET.getCode());
+            resultMap.put("message", ResponseCode.FAIL_NOT_EXIST_PRESET.getMessage());
         }
         return resultMap;
     }
@@ -208,7 +225,6 @@ public class PresetServiceImpl implements PresetService {
         String screenId = String.valueOf(param.get("screenId"));
         String presetId = String.valueOf(param.get("presetId"));
 
-        // TODO : 파라미터 매칭해야함(screenInfo)
         Map<String, Object> screenInfo = screenMapper.getScreen(screenId);
         String removeKey = "screenNm";
         screenInfo.remove(removeKey);
@@ -222,8 +238,6 @@ public class PresetServiceImpl implements PresetService {
         requestBodyMap.put("layers", layerInfos);
 
         resultMap.put("data", requestBodyMap);
-
-        // TODO : Agent 연동
 
         String ip = "192.168.123.12";
         String port = "8800";
@@ -244,31 +258,49 @@ public class PresetServiceImpl implements PresetService {
                 .uri(agentUrl)
                 .headers(httpHeaders -> httpHeaders.addAll(headers))
                 .body(BodyInserters.fromValue(requestBodyMap))
-//                .exchange()
-//                .flatMap(response -> response.bodyToMono(String.class));
                 .retrieve()
                 .bodyToMono(String.class);
-//                            response.bodyToMono(byte[].class)
 
         // 응답 처리
-        // TODO : 예외처리
+        // TODO : Agent 예외처리
         responseMono.subscribe(response -> {
             String data = response.toString();
-            System.out.println("data = " + data);
-//            int statusCode = Integer.parseInt(response);
-//            if (statusCode == 200) {
-//                log.info("요청 성공");
-//            } else {
-//                log.info("요청 실패 상태 코드: {}", statusCode);
-//            }
+//            System.out.println("data = " + data);
+
+            Map<String, Object> responseMap = new HashMap<>();
+
+            try {
+                ObjectMapper objectMapper = new ObjectMapper();
+                responseMap = objectMapper.readValue(data, Map.class);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            if(responseMap.get("code").equals(200)){
+
+
+                // TODO : [DB] preset Status >> RUN
+                Map<String, Object> queryMap = new HashMap<>();
+                queryMap.put("presetId", param.get("presetId"));
+                queryMap.put("presetStatus", "RUN");
+                int patchPresetStatusResult = presetMapper.patchPresetStatus(queryMap);
+
+                if(patchPresetStatusResult > 0) {
+                    resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
+                }
+                else{
+                    // TODO : Agent >> 프리셋 상태 업데이트 예외 처리
+//                    resultMap.put("code", ResponseCode.FAIL_UPDATE_DISPLAY.getCode());
+//                    resultMap.put("message", ResponseCode.FAIL_UPDATE_DISPLAY.getMessage());
+                }
+            }
+            else{
+                resultMap.put("code", ResponseCode.FAIL_DISPLAY_SETTING_TO_AGENT.getCode());
+                resultMap.put("message", ResponseCode.FAIL_DISPLAY_SETTING_TO_AGENT.getMessage());
+
+            }
         });
 
-        // TODO : [DB] preset Status >> RUN
-        Map<String, Object> queryMap = new HashMap<>();
-        queryMap.put("presetId", param.get("presetId"));
-        queryMap.put("presetStatus", "RUN");
-         int patchPresetStatusResult = presetMapper.patchPresetStatus(queryMap);
-
+        // TODO : 위 예외 처리 끝나면 삭제
         resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
         return resultMap;
     }
@@ -283,16 +315,10 @@ public class PresetServiceImpl implements PresetService {
 
         String agentUrl = "http://" + ip + ":" + port + "/vieweragent/Preset/layer-placement";
 
-        // TODO : Agent 연동
-        /*
-
-         */
-        // TODO : [DB] preset Status >> STOP
         Map<String, Object> queryMap = new HashMap<>();
         queryMap.put("presetId", param.get("presetId"));
         queryMap.put("presetStatus", "WAIT");
          int patchPresetStatusResult = presetMapper.patchPresetStatus(queryMap);
-
 
 
         resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));

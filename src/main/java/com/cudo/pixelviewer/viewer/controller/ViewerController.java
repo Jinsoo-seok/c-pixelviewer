@@ -106,7 +106,15 @@ public class ViewerController {
 
 
         try {
-            responseMap = viewerService.postPreviewImgUpload(type, name, file);
+            if (type.equals("10") || type.equals("20") || type.equals("30")
+                || type.equals("40") || type.equals("50") || type.equals("60")
+                || type.equals("70") || type.equals("80") || type.equals("90")
+                || type.equals("100")){
+                responseMap = viewerService.postPreviewImgUpload(type, name, file);
+            }
+            else {
+                responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
+            }
         }
         catch (Exception exception) {
             log.error("[Exception][postPreviewImgUpload] - {}", exception.getMessage());

@@ -107,6 +107,16 @@
         FROM Displays_Setting
         WHERE display_id = #{displayId}
     </select>
+    <select id="displayUsedCheck" resultType="String">
+        SELECT screen_nm AS screenNm
+        FROM Screens
+        where screen_id =
+        (
+            SELECT screen_id
+            FROM pixelviewer.Screen_Displays
+            WHERE display_id = #{displayId}
+        )
+    </select>
     <delete id="deleteDisplayInfo" parameterType="Map">
         DELETE FROM Displays_Setting
         WHERE display_id = #{displayId}
@@ -121,7 +131,11 @@
         WHERE setting_key = #{settingKey}
     </update>
 
-
+    <select id="getTestPattern" resultType="String">
+        SELECT setting_value
+        FROM Settings
+        WHERE setting_key = "testPattern"
+    </select>
 
 
 </mapper>
