@@ -8,6 +8,18 @@
         VALUES (#{scheduleName}, #{startDate}, #{endDate}, #{startTime}, #{endTime}, #{scheduleDay});
     </insert>
 
+    <update id="putLedPower" parameterType="Map">
+        UPDATE led_pwr_schedule
+        SET sch_nm = #{scheduleName}, sch_start_date = #{startDate}, sch_end_date = #{endDate},
+            time_pwr_on = #{startTime}, time_pwr_off = #{endTime}, run_day_week = #{scheduleDay}
+        WHERE schedule_id = #{scheduleId}
+    </update>
+    
+    <delete id="deleteLedPower" parameterType="Long">
+        DELETE FROM led_pwr_schedule
+        WHERE schedule_id = #{scheduleId}
+    </delete>
+
     <select id="selectPowerSchedule" resultType="com.cudo.pixelviewer.vo.PowerScheduleVo">
         SELECT schedule_id, sch_start_date, sch_end_date, time_pwr_on, time_pwr_off, run_day_week
         FROM led_pwr_schedule

@@ -45,9 +45,9 @@ public class TcpClient {
 
                 channel = future.channel();
             } else {
-                log.info("Failed to connect. Retrying in 10 seconds...");
+                log.error("Failed to connect. Retrying in 5 seconds... Because {}", String.valueOf(future.cause()));
 
-                future.channel().eventLoop().schedule(() -> connect(bootstrap, eventLoop), 10, TimeUnit.SECONDS);
+                future.channel().eventLoop().schedule(() -> connect(bootstrap, eventLoop), 5, TimeUnit.SECONDS);
             }
         });
     }

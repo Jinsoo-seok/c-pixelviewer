@@ -6,6 +6,7 @@ import com.cudo.pixelviewer.util.ParameterUtils;
 import com.cudo.pixelviewer.util.ResponseCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.quartz.SchedulerException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -261,7 +262,7 @@ public class ScheduleController {
             responseMap.put("code", paramException.getCode());
             responseMap.put("message", paramException.getMessage());
         } catch (Exception exception) {
-            log.error("[Exception][getPlaylistList] - {}", exception.getMessage());
+            log.error("[Exception] - {}", exception.getMessage());
 
             responseMap.put("exceptionMessage", exception.getMessage());
         }
@@ -300,14 +301,14 @@ public class ScheduleController {
             parameterCompareDate("startDate", "endDate", param.get("startDate"), param.get("endDate"));
             parameterArray("scheduleDay", param.get("scheduleDay"), true);
 
-            responseMap = scheduleService.setLedContent(param);
+            responseMap = scheduleService.putLedPower(param);
         } catch (ParamException paramException) {
-            log.error("[paramException][patchLayerTopMost] - {}", paramException.getMessage());
+            log.error("[paramException] - {}", paramException.getMessage());
 
             responseMap.put("code", paramException.getCode());
             responseMap.put("message", paramException.getMessage());
         } catch (Exception exception) {
-            log.error("[Exception][getPlaylistList] - {}", exception.getMessage());
+            log.error("[Exception] - {}", exception.getMessage());
 
             responseMap.put("exceptionMessage", exception.getMessage());
         }
@@ -338,14 +339,18 @@ public class ScheduleController {
             parameterValidation(param, keyList);
             parameterInt("scheduleId", param.get("scheduleId"), true);
 
-            responseMap = scheduleService.setLedContent(param);
+            responseMap = scheduleService.deleteLedPower(param);
         } catch (ParamException paramException) {
-            log.error("[paramException][patchLayerTopMost] - {}", paramException.getMessage());
+            log.error("[paramException] - {}", paramException.getMessage());
 
             responseMap.put("code", paramException.getCode());
             responseMap.put("message", paramException.getMessage());
+        } catch (SchedulerException exception) {
+            log.error("[SchedulerException] - {}", exception.getMessage());
+
+            responseMap.put("exceptionMessage", "Schedule deletion Exception");
         } catch (Exception exception) {
-            log.error("[Exception][getPlaylistList] - {}", exception.getMessage());
+            log.error("[Exception] - {}", exception.getMessage());
 
             responseMap.put("exceptionMessage", exception.getMessage());
         }

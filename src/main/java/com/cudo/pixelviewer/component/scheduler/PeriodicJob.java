@@ -94,7 +94,7 @@ public class PeriodicJob implements Job {
 
             log.info("Schedule Register Id : {}", String.valueOf(powerDataMap.get(DATA_MAP_KEY.getCode())) + powerInfo.getScheduleId());
         } else {
-            log.info("This is the time when schedule registration is not possible");
+            log.info("This is the time when schedule registration is not possible. power ScheduleId : {}", powerInfo.getScheduleId());
         }
     }
 
