@@ -1,7 +1,7 @@
 package com.cudo.pixelviewer.viewer.service;
 
 import com.cudo.pixelviewer.bo.mapper.AdminSettingMapper;
-import com.cudo.pixelviewer.external.mapper.ExternalsMapper;
+import com.cudo.pixelviewer.externals.mapper.ExternalsMapper;
 import com.cudo.pixelviewer.operate.mapper.LayerMapper;
 import com.cudo.pixelviewer.operate.mapper.PlaylistMapper;
 import com.cudo.pixelviewer.operate.mapper.PresetMapper;

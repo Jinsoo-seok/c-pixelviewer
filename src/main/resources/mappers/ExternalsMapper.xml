@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.cudo.pixelviewer.external.mapper.ExternalsMapper">
+<mapper namespace="com.cudo.pixelviewer.externals.mapper.ExternalsMapper">
 
     <select id="getExternalInfos" resultType="Map">
         SELECT external_type AS externalType, external_data AS externalData

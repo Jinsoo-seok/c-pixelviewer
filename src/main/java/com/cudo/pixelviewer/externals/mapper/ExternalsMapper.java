@@ -1,4 +1,4 @@
-package com.cudo.pixelviewer.external.mapper;
+package com.cudo.pixelviewer.externals.mapper;
 
 import org.apache.ibatis.annotations.Mapper;
 
