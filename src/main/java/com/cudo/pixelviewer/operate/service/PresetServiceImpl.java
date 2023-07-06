@@ -217,9 +217,8 @@ public class PresetServiceImpl implements PresetService {
         if(param.containsKey("layerInfoList")){
             int setPlaylistSelectYnResult = playlistMapper.setPlaylistSelectYn(param);
         }
-
-        String localIp = "192.168.123.89";
-        String localPort = "80";
+        String localIp = "106.245.226.42";
+        String localPort = "9898";
         String baseUrl = "http://" + localIp + ":" + localPort + "/api-viewer/";
 
         String playInfoUrl = baseUrl + "playInfo";
@@ -247,6 +246,14 @@ public class PresetServiceImpl implements PresetService {
 
         resultMap.put("data", requestBodyMap);
 
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            String json = objectMapper.writeValueAsString(requestBodyMap);
+
+            System.out.println("[presetRun >> WAS to Agent] requestBodyMap = " + json);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         String ip = "192.168.123.12";
         String port = "8800";
 
