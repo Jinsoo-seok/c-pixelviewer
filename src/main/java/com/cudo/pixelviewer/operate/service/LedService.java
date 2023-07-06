@@ -7,4 +7,5 @@ public interface LedService {
     Map<String, Object> setInputSource(String source);
     Map<String, Object> loadPreset(Integer presetNumber);
     Map<String, Object> getLedStatus();
+    Map<String, Object> getLedPreset();
 }
