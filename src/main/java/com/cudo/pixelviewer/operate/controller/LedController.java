@@ -111,13 +111,13 @@ public class LedController {
 
         responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
 
-        String[] keyList = {"presetNumber"};
+        String[] keyList = {"presetId"};
 
         try {
             parameterValidation(param, keyList);
-            parameterInt("presetNumber", param.get("presetNumber"), true);
+            parameterString("presetId", param.get("presetId"), true, 0, null);
 
-            responseMap = ledService.loadPreset((Integer) param.get("presetNumber"));
+            responseMap = ledService.loadPreset(String.valueOf(param.get("presetNumber")));
         } catch (ParamException paramException) {
             log.error("[paramException][patchLayerTopMost] - {}", paramException.getMessage());
 

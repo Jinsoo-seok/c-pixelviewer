@@ -43,7 +43,7 @@ public class LedServiceImpl implements LedService {
     }
 
     @Override
-    public Map<String, Object> loadPreset(Integer presetNumber) {
+    public Map<String, Object> loadPreset(String presetNumber) {
         Map<String, Object> resultMap = new HashMap<>();
 
         // 하드 코딩용
