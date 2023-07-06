@@ -111,13 +111,13 @@ public class LedController {
 
         responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
 
-        String[] keyList = {"presetNumber"};
+        String[] keyList = {"presetId"};
 
         try {
             parameterValidation(param, keyList);
-            parameterInt("presetNumber", param.get("presetNumber"), true);
+            parameterString("presetId", param.get("presetId"), true, 0, null);
 
-            responseMap = ledService.loadPreset((Integer) param.get("presetNumber"));
+            responseMap = ledService.loadPreset(String.valueOf(param.get("presetNumber")));
         } catch (ParamException paramException) {
             log.error("[paramException][patchLayerTopMost] - {}", paramException.getMessage());
 
@@ -153,6 +153,73 @@ public class LedController {
             responseMap = ledService.getLedStatus();
         } catch (Exception exception) {
             log.error("[Exception][getPlaylistList] - {}", exception.getMessage());
+
+            responseMap.put("exceptionMessage", exception.getMessage());
+        }
+
+        long endTime = System.currentTimeMillis();
+        long procTime = endTime - startTime;
+        log.info("{} [END] [{}] - {}", apiInfo, procTime, responseMap.get("code"));
+
+        return responseMap;
+    }
+
+    /**
+     * * 프리셋 리스트 조회
+     */
+    @GetMapping("/preset")
+    public Map<String, Object> getLedPreset(HttpServletRequest request) {
+        long startTime = System.currentTimeMillis();
+        String apiInfo = "[" + request.getRequestURI() + "] [" + request.getMethod() + "]";
+        log.info("{} [START] [{}]", apiInfo, startTime);
+
+        Map<String, Object> responseMap = new HashMap<>();
+
+        responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
+
+        try {
+            responseMap = ledService.getLedPreset();
+        } catch (Exception exception) {
+            log.error("[Exception] - {}", exception.getMessage());
+
+            responseMap.put("exceptionMessage", exception.getMessage());
+        }
+
+        long endTime = System.currentTimeMillis();
+        long procTime = endTime - startTime;
+        log.info("{} [END] [{}] - {}", apiInfo, procTime, responseMap.get("code"));
+
+        return responseMap;
+    }
+
+    /**
+     * * 프리셋 리스트 조회
+     */
+    @PatchMapping("/preset/name")
+    public Map<String, Object> putLedPresetName(HttpServletRequest request, @RequestBody Map<String, Object> param) {
+        long startTime = System.currentTimeMillis();
+        String apiInfo = "[" + request.getRequestURI() + "] [" + request.getMethod() + "]";
+        log.info("{} [START] [{}]", apiInfo, startTime);
+
+        Map<String, Object> responseMap = new HashMap<>();
+
+        responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
+
+        String[] keyList = {"presetId", "presetName"};
+
+        try {
+            parameterValidation(param, keyList);
+            parameterString("presetId", param.get("presetId"), true, 0, null);
+            parameterString("presetName", param.get("presetName"), true, 0, null);
+
+            responseMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
+        } catch (ParamException paramException) {
+            log.error("[paramException] - {}", paramException.getMessage());
+
+            responseMap.put("code", paramException.getCode());
+            responseMap.put("message", paramException.getMessage());
+        } catch (Exception exception) {
+            log.error("[Exception] - {}", exception.getMessage());
 
             responseMap.put("exceptionMessage", exception.getMessage());
         }
