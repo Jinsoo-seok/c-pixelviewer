@@ -68,7 +68,7 @@
     </select>
     <update id="putPlaylist">
         UPDATE Playlists
-        SET content_id_list = #{contentIdList}, update_date = NOW()
+        SET playlist_nm = #{playlistNm}, content_id_list = #{contentIdList}, update_date = NOW()
         WHERE Playlists.playlist_id = #{playlistId}
     </update>
     <update id="putPlaylist2">

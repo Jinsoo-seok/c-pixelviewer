@@ -123,11 +123,12 @@ public class PlaylistController {
         Map<String, Object> responseMap = new HashMap<>();
         responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
 
-        String[] keyList = {"playlistId", "contentIdList"};
+        String[] keyList = {"playlistId", "playlistNm", "contentIdList"};
 
         try {
             parameterValidation(param, keyList);
             parameterInt("playlistId", param.get("playlistId"), true);
+            parameterString("playlistNm", param.get("playlistNm"), true, 0, null);
             parameterArray("contentIdList", param.get("contentIdList"), true);
 
             responseMap = playlistService.putPlaylist(param);

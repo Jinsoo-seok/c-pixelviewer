@@ -31,6 +31,25 @@ public class LayerServiceImpl implements LayerService {
 
         if(layerList.size() > 0){
             for (Map<String, Object> layer : layerList) {
+                for (String key : layer.keySet()) {
+                    if (key.endsWith("En")) {
+                        Object value = layer.get(key);
+                        if (value instanceof String) {
+                            String strValue = (String) value;
+                            if (strValue.equals("1") || strValue.equals("0")) {
+                                boolean booleanValue = strValue.equals("1");
+                                layer.put(key, booleanValue);
+                            }
+                        } else if (value instanceof Integer) {
+                            int intValue = (int) value;
+                            if (intValue == 1 || intValue == 0) {
+                                boolean booleanValue = intValue == 1;
+                                layer.put(key, booleanValue);
+                            }
+                        }
+                    }
+                }
+
                 List<Integer> playList = layerMapper.getLayerListPlayList((Integer) layer.get("layerId"));
                 layer.put("playList", playList);
             }
@@ -50,6 +69,25 @@ public class LayerServiceImpl implements LayerService {
 
 //        LayerVo layerVo = layerMapper.getLayer(layerId);
         Map<String, Object> layerMap = layerMapper.getLayer(layerId);
+
+        for (String key : layerMap.keySet()) {
+            if (key.endsWith("En")) {
+                Object value = layerMap.get(key);
+                if (value instanceof String) {
+                    String strValue = (String) value;
+                    if (strValue.equals("1") || strValue.equals("0")) {
+                        boolean booleanValue = strValue.equals("1");
+                        layerMap.put(key, booleanValue);
+                    }
+                } else if (value instanceof Integer) {
+                    int intValue = (int) value;
+                    if (intValue == 1 || intValue == 0) {
+                        boolean booleanValue = intValue == 1;
+                        layerMap.put(key, booleanValue);
+                    }
+                }
+            }
+        }
 
         if(layerMap != null){
             List<Map<String, Object>> layerObject = layerMapper.getLayerLayerObject(layerId);
@@ -150,7 +188,7 @@ public class LayerServiceImpl implements LayerService {
         if(layerCheck == 1){  // Exist : 1
             int deleteLayerResult = layerMapper.deleteLayer(param);
 
-            if(deleteLayerResult > 1){ // Success : 1
+            if(deleteLayerResult > 0){ // Success
                 resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
             }
             else{
