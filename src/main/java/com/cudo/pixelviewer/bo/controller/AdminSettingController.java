@@ -68,7 +68,8 @@ public class AdminSettingController {
                 "ledPresetCount",
                 "loginEn",
                 "imgDefaultPlaytime",
-                "externalinfoArea"
+                "externalinfoArea",
+                "nx", "ny"
         };
 
         try {
@@ -82,6 +83,8 @@ public class AdminSettingController {
             parameterBoolean("loginEn", param.get("loginEn"), true);
             parameterInt("imgDefaultPlaytime", param.get("imgDefaultPlaytime"), true);
             parameterString("externalinfoArea", param.get("externalinfoArea"), true, 0, null);
+            parameterInt("nx", param.get("nx"), true);
+            parameterInt("ny", param.get("ny"), true);
 
             responseMap = adminSettingService.putAdminSetting(param);
         }

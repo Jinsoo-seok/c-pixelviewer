@@ -72,6 +72,12 @@ public class AdminSettingServiceImpl implements AdminSettingService {
 
         List<Map<String, Object>> tempArray = new ArrayList<>();
 
+        param.put("coords", param.get("nx") + "," + param.get("ny"));
+        String[] removeKey = {"nx", "ny"};
+        for (String key : removeKey) {
+            param.remove(key);
+        }
+
         for (Map.Entry<String, Object> entry : param.entrySet()) {
             Map<String, Object> queryMap = new HashMap<>();
             String key = entry.getKey();
