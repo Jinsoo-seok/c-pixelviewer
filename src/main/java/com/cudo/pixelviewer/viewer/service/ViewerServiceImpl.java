@@ -129,7 +129,8 @@ public class ViewerServiceImpl implements ViewerService {
                     }
                 }
             }
-            Map<String, Object> playlist = playlistMapper.getPlaylist(layerId);
+//            Map<String, Object> playlist = playlistMapper.getPlaylist(layerId);
+            Map<String, Object> playlist = playlistMapper.getPlaylistAboutLayer(layerId);
 
             if(playlist != null) {
                 Map<String, Object> playlistResultMap = new HashMap<>();

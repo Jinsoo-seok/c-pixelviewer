@@ -87,6 +87,14 @@
     </select>
 
 
+    <select id="getPlaylistAboutLayer" resultType="Map">
+        SELECT playlist_nm AS playlistNm, layer_id AS layerId, preset_id AS presetId, playlist_id AS playlistId, content_id_list AS contentIdList, screen_id AS screenId, update_date AS updateDate
+        FROM Playlists
+        WHERE Playlists.layer_id = #{layerId}
+            AND Playlists.select_yn = 'Y'
+    </select>
+
+
 
 
     <select id="getPlaylistContentsList" resultType="com.cudo.pixelviewer.vo.PlaylistContentsVo">
