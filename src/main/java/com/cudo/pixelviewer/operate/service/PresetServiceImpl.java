@@ -1,6 +1,7 @@
 package com.cudo.pixelviewer.operate.service;
 
 import com.cudo.pixelviewer.operate.mapper.LayerMapper;
+import com.cudo.pixelviewer.operate.mapper.PlaylistMapper;
 import com.cudo.pixelviewer.operate.mapper.PresetMapper;
 import com.cudo.pixelviewer.operate.mapper.ScreenMapper;
 import com.cudo.pixelviewer.util.ParameterUtils;
@@ -37,6 +38,8 @@ public class PresetServiceImpl implements PresetService {
     final PresetMapper presetMapper;
 
     final LayerMapper layerMapper;
+
+    final PlaylistMapper playlistMapper;
 
 
     @Override
@@ -209,6 +212,11 @@ public class PresetServiceImpl implements PresetService {
     public Map<String, Object> patchPresetRun(Map<String, Object> param) {
         Map<String, Object> resultMap = new HashMap<>();
         Map<String, Object> requestBodyMap = new HashMap<>();
+
+
+        if(param.containsKey("layerInfoList")){
+            int setPlaylistSelectYnResult = playlistMapper.setPlaylistSelectYn(param);
+        }
 
         String localIp = "192.168.123.89";
         String localPort = "80";

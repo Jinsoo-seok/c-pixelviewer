@@ -94,6 +94,39 @@
             AND Playlists.select_yn = 'Y'
     </select>
 
+    <update id="setPlaylistSelectYn">
+        <foreach collection="layerInfoList" item="layerInfo">
+            SET @result = (
+                SELECT CASE
+                    WHEN (
+                    SELECT playlist_id
+                    FROM pixelviewer.Playlists
+                    WHERE layer_id = #{layerInfo.layerId} AND select_yn = 'Y'
+                    LIMIT 1
+                    ) = #{layerInfo.playlistId} THEN 1
+                    ELSE 0
+                END
+            );
+
+            IF @result = 0 THEN
+                UPDATE pixelviewer.Playlists
+                SET select_yn = 'N'
+                WHERE playlist_id = (
+                    SELECT playlist_id
+                    FROM pixelviewer.Playlists
+                    WHERE layer_id = #{layerInfo.layerId}
+                      AND select_yn = 'Y'
+                    LIMIT 1
+                );
+
+                UPDATE pixelviewer.Playlists
+                SET select_yn = 'Y'
+                WHERE playlist_id = #{layerInfo.playlistId}
+                  AND layer_id = #{layerInfo.layerId};
+            END IF;
+        </foreach>
+    </update>
+
 
 
 

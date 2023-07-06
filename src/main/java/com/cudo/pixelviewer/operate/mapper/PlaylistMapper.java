@@ -48,4 +48,6 @@ public interface PlaylistMapper {
 
     Map<String, Object> getPlaylistAboutLayer(String layerId);
 
+    int setPlaylistSelectYn(Map<String, Object> param);
+
 }
