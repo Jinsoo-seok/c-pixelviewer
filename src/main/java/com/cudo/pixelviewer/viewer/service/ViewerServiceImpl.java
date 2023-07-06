@@ -191,6 +191,7 @@ public class ViewerServiceImpl implements ViewerService {
     public Map<String, Object> putUpdateAndHealthCheck(Map<String, Object> param) {
         Map<String, Object> resultMap = new HashMap<>();
         Map<String, Object> dataMap = new HashMap<>();
+        Map<String, Object> tempPresetMap = new HashMap<>();
         String presetId = String.valueOf(param.get("presetId"));
 
         PresetVo presetVo = presetMapper.getPreset(presetId);
@@ -200,8 +201,9 @@ public class ViewerServiceImpl implements ViewerService {
             SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
             String dateString = formatter.format(presetUpdateDate);
 
-            dataMap.put("presetStatus", presetVo.getPresetStatus());
-            dataMap.put("playInfoVersion", dateString);
+            tempPresetMap.put("presetStatus", presetVo.getPresetStatus());
+            tempPresetMap.put("playInfoVersion", dateString);
+            dataMap.put("preset", tempPresetMap);
 
             List<Map<String, Object>> externalInfos = externalsMapper.getExternalInfos();
 
