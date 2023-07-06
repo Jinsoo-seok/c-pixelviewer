@@ -7,11 +7,6 @@
         SELECT setting_key AS settingKey, setting_value AS settingValue
         FROM Settings
     </select>
-    <select id="getAdminSettingList2" resultType="com.cudo.pixelviewer.vo.AdminSettingVo">
-        SELECT *
-        FROM Setting
-        WHERE program_id = 1
-    </select>
 
     <update id="putAdminSetting" >
         <foreach collection="param" item="item" separator=";">
@@ -23,42 +18,6 @@
         </foreach>
     </update>
 
-
-    <update id="patchLayerTopMost">
-        UPDATE Setting AS S
-        SET view_topmost_en = #{type}
-        WHERE S.program_id = 1
-    </update>
-
-    <update id="patchTempHumi">
-        UPDATE Setting AS S
-        SET view_temphumi_en = #{type}
-        WHERE S.program_id = 1
-    </update>
-
-    <update id="patchControlType">
-        UPDATE Setting AS S
-        SET led_comm_type = #{type}
-        WHERE S.program_id = 1
-    </update>
-
-    <update id="patchLedPresetEnable">
-        UPDATE Setting AS S
-        SET led_preset_en = #{type}
-        WHERE S.program_id = 1
-    </update>
-
-    <update id="patchLedPresetCount">
-        UPDATE Setting AS S
-        SET led_preset_count = #{presetCount}
-        WHERE S.program_id = 1
-    </update>
-
-    <update id="patchLedInputEnable">
-        UPDATE Setting AS S
-        SET led_input_select_en = #{type}
-        WHERE S.program_id = 1
-    </update>
 
     <select id="getDisplayInfoList" resultType="com.cudo.pixelviewer.vo.DisplaySettingVo">
         SELECT *
@@ -142,6 +101,5 @@
         FROM Settings
         WHERE setting_key = #{key}
     </select>
-
 
 </mapper>

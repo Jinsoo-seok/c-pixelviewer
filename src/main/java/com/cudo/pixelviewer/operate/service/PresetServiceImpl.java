@@ -1,6 +1,7 @@
 package com.cudo.pixelviewer.operate.service;
 
 import com.cudo.pixelviewer.operate.mapper.LayerMapper;
+import com.cudo.pixelviewer.operate.mapper.PlaylistMapper;
 import com.cudo.pixelviewer.operate.mapper.PresetMapper;
 import com.cudo.pixelviewer.operate.mapper.ScreenMapper;
 import com.cudo.pixelviewer.util.ParameterUtils;
@@ -37,6 +38,8 @@ public class PresetServiceImpl implements PresetService {
     final PresetMapper presetMapper;
 
     final LayerMapper layerMapper;
+
+    final PlaylistMapper playlistMapper;
 
 
     @Override
@@ -210,8 +213,12 @@ public class PresetServiceImpl implements PresetService {
         Map<String, Object> resultMap = new HashMap<>();
         Map<String, Object> requestBodyMap = new HashMap<>();
 
-        String localIp = "192.168.123.89";
-        String localPort = "80";
+
+        if(param.containsKey("layerInfoList")){
+            int setPlaylistSelectYnResult = playlistMapper.setPlaylistSelectYn(param);
+        }
+        String localIp = "106.245.226.42";
+        String localPort = "9898";
         String baseUrl = "http://" + localIp + ":" + localPort + "/api-viewer/";
 
         String playInfoUrl = baseUrl + "playInfo";
@@ -239,6 +246,14 @@ public class PresetServiceImpl implements PresetService {
 
         resultMap.put("data", requestBodyMap);
 
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            String json = objectMapper.writeValueAsString(requestBodyMap);
+
+            System.out.println("[presetRun >> WAS to Agent] requestBodyMap = " + json);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         String ip = "192.168.123.12";
         String port = "8800";
 

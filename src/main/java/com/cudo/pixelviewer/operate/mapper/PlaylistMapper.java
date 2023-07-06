@@ -46,4 +46,8 @@ public interface PlaylistMapper {
 
     List<Map<String, Object>> getIncludedList(String idList);
 
+    Map<String, Object> getPlaylistAboutLayer(String layerId);
+
+    int setPlaylistSelectYn(Map<String, Object> param);
+
 }

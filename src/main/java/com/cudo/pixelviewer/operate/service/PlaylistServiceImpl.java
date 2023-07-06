@@ -49,61 +49,62 @@ public class PlaylistServiceImpl implements PlaylistService {
 
         if(playlist != null){
             String contentIdList = (String) playlist.get("contentIdList");
-            String queryTemp = "(" + contentIdList + ")";
-            List<Map<String, Object>> tempContentIdList = new ArrayList<>();
-            try {
-                JSONParser parser = new JSONParser();
-                Object obj = parser.parse(contentIdList);
-                playlist.put("contentIdList", obj);
-                tempContentIdList = (List<Map<String, Object>>) obj;
+            if(!contentIdList.equals("NULL")) {
+                String queryTemp = "(" + contentIdList + ")";
+                List<Map<String, Object>> tempContentIdList = new ArrayList<>();
+                try {
+                    JSONParser parser = new JSONParser();
+                    Object obj = parser.parse(contentIdList);
+                    playlist.put("contentIdList", obj);
+                    tempContentIdList = (List<Map<String, Object>>) obj;
 
-                StringBuilder contentIds = new StringBuilder();
+                    StringBuilder contentIds = new StringBuilder();
 
-                if(tempContentIdList != null){
-                    for (Map<String, Object> item : tempContentIdList) {
-                        Long contentId = (Long) item.get("contentId");
-                        contentIds.append(contentId).append(",");
-                    }
-                }
-                if (contentIds.length() > 0) {
-                    contentIds.setLength(contentIds.length() - 1);
-                }
-                queryTemp = "(" + contentIds + ")";
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-
-            // TODO : 중복 id 처리 시, 데이터 꼬임 현상 있음
-            List<Map<String, Object>> playlistContentList = playlistMapper.getPlaylistContentList(queryTemp);
-            Long order = 1L;
-            if(playlistContentList.size() != 0){
-                List<Map<String, Object>> tempContentArray = new ArrayList<>();
-
-                for (int i = 0; i < tempContentIdList.size(); i++) {
-                    for(int x = 0; x < tempContentIdList.size(); x++) {
-                        Long tempOrder = (Long) tempContentIdList.get(x).get("order");
-                        if (tempOrder == order) {
-                            Long orderContentId = (Long) tempContentIdList.get(x).get("contentId");
-                            for (Map<String, Object> playlistContent : playlistContentList) {
-                                Integer dbContentId = (Integer) playlistContent.get("contentId");
-                                if (orderContentId.equals(dbContentId.longValue())) {
-                                    System.out.println("orderContentId == dbContentId");
-                                    playlistContent.put("weatherFl", tempContentIdList.get(x).get("weatherFl"));
-                                    playlistContent.put("airInfoFl", tempContentIdList.get(x).get("airInfoFl"));
-                                    playlistContent.put("stretch", tempContentIdList.get(x).get("stretch"));
-                                    playlistContent.put("order", tempContentIdList.get(x).get("order"));
-                                    tempContentArray.add(playlistContent);
-                                }
-                            }
-                            order++;
+                    if (tempContentIdList != null) {
+                        for (Map<String, Object> item : tempContentIdList) {
+                            Long contentId = (Long) item.get("contentId");
+                            contentIds.append(contentId).append(",");
                         }
                     }
+                    if (contentIds.length() > 0) {
+                        contentIds.setLength(contentIds.length() - 1);
+                    }
+                    queryTemp = "(" + contentIds + ")";
+                } catch (ParseException e) {
+                    e.printStackTrace();
                 }
-                playlist.put("contentArray", tempContentArray);
-                String removeKey = "contentIdList";
-                playlist.remove(removeKey);
-            }
 
+                // TODO : 중복 id 처리 시, 데이터 꼬임 현상 있음
+                List<Map<String, Object>> playlistContentList = playlistMapper.getPlaylistContentList(queryTemp);
+                Long order = 1L;
+                if (playlistContentList.size() != 0) {
+                    List<Map<String, Object>> tempContentArray = new ArrayList<>();
+
+                    for (int i = 0; i < tempContentIdList.size(); i++) {
+                        for (int x = 0; x < tempContentIdList.size(); x++) {
+                            Long tempOrder = (Long) tempContentIdList.get(x).get("order");
+                            if (tempOrder == order) {
+                                Long orderContentId = (Long) tempContentIdList.get(x).get("contentId");
+                                for (Map<String, Object> playlistContent : playlistContentList) {
+                                    Integer dbContentId = (Integer) playlistContent.get("contentId");
+                                    if (orderContentId.equals(dbContentId.longValue())) {
+                                        System.out.println("orderContentId == dbContentId");
+                                        playlistContent.put("weatherFl", tempContentIdList.get(x).get("weatherFl"));
+                                        playlistContent.put("airInfoFl", tempContentIdList.get(x).get("airInfoFl"));
+                                        playlistContent.put("stretch", tempContentIdList.get(x).get("stretch"));
+                                        playlistContent.put("order", tempContentIdList.get(x).get("order"));
+                                        tempContentArray.add(playlistContent);
+                                    }
+                                }
+                                order++;
+                            }
+                        }
+                    }
+                    playlist.put("contentArray", tempContentArray);
+                    String removeKey = "contentIdList";
+                    playlist.remove(removeKey);
+                }
+            }
             resultMap.put("data", playlist);
             resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
         }

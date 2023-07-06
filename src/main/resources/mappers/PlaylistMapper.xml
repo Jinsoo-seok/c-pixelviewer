@@ -87,6 +87,47 @@
     </select>
 
 
+    <select id="getPlaylistAboutLayer" resultType="Map">
+        SELECT playlist_nm AS playlistNm, layer_id AS layerId, preset_id AS presetId, playlist_id AS playlistId, content_id_list AS contentIdList, screen_id AS screenId, update_date AS updateDate
+        FROM Playlists
+        WHERE Playlists.layer_id = #{layerId}
+            AND Playlists.select_yn = 'Y'
+    </select>
+
+    <update id="setPlaylistSelectYn">
+        <foreach collection="layerInfoList" item="layerInfo">
+            SET @result = (
+                SELECT CASE
+                    WHEN (
+                    SELECT playlist_id
+                    FROM pixelviewer.Playlists
+                    WHERE layer_id = #{layerInfo.layerId} AND select_yn = 'Y'
+                    LIMIT 1
+                    ) = #{layerInfo.playlistId} THEN 1
+                    ELSE 0
+                END
+            );
+
+            IF @result = 0 THEN
+                UPDATE pixelviewer.Playlists
+                SET select_yn = 'N', update_date = NOW()
+                WHERE playlist_id = (
+                    SELECT playlist_id
+                    FROM pixelviewer.Playlists
+                    WHERE layer_id = #{layerInfo.layerId}
+                      AND select_yn = 'Y'
+                    LIMIT 1
+                );
+
+                UPDATE pixelviewer.Playlists
+                SET select_yn = 'Y', update_date = NOW()
+                WHERE playlist_id = #{layerInfo.playlistId}
+                  AND layer_id = #{layerInfo.layerId};
+            END IF;
+        </foreach>
+    </update>
+
+
 
 
     <select id="getPlaylistContentsList" resultType="com.cudo.pixelviewer.vo.PlaylistContentsVo">

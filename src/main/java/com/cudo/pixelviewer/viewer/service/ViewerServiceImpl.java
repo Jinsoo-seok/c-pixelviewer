@@ -129,7 +129,8 @@ public class ViewerServiceImpl implements ViewerService {
                     }
                 }
             }
-            Map<String, Object> playlist = playlistMapper.getPlaylist(layerId);
+//            Map<String, Object> playlist = playlistMapper.getPlaylist(layerId);
+            Map<String, Object> playlist = playlistMapper.getPlaylistAboutLayer(layerId);
 
             if(playlist != null) {
                 Map<String, Object> playlistResultMap = new HashMap<>();
@@ -190,6 +191,7 @@ public class ViewerServiceImpl implements ViewerService {
     public Map<String, Object> putUpdateAndHealthCheck(Map<String, Object> param) {
         Map<String, Object> resultMap = new HashMap<>();
         Map<String, Object> dataMap = new HashMap<>();
+        Map<String, Object> tempPresetMap = new HashMap<>();
         String presetId = String.valueOf(param.get("presetId"));
 
         PresetVo presetVo = presetMapper.getPreset(presetId);
@@ -199,8 +201,9 @@ public class ViewerServiceImpl implements ViewerService {
             SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
             String dateString = formatter.format(presetUpdateDate);
 
-            dataMap.put("presetStatus", presetVo.getPresetStatus());
-            dataMap.put("playInfoVersion", dateString);
+            tempPresetMap.put("presetStatus", presetVo.getPresetStatus());
+            tempPresetMap.put("playInfoVersion", dateString);
+            dataMap.put("preset", tempPresetMap);
 
             List<Map<String, Object>> externalInfos = externalsMapper.getExternalInfos();
 
@@ -218,7 +221,9 @@ public class ViewerServiceImpl implements ViewerService {
                     }
                     if(obj != null) {
                         if (externalType.equals("날씨")) {
-                            dataMap.put("weatherInfo", obj);
+                            // TODO : 시간별 분기처리
+                            Map<String, Object> tempMap = (Map<String, Object>) obj;
+                            dataMap.put("weatherInfo", tempMap.get("weather12"));
                         }
                         else if (externalType.equals("대기")) {
                             dataMap.put("airInfo", obj);
@@ -226,7 +231,6 @@ public class ViewerServiceImpl implements ViewerService {
                     }
                 }
             }
-            // TODO : 날씨, 대기 정보 조회
             resultMap.put("data", dataMap);
 
             resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
@@ -234,7 +238,8 @@ public class ViewerServiceImpl implements ViewerService {
         else{
             resultMap.putAll(ParameterUtils.responseOption(ResponseCode.NO_CONTENT.getCodeName()));
         }
-        return resultMap;
+//        return resultMap;
+        return dataMap;
     }
 
     @Override
@@ -252,12 +257,14 @@ public class ViewerServiceImpl implements ViewerService {
                 LocalDateTime localDateTime = LocalDateTime.now();
                 String formattedDateTime = localDateTime.format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
 
+                Boolean agentCatureType = false;
                 Boolean contentsType = false;
                 Boolean weatherType = false;
 
                 switch(type) {
                     // Agent Capture Img
                     case "10": {
+                        agentCatureType = true;
                         filePath += "agent" + File.separator + name + extension;
                         break;
                     }
@@ -284,9 +291,17 @@ public class ViewerServiceImpl implements ViewerService {
                 File destFile = new File(filePath);
                 FileUtils.copyInputStreamToFile(file.getInputStream(), destFile);
 
-                Boolean weatherImgDB = false;
-                if(weatherType){
+
+                if(agentCatureType || contentsType){
+                    Map<String, Object> dataMap = new HashMap<>();
+                    dataMap.put("filePath", filePath);
+                    resultMap.put("data", dataMap);
+                    resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
+                }
+                else if(weatherType){
+                    Boolean weatherImgDB = false;
                     String settingKey = "";
+
                     if (type.equals("30")) {
                         settingKey = "weatherSunny";
                     } else if (type.equals("40")) {
@@ -307,17 +322,16 @@ public class ViewerServiceImpl implements ViewerService {
                     if(weatherImgResult > 0){
                         weatherImgDB = true;
                     }
-                }
-
-                if(weatherImgDB) {
-                    Map<String, Object> dataMap = new HashMap<>();
-                    dataMap.put("filePath", filePath);
-                    resultMap.put("data", dataMap);
-                    resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
-                }
-                else{
-                    resultMap.put("code", ResponseCode.FAIL_UPDATE_ADMIN_SETTING_WEATHER_IMG.getCode());
-                    resultMap.put("message", ResponseCode.FAIL_UPDATE_ADMIN_SETTING_WEATHER_IMG.getMessage());
+                    if(weatherImgDB) {
+                        Map<String, Object> dataMap = new HashMap<>();
+                        dataMap.put("filePath", filePath);
+                        resultMap.put("data", dataMap);
+                        resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
+                    }
+                    else{
+                        resultMap.put("code", ResponseCode.FAIL_UPDATE_ADMIN_SETTING_WEATHER_IMG.getCode());
+                        resultMap.put("message", ResponseCode.FAIL_UPDATE_ADMIN_SETTING_WEATHER_IMG.getMessage());
+                    }
                 }
             } catch (IOException ioException) {
                 ioException.printStackTrace();
