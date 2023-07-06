@@ -1,6 +1,7 @@
 package com.cudo.pixelviewer.component.scheduler;
 
 import com.cudo.pixelviewer.schedule.mapper.ScheduleMapper;
+import com.cudo.pixelviewer.vo.LightScheduleVo;
 import com.cudo.pixelviewer.vo.PowerScheduleVo;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -33,10 +34,17 @@ public class PeriodicJob implements Job {
         param.put("nowDate", nowDate);
 
         // 전원 스케줄 조회
-        List<PowerScheduleVo> powerScheduleList = scheduleMapper.selectPowerSchedule(param);
+        List<PowerScheduleVo> powerScheduleList = scheduleMapper.selectPowerSchedule(nowDate);
 
         // 전원 스케줄 등록
         powerSchedule(powerScheduleList, nowDate);
+
+        // 밝기 스케줄 조회
+        List<LightScheduleVo> lightScheduleList = scheduleMapper.selectLightSchedule(nowDate);
+
+        // 밝기 스케줄 등록
+        lightSchedule(lightScheduleList, nowDate);
+
     }
 
     /**
@@ -92,9 +100,60 @@ public class PeriodicJob implements Job {
 
             scheduler.scheduleJob(powerJob, powerTrigger);
 
-            log.info("Schedule Register Id : {}", String.valueOf(powerDataMap.get(DATA_MAP_KEY.getCode())) + powerInfo.getScheduleId());
+            log.info("Power Schedule Register Id : {}", String.valueOf(powerDataMap.get(DATA_MAP_KEY.getCode())) + powerInfo.getScheduleId());
         } else {
             log.info("This is the time when schedule registration is not possible. power ScheduleId : {}", powerInfo.getScheduleId());
+        }
+    }
+
+    /**
+     * * 밝기 스케줄 설정
+     */
+    private void lightSchedule(List<LightScheduleVo> lightSchedule, String nowDate) throws SchedulerException {
+        for (LightScheduleVo lightInfo : lightSchedule) {
+
+            if (checkDay(nowDate, lightInfo.getRunDayWeek())) {
+                List<String> lightTime = Arrays.asList(lightInfo.getRuntime().split(":"));
+
+                // 밝기 스케줄 등록
+                if (lightTime.size() > 0) {
+                    JobDataMap lightDataMap = new JobDataMap();
+
+                    lightDataMap.put(LIGHT.getCode(), LIGHT.getValue());
+                    lightDataMap.put(LIGHT.getValue(), Float.parseFloat(lightInfo.getBrightnessVal()) / 100);
+
+                    setLightSchedule(nowDate, lightInfo, lightTime, lightDataMap);
+                }
+            }
+        }
+
+    }
+
+    /**
+     * * 밝기 스케줄 job, trigger 설정
+     */
+    private void setLightSchedule(String nowDate, LightScheduleVo lightInfo, List<String> lightTime, JobDataMap lightDataMap) throws SchedulerException {
+        LocalTime lightScheduleTime = LocalTime.of(Integer.parseInt(lightTime.get(0)), Integer.parseInt(lightTime.get(1)), Integer.parseInt(lightTime.get(2)));
+        LocalTime nowTime = LocalTime.now();
+
+        if (lightScheduleTime.isAfter(nowTime)) {
+            JobDetail lightJob = JobBuilder.newJob(ScheduleJob.class)
+                    .withIdentity(String.valueOf(lightDataMap.get(DATA_MAP_KEY.getCode())) + lightInfo.getListId())
+                    .usingJobData(lightDataMap)
+                    .requestRecovery(true)
+                    .build();
+
+            Trigger lightTrigger = TriggerBuilder.newTrigger()
+                    .withIdentity(String.valueOf(lightDataMap.get(DATA_MAP_KEY.getCode())) + lightInfo.getListId())
+                    .withSchedule(CronScheduleBuilder
+                            .cronSchedule(cronExpression(nowDate, lightTime)))
+                    .build();
+
+            scheduler.scheduleJob(lightJob, lightTrigger);
+
+            log.info("Light Schedule Register Id : {}", String.valueOf(lightDataMap.get(DATA_MAP_KEY.getCode())) + lightInfo.getScheduleId());
+        } else {
+            log.info("This is the time when schedule registration is not possible. Light ScheduleId : {}", lightInfo.getScheduleId());
         }
     }
 

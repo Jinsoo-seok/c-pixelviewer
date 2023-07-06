@@ -11,9 +11,11 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.cudo.pixelviewer.component.scheduler.ScheduleCode.LIGHT;
 import static com.cudo.pixelviewer.util.ParameterUtils.*;
 
 @Slf4j
@@ -41,7 +43,7 @@ public class ScheduleController {
         try {
             responseMap = scheduleService.getCalenderStatus(param);
         } catch (Exception exception) {
-            log.error("[Exception][getPlaylistList] - {}", exception.getMessage());
+            log.error("[Exception] - {}", exception.getMessage());
 
             responseMap.put("exceptionMessage", exception.getMessage());
         }
@@ -393,14 +395,14 @@ public class ScheduleController {
                 parameterInt("brightness", ((Map<String, Object>) brightness).get("brightness"), true);
             }
 
-            responseMap = scheduleService.setLedContent(param);
+            responseMap = scheduleService.postLight(param);
         } catch (ParamException paramException) {
-            log.error("[paramException][patchLayerTopMost] - {}", paramException.getMessage());
+            log.error("[paramException] - {}", paramException.getMessage());
 
             responseMap.put("code", paramException.getCode());
             responseMap.put("message", paramException.getMessage());
         } catch (Exception exception) {
-            log.error("[Exception][getPlaylistList] - {}", exception.getMessage());
+            log.error("[Exception] - {}", exception.getMessage());
 
             responseMap.put("exceptionMessage", exception.getMessage());
         }
@@ -444,14 +446,14 @@ public class ScheduleController {
                 parameterInt("brightness", ((Map<String, Object>) brightness).get("brightness"), true);
             }
 
-            responseMap = scheduleService.setLedContent(param);
+            responseMap = scheduleService.putLight(param);
         } catch (ParamException paramException) {
-            log.error("[paramException][patchLayerTopMost] - {}", paramException.getMessage());
+            log.error("[paramException] - {}", paramException.getMessage());
 
             responseMap.put("code", paramException.getCode());
             responseMap.put("message", paramException.getMessage());
         } catch (Exception exception) {
-            log.error("[Exception][getPlaylistList] - {}", exception.getMessage());
+            log.error("[Exception] - {}", exception.getMessage());
 
             responseMap.put("exceptionMessage", exception.getMessage());
         }
@@ -482,14 +484,14 @@ public class ScheduleController {
             parameterValidation(param, keyList);
             parameterInt("scheduleId", param.get("scheduleId"), true);
 
-            responseMap = scheduleService.setLedContent(param);
+            responseMap = scheduleService.deleteLight(param);
         } catch (ParamException paramException) {
-            log.error("[paramException][patchLayerTopMost] - {}", paramException.getMessage());
+            log.error("[paramException] - {}", paramException.getMessage());
 
             responseMap.put("code", paramException.getCode());
             responseMap.put("message", paramException.getMessage());
         } catch (Exception exception) {
-            log.error("[Exception][getPlaylistList] - {}", exception.getMessage());
+            log.error("[Exception] - {}", exception.getMessage());
 
             responseMap.put("exceptionMessage", exception.getMessage());
         }

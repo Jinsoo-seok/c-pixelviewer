@@ -6,11 +6,15 @@ import io.netty.buffer.Unpooled;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.timeout.IdleStateEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 @Component
@@ -39,10 +43,8 @@ public class TcpClient {
                 });
 
 
-        bootstrap.connect("192.168.0.15", 6001).addListener((ChannelFuture future) -> {
+        bootstrap.connect("192.168.0.201", 9999).addListener((ChannelFuture future) -> {
             if (future.isSuccess()) {
-                log.info("Connected to TCP server");
-
                 channel = future.channel();
             } else {
                 log.error("Failed to connect. Retrying in 5 seconds... Because {}", String.valueOf(future.cause()));
@@ -86,6 +88,26 @@ public class TcpClient {
 
     private class TcpClientHandler extends SimpleChannelInboundHandler<ByteBuf> {
 
+        private final int HEARTBEAT_INTERVAL_SECONDS = 1; // 하트비트 간격
+        private ScheduledFuture<?> heartbeatTask;
+        private ChannelHandlerContext ctx;
+
+        /**
+         * * LED 컨트롤러에 하트비트 전송
+         */
+        private void sendHeartbeatMessage() {
+            ByteBuf heartbeatMessage = ctx.alloc().buffer();
+            byte[] heartbeat = {(byte) 0x99, (byte) 0x99, 0x04, 0x00};
+
+            heartbeatMessage.writeBytes(heartbeat);
+
+            // Heartbeat 메시지 전송
+            ctx.writeAndFlush(Unpooled.wrappedBuffer(heartbeatMessage));
+
+            log.info("Heartbeat send to TCP server");
+        }
+
+
         /**
          * * TCP 통신 후 Response 값 처리
          */
@@ -101,11 +123,35 @@ public class TcpClient {
             ctx.writeAndFlush(responseByte);
         }
 
+        /**
+         * * TCP server 연결 끊겼을 경우
+         */
         @Override
         public void channelInactive(ChannelHandlerContext ctx) {
             log.error("Lost connection to server. Reconnecting...");
 
+            // 하트비트 전송 작업 취소
+            heartbeatTask.cancel(true);
+
             connect(new Bootstrap(), ctx.channel().eventLoop().parent());
+        }
+
+        /**
+         * * TCP server 연결 성공 했을 경우
+         */
+        @Override
+        public void channelActive(ChannelHandlerContext ctx) {
+            log.info("Connected to TCP server");
+            this.ctx = ctx;
+
+            // 최초 연결 시 스케줄링된 하트비트 전송 작업 생성
+            ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
+            heartbeatTask = executor.scheduleAtFixedRate(
+                    this::sendHeartbeatMessage, // 하트비트 전송 작업
+                    0,
+                    HEARTBEAT_INTERVAL_SECONDS, // 주기적인 간격
+                    TimeUnit.SECONDS
+            );
         }
     }
 }
