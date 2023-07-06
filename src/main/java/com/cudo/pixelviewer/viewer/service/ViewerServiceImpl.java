@@ -286,7 +286,14 @@ public class ViewerServiceImpl implements ViewerService {
                 FileUtils.copyInputStreamToFile(file.getInputStream(), destFile);
 
                 Boolean weatherImgDB = false;
-                if(weatherType){
+
+                if(contentsType){
+                    Map<String, Object> dataMap = new HashMap<>();
+                    dataMap.put("filePath", filePath);
+                    resultMap.put("data", dataMap);
+                    resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
+                }
+                else if(weatherType){
                     String settingKey = "";
                     if (type.equals("30")) {
                         settingKey = "weatherSunny";
@@ -308,17 +315,16 @@ public class ViewerServiceImpl implements ViewerService {
                     if(weatherImgResult > 0){
                         weatherImgDB = true;
                     }
-                }
-
-                if(weatherImgDB) {
-                    Map<String, Object> dataMap = new HashMap<>();
-                    dataMap.put("filePath", filePath);
-                    resultMap.put("data", dataMap);
-                    resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
-                }
-                else{
-                    resultMap.put("code", ResponseCode.FAIL_UPDATE_ADMIN_SETTING_WEATHER_IMG.getCode());
-                    resultMap.put("message", ResponseCode.FAIL_UPDATE_ADMIN_SETTING_WEATHER_IMG.getMessage());
+                    if(weatherImgDB) {
+                        Map<String, Object> dataMap = new HashMap<>();
+                        dataMap.put("filePath", filePath);
+                        resultMap.put("data", dataMap);
+                        resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
+                    }
+                    else{
+                        resultMap.put("code", ResponseCode.FAIL_UPDATE_ADMIN_SETTING_WEATHER_IMG.getCode());
+                        resultMap.put("message", ResponseCode.FAIL_UPDATE_ADMIN_SETTING_WEATHER_IMG.getMessage());
+                    }
                 }
             } catch (IOException ioException) {
                 ioException.printStackTrace();
