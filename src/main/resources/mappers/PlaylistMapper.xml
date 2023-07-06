@@ -110,7 +110,7 @@
 
             IF @result = 0 THEN
                 UPDATE pixelviewer.Playlists
-                SET select_yn = 'N'
+                SET select_yn = 'N', update_date = NOW()
                 WHERE playlist_id = (
                     SELECT playlist_id
                     FROM pixelviewer.Playlists
@@ -120,7 +120,7 @@
                 );
 
                 UPDATE pixelviewer.Playlists
-                SET select_yn = 'Y'
+                SET select_yn = 'Y', update_date = NOW()
                 WHERE playlist_id = #{layerInfo.playlistId}
                   AND layer_id = #{layerInfo.layerId};
             END IF;
