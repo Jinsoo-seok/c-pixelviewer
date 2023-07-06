@@ -219,7 +219,9 @@ public class ViewerServiceImpl implements ViewerService {
                     }
                     if(obj != null) {
                         if (externalType.equals("날씨")) {
-                            dataMap.put("weatherInfo", obj);
+                            // TODO : 시간별 분기처리
+                            Map<String, Object> tempMap = (Map<String, Object>) obj;
+                            dataMap.put("weatherInfo", tempMap.get("weather12"));
                         }
                         else if (externalType.equals("대기")) {
                             dataMap.put("airInfo", obj);
@@ -227,7 +229,6 @@ public class ViewerServiceImpl implements ViewerService {
                     }
                 }
             }
-            // TODO : 날씨, 대기 정보 조회
             resultMap.put("data", dataMap);
 
             resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
@@ -235,7 +236,8 @@ public class ViewerServiceImpl implements ViewerService {
         else{
             resultMap.putAll(ParameterUtils.responseOption(ResponseCode.NO_CONTENT.getCodeName()));
         }
-        return resultMap;
+//        return resultMap;
+        return dataMap;
     }
 
     @Override

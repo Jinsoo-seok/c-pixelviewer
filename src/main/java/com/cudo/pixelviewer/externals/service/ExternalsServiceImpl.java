@@ -13,13 +13,14 @@ import org.springframework.http.MediaType;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+// TODO : 시간별 파라미터 변경해야함 >> 이후 스케줄
 
 @Service
 @RequiredArgsConstructor
@@ -42,10 +43,10 @@ public class ExternalsServiceImpl implements ExternalsService {
         String serviceKey2 = "NA%2B2mZ6YHlKo2jNmEfOmsmrL2HY0ulBt9v3GUhfHtIV40HGjglABV1Zq1qCcjGJar4c1RAjcTuVI%2Blnx%2FTmkSw%3D%3D";
         String serviceKey = "NA+2mZ6YHlKo2jNmEfOmsmrL2HY0ulBt9v3GUhfHtIV40HGjglABV1Zq1qCcjGJar4c1RAjcTuVI+lnx/TmkSw==";
         String pageNo = "1";
-        String numOfRows = "1";
+        String numOfRows = "36";
         String dataType = "JSON";
-        String baseDate = "20230705";
-        String baseTime = "0500";
+        String baseDate = "20230706";
+        String baseTime = "1700";
         String nx = coordsSplit[0];
         String ny = coordsSplit[1];
 
@@ -79,7 +80,24 @@ public class ExternalsServiceImpl implements ExternalsService {
                 System.out.println("[Second] webClientResponseMap = " + webClientResponseMap);
             }
             if(!webClientResponseMap.get("webClient").equals(false)) {
-                int putExternalsInfosResult = externalsMapper.putExternalsInfos(type, (String) webClientResponseMap.get("weatherInfo"));
+                List<Map<String, Object>> tempWeather12 = (List<Map<String, Object>>) webClientResponseMap.get("tempFirst");
+                List<Map<String, Object>> tempWeather24 = (List<Map<String, Object>>) webClientResponseMap.get("tempSecond");
+                List<Map<String, Object>> tempWeather36 = (List<Map<String, Object>>) webClientResponseMap.get("tempThird");
+
+                Map<String, Object> weatherResultMap = new HashMap<>();
+                weatherResultMap.put("weather12", processWeatherData(tempWeather12));
+                weatherResultMap.put("weather24", processWeatherData(tempWeather24));
+                weatherResultMap.put("weather36", processWeatherData(tempWeather36));
+
+                String mapperJson = "";
+                try {
+                    ObjectMapper mapper = new ObjectMapper();
+                    mapperJson = mapper.writeValueAsString(weatherResultMap);
+                } catch (JsonProcessingException e) {
+                    e.printStackTrace();
+                }
+
+                int putExternalsInfosResult = externalsMapper.putExternalsInfos(type, mapperJson);
                 if (putExternalsInfosResult > 0) {
                     resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
                 } else {
@@ -208,27 +226,71 @@ public class ExternalsServiceImpl implements ExternalsService {
         else if(type.equals("날씨")){
             Map<String, Object> responseBodyItems = (Map<String, Object>) responseBody.get("items");
             List<Map<String, Object>> responseBodyItem = (List<Map<String, Object>>) responseBodyItems.get("item");
-            Map<String, Object> weatherInfoLatest = responseBodyItem.get(0);
 
-            String[] keyNames = {"coFlag", "pm10Flag", "pm25Flag", "no2Flag", "o3Flag", "so2Flag"
-                    , "dataTime", "mangName"
-                    , "khaiGrade", "khaiValue"
-                    , "pm10Value24", "pm25Value24", "pm10Grade1h", "pm25Grade1h",};
 
-            for (String key : keyNames) {
-                weatherInfoLatest.remove(key);
+            List<Map<String, Object>> tempFirst = new ArrayList<>();
+            List<Map<String, Object>> tempSecond = new ArrayList<>();
+            List<Map<String, Object>> tempThird = new ArrayList<>();
+
+            for (int i = 0; i < responseBodyItem.size(); i++) {
+                Map<String, Object> item = responseBodyItem.get(i);
+
+                if (i >= 0 && i < 12) {
+                    tempFirst.add(item);
+                } else if (i >= 12 && i < 24) {
+                    tempSecond.add(item);
+                } else if (i >= 24 && i < 36) {
+                    tempThird.add(item);
+                }
             }
-            String mapperJson = "";
-            try {
-                ObjectMapper mapper = new ObjectMapper();
-                mapperJson = mapper.writeValueAsString(weatherInfoLatest);
-                returnMap.put("webClient", true);
-                returnMap.put("weatherInfo", mapperJson);
-            } catch (JsonProcessingException e) {
-                e.printStackTrace();
+            returnMap.put("webClient", true);
+
+            returnMap.put("tempFirst", tempFirst);
+            returnMap.put("tempSecond", tempSecond);
+            returnMap.put("tempThird", tempThird);
+        }
+        return returnMap;
+    }
+
+    public Map<String, Object> processWeatherData(List<Map<String, Object>> tempWeatherList) {
+        Map<String, Object> weatherResult = new HashMap<>();
+
+        for (Map<String, Object> tempWeather : tempWeatherList) {
+            String category = (String) tempWeather.get("category");
+            String fcstValue = (String) tempWeather.get("fcstValue");
+
+            switch (category) {
+                case "SKY":
+                    weatherResult.put("skyStatus", fcstValue);
+                    break;
+                case "PTY":
+                    weatherResult.put("rainStatus", fcstValue);
+                    break;
+                case "PCP":
+                    if(fcstValue.equals("강수없음")){
+                        weatherResult.put("precipitation", "0");
+                    }
+                    else{
+                        weatherResult.put("precipitation", fcstValue);
+                    }
+                    break;
+                case "TMP":
+                    weatherResult.put("tempStatus", fcstValue);
+                    break;
+                case "REH":
+                    weatherResult.put("humiStatus", fcstValue);
+                    break;
+                case "VEC":
+                    weatherResult.put("windWay", fcstValue);
+                    break;
+                case "WSD":
+                    weatherResult.put("windSpeed", fcstValue);
+                    break;
+                default:
+                    // Handle other categories if needed
+                    break;
             }
         }
-
-        return returnMap;
+        return weatherResult;
     }
 }
