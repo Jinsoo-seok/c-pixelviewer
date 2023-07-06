@@ -213,6 +213,18 @@ public class ExternalsServiceImpl implements ExternalsService {
             for (String key : keyNames) {
                 airInfoLatest.remove(key);
             }
+
+            for (Map.Entry<String, Object> entry : airInfoLatest.entrySet()) {
+                String key = entry.getKey();
+                Object value = entry.getValue();
+
+                if (key.equals("so2Value") || key.equals("no2Value") || key.equals("coValue") || key.equals("o3Value")) {
+                    airInfoLatest.put(key, Float.parseFloat(value.toString()));
+                } else {
+                    airInfoLatest.put(key, Integer.parseInt(value.toString()));
+                }
+            }
+
             String mapperJson = "";
             try {
                 ObjectMapper mapper = new ObjectMapper();
@@ -261,30 +273,29 @@ public class ExternalsServiceImpl implements ExternalsService {
 
             switch (category) {
                 case "SKY":
-                    weatherResult.put("skyStatus", fcstValue);
+                    weatherResult.put("skyStatus", Integer.parseInt(fcstValue));
                     break;
                 case "PTY":
-                    weatherResult.put("rainStatus", fcstValue);
+                    weatherResult.put("rainStatus", Integer.parseInt(fcstValue));
                     break;
                 case "PCP":
-                    if(fcstValue.equals("강수없음")){
-                        weatherResult.put("precipitation", "0");
-                    }
-                    else{
-                        weatherResult.put("precipitation", fcstValue);
+                    if (fcstValue.equals("강수없음")) {
+                        weatherResult.put("precipitation", 0);
+                    } else {
+                        weatherResult.put("precipitation", Integer.parseInt(fcstValue));
                     }
                     break;
                 case "TMP":
-                    weatherResult.put("tempStatus", fcstValue);
+                    weatherResult.put("tempStatus", Integer.parseInt(fcstValue));
                     break;
                 case "REH":
-                    weatherResult.put("humiStatus", fcstValue);
+                    weatherResult.put("humiStatus", Integer.parseInt(fcstValue));
                     break;
                 case "VEC":
-                    weatherResult.put("windWay", fcstValue);
+                    weatherResult.put("windWay", Integer.parseInt(fcstValue));
                     break;
                 case "WSD":
-                    weatherResult.put("windSpeed", fcstValue);
+                    weatherResult.put("windSpeed", Float.parseFloat(fcstValue));
                     break;
                 default:
                     // Handle other categories if needed
