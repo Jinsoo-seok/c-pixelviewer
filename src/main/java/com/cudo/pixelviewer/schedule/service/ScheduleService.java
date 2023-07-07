@@ -8,7 +8,10 @@ import java.util.Map;
 public interface ScheduleService {
     Map<String, Object> getCalenderStatus(Map<String, Object> param);
     Map<String, Object> getScheduleStatus(Map<String, Object> param);
-    Map<String, Object> postLedPlaylist(Map<String, Object> param);
+
+    Map<String, Object> postLedPlaylistSchedule(Map<String, Object> param);
+    Map<String, Object> puLedPlaylistSchedule(Map<String, Object> param);
+    Map<String, Object> deletePlaylistSchedule(Map<String, Object> param);
 
     Map<String, Object> postLedPower(Map<String, Object> param) throws SchedulerException, ParseException;
     Map<String, Object> putLedPower(Map<String, Object> param) throws SchedulerException, ParseException;

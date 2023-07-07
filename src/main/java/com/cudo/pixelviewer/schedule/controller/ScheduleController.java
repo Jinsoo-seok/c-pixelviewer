@@ -126,7 +126,7 @@ public class ScheduleController {
             parameterTime("endTime", param.get("endTime"), true);
             parameterCompareDate("startDate", "endDate", param.get("startDate"), param.get("endDate"));
 
-            responseMap = scheduleService.postLedPlaylist(param);
+            responseMap = scheduleService.postLedPlaylistSchedule(param);
         } catch (ParamException paramException) {
             log.error("[paramException] - {}", paramException.getMessage());
 
@@ -174,7 +174,7 @@ public class ScheduleController {
             parameterTime("endTime", param.get("endTime"), true);
             parameterCompareDate("startDate", "endDate", param.get("startDate"), param.get("endDate"));
 
-            responseMap = scheduleService.postLedPlaylist(param);
+            responseMap = scheduleService.puLedPlaylistSchedule(param);
         } catch (ParamException paramException) {
             log.error("[paramException] - {}", paramException.getMessage());
 
@@ -212,7 +212,7 @@ public class ScheduleController {
             parameterValidation(param, keyList);
             parameterInt("scheduleId", param.get("scheduleId"), true);
 
-            responseMap = scheduleService.postLedPlaylist(param);
+            responseMap = scheduleService.deletePlaylistSchedule(param);
         } catch (ParamException paramException) {
             log.error("[paramException] - {}", paramException.getMessage());
 

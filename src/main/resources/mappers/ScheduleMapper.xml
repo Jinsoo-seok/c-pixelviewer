@@ -3,13 +3,34 @@
 
 <mapper namespace="com.cudo.pixelviewer.schedule.mapper.ScheduleMapper">
 
-    <insert id="postLedPlaylist" parameterType="Map" useGeneratedKeys="true" keyColumn="schedule_id"
+    <insert id="postLedPlaylistSchedule" parameterType="Map" useGeneratedKeys="true" keyColumn="schedule_id"
             keyProperty="scheduleId">
         INSERT INTO playlist_schedule (sch_nm, sch_start_date, sch_end_date, time_start, time_end, run_day_week,
                                        preset_id, layer_id, playlist_id)
-        VALUES (#{scheduleName}, #{startDate}, #{endDate}, #{startTime}, #{endTime}, #{scheduleDay}, #{presetId}, #{layerId},
+        VALUES (#{scheduleName}, #{startDate}, #{endDate}, #{startTime}, #{endTime}, #{scheduleDay}, #{presetId},
+                #{layerId},
                 #{playListId});
     </insert>
+
+    <update id="putLedPlaylistSchedule" parameterType="Map">
+        UPDATE playlist_schedule
+        SET sch_nm         = #{scheduleName},
+            sch_start_date = #{startDate},
+            sch_end_date   = #{endDate},
+            time_start     = #{startTime},
+            time_end       = #{endTime},
+            run_day_week   = #{scheduleDay},
+            preset_id      = #{presetId},
+            layer_id       = #{layerId},
+            playlist_id    = #{playListId}
+        WHERE schedule_id = #{scheduleId}
+    </update>
+
+    <delete id="deletePlayListSchedule" parameterType="Long">
+        DELETE
+        FROM playlist_schedule
+        WHERE schedule_id = #{scheduleId}
+    </delete>
 
     <insert id="postLedPower" parameterType="com.cudo.pixelviewer.vo.PowerScheduleVo" useGeneratedKeys="true"
             keyProperty="scheduleId">

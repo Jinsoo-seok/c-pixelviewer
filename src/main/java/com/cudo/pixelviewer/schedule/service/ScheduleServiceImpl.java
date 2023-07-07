@@ -124,13 +124,46 @@ public class ScheduleServiceImpl implements ScheduleService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Map<String, Object> postLedPlaylist(Map<String, Object> param) {
+    public Map<String, Object> postLedPlaylistSchedule(Map<String, Object> param) {
         Map<String, Object> responseMap = new HashMap<>();
 
-        int insertCount = scheduleMapper.postLedPlaylist(setPowerParam(param));
+        int insertCount = scheduleMapper.postLedPlaylistSchedule(setPowerParam(param));
 
         if (insertCount > 0) {
-            // 스케줄 등록
+            // TODO 스케줄 등록
+            responseMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
+        } else {
+            responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
+        }
+
+        return responseMap;
+    }
+
+    @Override
+    public Map<String, Object> puLedPlaylistSchedule(Map<String, Object> param) {
+        Map<String, Object> responseMap = new HashMap<>();
+
+        int insertCount = scheduleMapper.putLedPlaylistSchedule(setPowerParam(param));
+
+        if (insertCount > 0) {
+            // TODO 스케줄 수정
+            responseMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
+        } else {
+            responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
+        }
+
+        return responseMap;
+    }
+
+    @Override
+    public Map<String, Object> deletePlaylistSchedule(Map<String, Object> param) {
+        Map<String, Object> responseMap = new HashMap<>();
+
+        Long scheduleId = Long.parseLong(String.valueOf(param.get("scheduleId")));
+        int insertCount = scheduleMapper.deletePlayListSchedule(scheduleId);
+
+        if (insertCount > 0) {
+            // TODO 스케줄 삭제
             responseMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
         } else {
             responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
@@ -369,7 +402,7 @@ public class ScheduleServiceImpl implements ScheduleService {
                                 .schNm(String.valueOf(param.get("scheduleName")))
                                 .schStartDate(String.valueOf(param.get("startDate")))
                                 .schEndDate(String.valueOf(param.get("endDate")))
-                                .runDayWeek(String.valueOf(param.get("scheduleDay")))
+                                .runDayWeek(param.get("scheduleDay") == null ? null : String.valueOf(param.get("scheduleDay")))
                                 .listId(listId.get(i))
                                 .runtime(String.valueOf(insertLightList.get(i).getRuntime()))
                                 .BrightnessVal(String.valueOf(insertLightList.get(i).getBrightnessVal()))
@@ -390,7 +423,7 @@ public class ScheduleServiceImpl implements ScheduleService {
                                 .schNm(String.valueOf(param.get("scheduleName")))
                                 .schStartDate(String.valueOf(param.get("startDate")))
                                 .schEndDate(String.valueOf(param.get("endDate")))
-                                .runDayWeek(String.valueOf(param.get("scheduleDay")))
+                                .runDayWeek(param.get("scheduleDay") == null ? null : String.valueOf(param.get("scheduleDay")))
                                 .listId(lightListScheduleVo.getListId())
                                 .runtime(String.valueOf(lightListScheduleVo.getRuntime()))
                                 .BrightnessVal(String.valueOf(lightListScheduleVo.getBrightnessVal()))
