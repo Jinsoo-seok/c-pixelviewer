@@ -73,6 +73,30 @@ public class PresetController {
 
         return responseMap;
     }
+    @GetMapping("/status-run")
+    public Map<String, Object> getRunPreset(HttpServletRequest request) {
+        long startTime = System.currentTimeMillis();
+        String apiInfo = "["+ request.getRequestURI() + "] [" + request.getMethod() + "]";
+        log.info("{} [START] [{}]", apiInfo, startTime);
+
+        Map<String, Object> responseMap = new HashMap<>();
+        responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
+
+
+        try {
+            responseMap = presetService.getRunPreset();
+        }
+        catch (Exception exception) {
+            log.error("[Exception][getRunPreset] - {}", exception.getMessage());
+            responseMap.put("exceptionMessage", exception.getMessage());
+        }
+
+        long endTime = System.currentTimeMillis();
+        long procTime = endTime-startTime;
+        log.info("{} [END] [{}] - {}", apiInfo, procTime, responseMap.get("code"));
+
+        return responseMap;
+    }
 
 
     @PostMapping

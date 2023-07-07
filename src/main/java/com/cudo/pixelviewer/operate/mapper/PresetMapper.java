@@ -16,6 +16,8 @@ public interface PresetMapper {
     PresetVo getPreset(String presetId);
     List<LayerVo> getPresetLayers(String presetId);
 
+    PresetVo getRunPreset();
+
     int postPresetValid(Map<String, Object> param);
     int postPreset(Map<String, Object> param);
 

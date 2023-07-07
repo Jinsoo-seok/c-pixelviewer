@@ -80,6 +80,25 @@ public class PresetServiceImpl implements PresetService {
     }
 
     @Override
+    public Map<String, Object> getRunPreset() {
+        Map<String, Object> resultMap = new HashMap<>();
+        Map<String, Object> dataMap = new HashMap<>();
+
+        PresetVo runPresetVo = presetMapper.getRunPreset();
+
+        if(runPresetVo != null){
+            dataMap.put("preset", runPresetVo);
+            resultMap.put("data", dataMap);
+
+            resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
+        }
+        else{
+            resultMap.putAll(ParameterUtils.responseOption(ResponseCode.NO_CONTENT.getCodeName()));
+        }
+        return resultMap;
+    }
+
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> postPreset(Map<String, Object> param) {
         Map<String, Object> resultMap = new HashMap<>();

@@ -19,6 +19,12 @@
         WHERE L.preset_id = #{presetId}
     </select>
 
+    <select id="getRunPreset" resultType="com.cudo.pixelviewer.vo.PresetVo">
+        SELECT *
+        FROM Presets AS P
+        WHERE P.preset_status = "play"
+    </select>
+
     <select id="postPresetValid" resultType="int">
         SELECT count(preset_id)
         FROM Presets
