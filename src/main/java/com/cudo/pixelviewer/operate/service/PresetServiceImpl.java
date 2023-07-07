@@ -219,6 +219,8 @@ public class PresetServiceImpl implements PresetService {
         if(param.containsKey("layerInfoList")){
             int setPlaylistSelectYnResult = playlistMapper.setPlaylistSelectYn(param);
         }
+        int refreshPresetUpdateDate = presetMapper.refreshPresetUpdateDate(param.get("presetId"));
+
         String localIp = "106.245.226.42";
         String localPort = "9898";
         String baseUrl = "http://" + localIp + ":" + localPort + "/api-viewer/";

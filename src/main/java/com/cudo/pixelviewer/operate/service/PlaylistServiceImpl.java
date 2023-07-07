@@ -1,6 +1,7 @@
 package com.cudo.pixelviewer.operate.service;
 
 import com.cudo.pixelviewer.operate.mapper.PlaylistMapper;
+import com.cudo.pixelviewer.operate.mapper.PresetMapper;
 import com.cudo.pixelviewer.util.ParameterUtils;
 import com.cudo.pixelviewer.util.ResponseCode;
 import com.cudo.pixelviewer.vo.PlaylistContentsVo;
@@ -23,6 +24,8 @@ import java.util.Map;
 public class PlaylistServiceImpl implements PlaylistService {
 
     final PlaylistMapper playlistMapper;
+
+    final PresetMapper presetMapper;
 
     @Override
     public Map<String, Object> getPlaylistList() {
@@ -163,6 +166,7 @@ public class PlaylistServiceImpl implements PlaylistService {
             int putPlaylistResult = playlistMapper.putPlaylist(param);
 
             if(putPlaylistResult == 1){ // Success : 1
+                int refreshPresetUpdateDate = presetMapper.refreshPresetUpdateDate(param.get("presetId"));
                 dataMap.put("playlistId", param.get("playlistId"));
                 resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
                 resultMap.put("data", dataMap);
