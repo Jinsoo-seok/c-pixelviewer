@@ -5,16 +5,18 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class PowerScheduleVo {
+public class LightScheduleVo {
     Long scheduleId;
     String schNm;
     String schStartDate;
     String schEndDate;
-    String timePwrOn;
-    String timePwrOff;
     String runDayWeek;
+    Long listId;
+    String runtime;
+    String BrightnessVal;
 }

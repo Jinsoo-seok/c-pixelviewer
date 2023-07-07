@@ -11,9 +11,11 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.cudo.pixelviewer.component.scheduler.ScheduleCode.LIGHT;
 import static com.cudo.pixelviewer.util.ParameterUtils.*;
 
 @Slf4j
@@ -41,7 +43,7 @@ public class ScheduleController {
         try {
             responseMap = scheduleService.getCalenderStatus(param);
         } catch (Exception exception) {
-            log.error("[Exception][getPlaylistList] - {}", exception.getMessage());
+            log.error("[Exception] - {}", exception.getMessage());
 
             responseMap.put("exceptionMessage", exception.getMessage());
         }
@@ -97,10 +99,10 @@ public class ScheduleController {
     }
 
     /**
-     * * LED 영상 스케줄 등록
+     * * LED 플레이리스트 영상 스케줄 등록
      */
     @PostMapping("/contetnts-reg")
-    public Map<String, Object> setLedContent(HttpServletRequest request, @RequestBody Map<String, Object> param) {
+    public Map<String, Object> postLedPlaylist(HttpServletRequest request, @RequestBody Map<String, Object> param) {
         long startTime = System.currentTimeMillis();
         String apiInfo = "[" + request.getRequestURI() + "] [" + request.getMethod() + "]";
         log.info("{} [START] [{}]", apiInfo, startTime);
@@ -109,29 +111,29 @@ public class ScheduleController {
 
         responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
 
-        String[] keyList = {"preset", "playList", "scheduleName", "startDate", "endDate", "startTime", "endTime", "scheduleDay"};
+        String[] keyList = {"presetId", "layerId", "playListId", "scheduleName", "startDate", "endDate", "startTime", "endTime"};
 
         try {
             parameterValidation(param, keyList);
 
-            parameterInt("preset", param.get("preset"), true);
-            parameterInt("playList", param.get("playList"), true);
+            parameterInt("presetId", param.get("presetId"), true);
+            parameterInt("layerId", param.get("layerId"), true);
+            parameterInt("playListId", param.get("playListId"), true);
             parameterString("scheduleName", param.get("scheduleName"), true, 0, null);
             parameterDate("startDate", param.get("startDate"), true);
             parameterDate("endDate", param.get("endDate"), true);
             parameterTime("startTime", param.get("startTime"), true);
             parameterTime("endTime", param.get("endTime"), true);
             parameterCompareDate("startDate", "endDate", param.get("startDate"), param.get("endDate"));
-            parameterArray("scheduleDay", param.get("scheduleDay"), true);
 
-            responseMap = scheduleService.setLedContent(param);
+            responseMap = scheduleService.postLedPlaylistSchedule(param);
         } catch (ParamException paramException) {
-            log.error("[paramException][patchLayerTopMost] - {}", paramException.getMessage());
+            log.error("[paramException] - {}", paramException.getMessage());
 
             responseMap.put("code", paramException.getCode());
             responseMap.put("message", paramException.getMessage());
         } catch (Exception exception) {
-            log.error("[Exception][getPlaylistList] - {}", exception.getMessage());
+            log.error("[Exception] - {}", exception.getMessage());
 
             responseMap.put("exceptionMessage", exception.getMessage());
         }
@@ -144,7 +146,7 @@ public class ScheduleController {
     }
 
     /**
-     * * LED 영상 스케줄 수정
+     * * LED 플레이리스트 영상 스케줄 수정
      */
     @PatchMapping("/contetnts-edit")
     public Map<String, Object> editLedContent(HttpServletRequest request, @RequestBody Map<String, Object> param) {
@@ -156,30 +158,30 @@ public class ScheduleController {
 
         responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
 
-        String[] keyList = {"scheduleId", "preset", "playList", "scheduleName", "startDate", "endDate","startTime", "endTime", "scheduleDay"};
+        String[] keyList = {"scheduleId", "presetId", "layerId", "playListId", "scheduleName", "startDate", "endDate","startTime", "endTime"};
 
         try {
             parameterValidation(param, keyList);
 
             parameterInt("scheduleId", param.get("scheduleId"), true);
-            parameterInt("preset", param.get("preset"), true);
-            parameterInt("playList", param.get("playList"), true);
+            parameterInt("presetId", param.get("presetId"), true);
+            parameterInt("layerId", param.get("layerId"), true);
+            parameterInt("playListId", param.get("playListId"), true);
             parameterString("scheduleName", param.get("scheduleName"), true, 0, null);
             parameterDate("startDate", param.get("startDate"), true);
             parameterDate("endDate", param.get("endDate"), true);
             parameterTime("startTime", param.get("startTime"), true);
             parameterTime("endTime", param.get("endTime"), true);
             parameterCompareDate("startDate", "endDate", param.get("startDate"), param.get("endDate"));
-            parameterArray("scheduleDay", param.get("scheduleDay"), true);
 
-            responseMap = scheduleService.setLedContent(param);
+            responseMap = scheduleService.puLedPlaylistSchedule(param);
         } catch (ParamException paramException) {
-            log.error("[paramException][patchLayerTopMost] - {}", paramException.getMessage());
+            log.error("[paramException] - {}", paramException.getMessage());
 
             responseMap.put("code", paramException.getCode());
             responseMap.put("message", paramException.getMessage());
         } catch (Exception exception) {
-            log.error("[Exception][getPlaylistList] - {}", exception.getMessage());
+            log.error("[Exception] - {}", exception.getMessage());
 
             responseMap.put("exceptionMessage", exception.getMessage());
         }
@@ -192,7 +194,7 @@ public class ScheduleController {
     }
 
     /**
-     * * LED 영상 스케줄 삭제
+     * * LED 플레이리스트 영상 스케줄 삭제
      */
     @DeleteMapping("/contetnts-delete")
     public Map<String, Object> deleteLedContent(HttpServletRequest request, @RequestBody Map<String, Object> param) {
@@ -210,14 +212,14 @@ public class ScheduleController {
             parameterValidation(param, keyList);
             parameterInt("scheduleId", param.get("scheduleId"), true);
 
-            responseMap = scheduleService.setLedContent(param);
+            responseMap = scheduleService.deletePlaylistSchedule(param);
         } catch (ParamException paramException) {
-            log.error("[paramException][patchLayerTopMost] - {}", paramException.getMessage());
+            log.error("[paramException] - {}", paramException.getMessage());
 
             responseMap.put("code", paramException.getCode());
             responseMap.put("message", paramException.getMessage());
         } catch (Exception exception) {
-            log.error("[Exception][getPlaylistList] - {}", exception.getMessage());
+            log.error("[Exception] - {}", exception.getMessage());
 
             responseMap.put("exceptionMessage", exception.getMessage());
         }
@@ -242,7 +244,7 @@ public class ScheduleController {
 
         responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
 
-        String[] keyList = {"scheduleName", "startDate", "endDate","startTime", "endTime", "scheduleDay"};
+        String[] keyList = {"scheduleName", "startDate", "endDate","startTime", "endTime"};
 
         try {
             parameterValidation(param, keyList);
@@ -253,11 +255,10 @@ public class ScheduleController {
             parameterTime("startTime", param.get("startTime"), true);
             parameterTime("endTime", param.get("endTime"), true);
             parameterCompareDate("startDate", "endDate", param.get("startDate"), param.get("endDate"));
-            parameterArray("scheduleDay", param.get("scheduleDay"), true);
 
             responseMap = scheduleService.postLedPower(param);
         } catch (ParamException paramException) {
-            log.error("[paramException][patchLayerTopMost] - {}", paramException.getMessage());
+            log.error("[paramException] - {}", paramException.getMessage());
 
             responseMap.put("code", paramException.getCode());
             responseMap.put("message", paramException.getMessage());
@@ -287,7 +288,7 @@ public class ScheduleController {
 
         responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
 
-        String[] keyList = {"scheduleId", "scheduleName", "startDate", "endDate","startTime", "endTime", "scheduleDay"};
+        String[] keyList = {"scheduleId", "scheduleName", "startDate", "endDate","startTime", "endTime"};
 
         try {
             parameterValidation(param, keyList);
@@ -299,7 +300,6 @@ public class ScheduleController {
             parameterTime("startTime", param.get("startTime"), true);
             parameterTime("endTime", param.get("endTime"), true);
             parameterCompareDate("startDate", "endDate", param.get("startDate"), param.get("endDate"));
-            parameterArray("scheduleDay", param.get("scheduleDay"), true);
 
             responseMap = scheduleService.putLedPower(param);
         } catch (ParamException paramException) {
@@ -375,7 +375,7 @@ public class ScheduleController {
 
         responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
 
-        String[] keyList = {"scheduleName", "startDate", "endDate", "brightnessList", "scheduleDay"};
+        String[] keyList = {"scheduleName", "startDate", "endDate", "brightnessList"};
 
         try {
             parameterValidation(param, keyList);
@@ -385,7 +385,6 @@ public class ScheduleController {
             parameterDate("endDate", param.get("endDate"), true);
             parameterCompareDate("startDate", "endDate", param.get("startDate"), param.get("endDate"));
             parameterArray("brightnessList", param.get("brightnessList"), true);
-            parameterArray("scheduleDay", param.get("scheduleDay"), true);
 
             for (Object brightness : (ArrayList) param.get("brightnessList")) {
                 parameterMap("brightnessList", brightness, true);
@@ -393,14 +392,14 @@ public class ScheduleController {
                 parameterInt("brightness", ((Map<String, Object>) brightness).get("brightness"), true);
             }
 
-            responseMap = scheduleService.setLedContent(param);
+            responseMap = scheduleService.postLight(param);
         } catch (ParamException paramException) {
-            log.error("[paramException][patchLayerTopMost] - {}", paramException.getMessage());
+            log.error("[paramException] - {}", paramException.getMessage());
 
             responseMap.put("code", paramException.getCode());
             responseMap.put("message", paramException.getMessage());
         } catch (Exception exception) {
-            log.error("[Exception][getPlaylistList] - {}", exception.getMessage());
+            log.error("[Exception] - {}", exception.getMessage());
 
             responseMap.put("exceptionMessage", exception.getMessage());
         }
@@ -425,7 +424,7 @@ public class ScheduleController {
 
         responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
 
-        String[] keyList = {"scheduleId", "scheduleName", "startDate", "endDate", "brightnessList", "scheduleDay"};
+        String[] keyList = {"scheduleId", "scheduleName", "startDate", "endDate", "brightnessList"};
 
         try {
             parameterValidation(param, keyList);
@@ -436,7 +435,6 @@ public class ScheduleController {
             parameterDate("endDate", param.get("endDate"), true);
             parameterCompareDate("startDate", "endDate", param.get("startDate"), param.get("endDate"));
             parameterArray("brightnessList", param.get("brightnessList"), true);
-            parameterArray("scheduleDay", param.get("scheduleDay"), true);
 
             for (Object brightness : (ArrayList) param.get("brightnessList")) {
                 parameterMap("brightnessList", brightness, true);
@@ -444,14 +442,14 @@ public class ScheduleController {
                 parameterInt("brightness", ((Map<String, Object>) brightness).get("brightness"), true);
             }
 
-            responseMap = scheduleService.setLedContent(param);
+            responseMap = scheduleService.putLight(param);
         } catch (ParamException paramException) {
-            log.error("[paramException][patchLayerTopMost] - {}", paramException.getMessage());
+            log.error("[paramException] - {}", paramException.getMessage());
 
             responseMap.put("code", paramException.getCode());
             responseMap.put("message", paramException.getMessage());
         } catch (Exception exception) {
-            log.error("[Exception][getPlaylistList] - {}", exception.getMessage());
+            log.error("[Exception] - {}", exception.getMessage());
 
             responseMap.put("exceptionMessage", exception.getMessage());
         }
@@ -482,14 +480,14 @@ public class ScheduleController {
             parameterValidation(param, keyList);
             parameterInt("scheduleId", param.get("scheduleId"), true);
 
-            responseMap = scheduleService.setLedContent(param);
+            responseMap = scheduleService.deleteLight(param);
         } catch (ParamException paramException) {
-            log.error("[paramException][patchLayerTopMost] - {}", paramException.getMessage());
+            log.error("[paramException] - {}", paramException.getMessage());
 
             responseMap.put("code", paramException.getCode());
             responseMap.put("message", paramException.getMessage());
         } catch (Exception exception) {
-            log.error("[Exception][getPlaylistList] - {}", exception.getMessage());
+            log.error("[Exception] - {}", exception.getMessage());
 
             responseMap.put("exceptionMessage", exception.getMessage());
         }

@@ -15,8 +15,7 @@ import java.util.concurrent.TimeUnit;
 
 @Component
 @Slf4j
-public class TcpClient {
-
+public class DeviceControllerClient {
     private EventLoopGroup group;
     private Channel channel;
 
@@ -41,11 +40,9 @@ public class TcpClient {
 
         bootstrap.connect("192.168.0.15", 6001).addListener((ChannelFuture future) -> {
             if (future.isSuccess()) {
-                log.info("Connected to TCP server");
-
                 channel = future.channel();
             } else {
-                log.error("Failed to connect. Retrying in 5 seconds... Because {}", String.valueOf(future.cause()));
+                log.error("Failed to Device Controller Connect. Retrying in 5 seconds... Because {}", String.valueOf(future.cause()));
 
                 future.channel().eventLoop().schedule(() -> connect(bootstrap, eventLoop), 5, TimeUnit.SECONDS);
             }
@@ -62,19 +59,18 @@ public class TcpClient {
             future.addListener((ChannelFutureListener) future1 -> {
                 if (!future1.isSuccess()) {
                     Throwable cause = future1.cause();
-                    log.error("SEND PACKET TO TCP SERVER FAIL", cause);
+                    log.error("SEND PACKET TO DEVICE CONTROLLER FAIL", cause);
                 } else {
-                    log.info("SEND PACKET {} TO TCP SERVER SUCCESS", message);
+                    log.info("SEND PACKET {} TO DEVICE CONTROLLER SUCCESS", message);
                 }
             });
         } else {
-            log.error("NO ACTIVE TCP CONNECTION");
+            log.error("NO ACTIVE DEVICE CONTROLLER CONNECTION");
         }
     }
 
     @PreDestroy
     public void stop() throws InterruptedException {
-        System.out.println("disconnect TCP server");
         if (channel != null) {
             channel.close().sync();
         }
@@ -85,6 +81,8 @@ public class TcpClient {
 
 
     private class TcpClientHandler extends SimpleChannelInboundHandler<ByteBuf> {
+        private ChannelHandlerContext ctx;
+
 
         /**
          * * TCP 통신 후 Response 값 처리
@@ -101,11 +99,23 @@ public class TcpClient {
             ctx.writeAndFlush(responseByte);
         }
 
+        /**
+         * * TCP server 연결 끊겼을 경우
+         */
         @Override
         public void channelInactive(ChannelHandlerContext ctx) {
-            log.error("Lost connection to server. Reconnecting...");
+            log.error("Lost connection to Device Controller. Reconnecting...");
 
             connect(new Bootstrap(), ctx.channel().eventLoop().parent());
+        }
+
+        /**
+         * * TCP server 연결 성공 했을 경우
+         */
+        @Override
+        public void channelActive(ChannelHandlerContext ctx) {
+            log.info("Connected to Device Controller");
+            this.ctx = ctx;
         }
     }
 }

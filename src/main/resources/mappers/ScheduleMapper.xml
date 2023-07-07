@@ -3,20 +3,116 @@
 
 <mapper namespace="com.cudo.pixelviewer.schedule.mapper.ScheduleMapper">
 
-    <insert id="postLedPower" parameterType="Map">
+    <insert id="postLedPlaylistSchedule" parameterType="Map" useGeneratedKeys="true" keyColumn="schedule_id"
+            keyProperty="scheduleId">
+        INSERT INTO playlist_schedule (sch_nm, sch_start_date, sch_end_date, time_start, time_end, run_day_week,
+                                       preset_id, layer_id, playlist_id)
+        VALUES (#{scheduleName}, #{startDate}, #{endDate}, #{startTime}, #{endTime}, #{scheduleDay}, #{presetId},
+                #{layerId},
+                #{playListId});
+    </insert>
+
+    <update id="putLedPlaylistSchedule" parameterType="Map">
+        UPDATE playlist_schedule
+        SET sch_nm         = #{scheduleName},
+            sch_start_date = #{startDate},
+            sch_end_date   = #{endDate},
+            time_start     = #{startTime},
+            time_end       = #{endTime},
+            run_day_week   = #{scheduleDay},
+            preset_id      = #{presetId},
+            layer_id       = #{layerId},
+            playlist_id    = #{playListId}
+        WHERE schedule_id = #{scheduleId}
+    </update>
+
+    <delete id="deletePlayListSchedule" parameterType="Long">
+        DELETE
+        FROM playlist_schedule
+        WHERE schedule_id = #{scheduleId}
+    </delete>
+
+    <insert id="postLedPower" parameterType="com.cudo.pixelviewer.vo.PowerScheduleVo" useGeneratedKeys="true"
+            keyProperty="scheduleId">
         INSERT INTO led_pwr_schedule (sch_nm, sch_start_date, sch_end_date, time_pwr_on, time_pwr_off, run_day_week)
-        VALUES (#{scheduleName}, #{startDate}, #{endDate}, #{startTime}, #{endTime}, #{scheduleDay});
+        VALUES (#{schNm}, #{schStartDate}, #{schEndDate}, #{timePwrOn}, #{timePwrOff}, #{runDayWeek});
     </insert>
 
     <update id="putLedPower" parameterType="Map">
         UPDATE led_pwr_schedule
-        SET sch_nm = #{scheduleName}, sch_start_date = #{startDate}, sch_end_date = #{endDate},
-            time_pwr_on = #{startTime}, time_pwr_off = #{endTime}, run_day_week = #{scheduleDay}
+        SET sch_nm         = #{scheduleName},
+            sch_start_date = #{startDate},
+            sch_end_date   = #{endDate},
+            time_pwr_on    = #{startTime},
+            time_pwr_off   = #{endTime},
+            run_day_week   = #{scheduleDay}
         WHERE schedule_id = #{scheduleId}
     </update>
-    
+
     <delete id="deleteLedPower" parameterType="Long">
-        DELETE FROM led_pwr_schedule
+        DELETE
+        FROM led_pwr_schedule
+        WHERE schedule_id = #{scheduleId}
+    </delete>
+
+    <insert id="postLight" parameterType="com.cudo.pixelviewer.vo.LightScheduleVo" useGeneratedKeys="true"
+            keyProperty="scheduleId">
+        INSERT INTO brightness_schedule (sch_nm, sch_start_date, sch_end_date, run_day_week)
+        VALUES (#{schNm}, #{schStartDate}, #{schEndDate}, #{runDayWeek});
+    </insert>
+
+    <insert id="postLightList" parameterType="java.util.List" useGeneratedKeys="true" keyProperty="listId">
+        INSERT INTO brightness_control_lists (schedule_id, runtime, Brightness_val)
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.scheduleId}, #{item.runtime}, #{item.BrightnessVal})
+        </foreach>
+    </insert>
+
+    <select id="selectListId" parameterType="Map" resultType="long">
+        SELECT list_id
+        FROM brightness_control_lists
+        WHERE list_id >= #{listId}
+          AND schedule_id = #{scheduleId} limit #{count};
+    </select>
+
+    <select id="selectLightList" resultType="long">
+        SELECT list_id
+        FROM brightness_control_lists
+        WHERE schedule_id = #{scheduleId}
+    </select>
+
+    <delete id="deleteLightList" parameterType="Long">
+        DELETE
+        FROM brightness_control_lists
+        WHERE list_id IN
+        <foreach collection="list" item="item" index="index" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </delete>
+
+    <update id="putLight" parameterType="Map">
+        UPDATE brightness_schedule
+        SET sch_nm         = #{scheduleName},
+            sch_start_date = #{startDate},
+            sch_end_date   = #{endDate},
+            run_day_week   = #{scheduleDay}
+        WHERE schedule_id = #{scheduleId}
+    </update>
+
+    <update id="putLightList" parameterType="list">
+        <foreach collection="list" item="item" separator=";">
+            UPDATE brightness_control_lists
+            SET schedule_id = #{item.scheduleId},
+            runtime = #{item.runtime},
+            Brightness_val = #{item.BrightnessVal}
+            WHERE list_id = #{item.listId}
+        </foreach>
+    </update>
+
+    <delete id="deleteLight" parameterType="Long">
+        DELETE
+        FROM brightness_schedule
         WHERE schedule_id = #{scheduleId}
     </delete>
 
@@ -24,5 +120,19 @@
         SELECT schedule_id, sch_start_date, sch_end_date, time_pwr_on, time_pwr_off, run_day_week
         FROM led_pwr_schedule
         WHERE #{nowDate} between sch_start_date AND sch_end_date
+    </select>
+
+    <select id="selectLightSchedule" resultType="com.cudo.pixelviewer.vo.LightScheduleVo">
+        SELECT bs.schedule_id     AS schedule_id,
+               bs.sch_nm          AS sch_nm,
+               bs.sch_start_date  AS sch_start_date,
+               bs.sch_end_date    AS sch_end_date,
+               bs.run_day_week    AS run_day_week,
+               bcl.list_id        AS list_id,
+               bcl.runtime        AS runtime,
+               bcl.Brightness_val AS Brightness_val
+        FROM brightness_schedule AS bs
+                 INNER JOIN brightness_control_lists AS bcl on bs.schedule_id = bcl.schedule_id
+        WHERE #{nowDate} between bs.sch_start_date AND bs.sch_end_date
     </select>
 </mapper>
