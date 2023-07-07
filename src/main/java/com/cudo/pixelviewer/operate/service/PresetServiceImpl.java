@@ -10,6 +10,7 @@ import com.cudo.pixelviewer.vo.LayerToAgentVo;
 import com.cudo.pixelviewer.vo.LayerVo;
 import com.cudo.pixelviewer.vo.PresetStatusRunVo;
 import com.cudo.pixelviewer.vo.PresetVo;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +26,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -232,6 +234,7 @@ public class PresetServiceImpl implements PresetService {
     public Map<String, Object> patchPresetRun(Map<String, Object> param) {
         Map<String, Object> resultMap = new HashMap<>();
         Map<String, Object> requestBodyMap = new HashMap<>();
+        Map<String, Object> webClientResponse = new HashMap<>();
 
         String presetStatusPlay = "play";
         String presetStatusStop = "stop";
@@ -241,13 +244,20 @@ public class PresetServiceImpl implements PresetService {
         PresetStatusRunVo runPresetVo = presetMapper.getRunPreset();
         String controlType = (String) param.get("controlType");
 
+
+        // Set Agent
+        String ip = "192.168.123.12";
+        String port = "8800";
+
+        String agentUrl = "http://" + ip + ":" + port + "/vieweragent/Preset/layer-placement";
+
+        // To Agent
+        Map<String, Object> requestMap = createRequestBodyMap(param);
+        JsonMapToPrint(requestMap);
+        resultMap.put("data", requestMap);
+
         if(controlType.equals("applyNew")){
             // 프리셋 id가 다를 때, "적용 버튼" 클릭 >> agent->viewer까지 정보를 줘야하니 presetRun로직을 태우면서 상태값은 stop으로 하여 검은화면 표출
-
-
-            // TODO : PresetRun (Status = stop)
-            // 신규
-            int refreshPresetUpdateDateNew = presetMapper.refreshPresetUpdateDate(param.get("presetId"));
 
             // 기존
             int refreshPresetUpdateDateOld = presetMapper.refreshPresetUpdateDate(runPresetVo.getPresetId());
@@ -255,16 +265,34 @@ public class PresetServiceImpl implements PresetService {
             // 기존 프리셋 : play -> stop
             int presetStatusClearResult = presetMapper.patchPresetStatusRunClear();
 
-            // 신규 프리셋 : (stop, pause, none) -> play
-            param.put("controlType", presetStatusStop);
-            int presetStatusRunResult = presetMapper.patchPresetStatusSet(param);
+            // TODO : PresetRun (Status = stop)
+            // Agent Call
+            webClientResponse = webClientFunction("applyAndNew", agentUrl, requestMap);
 
-            // TODO : PresetRun 로직
+            if(webClientResponse.containsKey("data")){
+                String response = (String) webClientResponse.get("data");
+                if(response.contains("200")){
+                    // 신규
+                    int refreshPresetUpdateDateNew = presetMapper.refreshPresetUpdateDate(param.get("presetId"));
+                    // 신규 프리셋 : (stop, pause, none) -> play
+                    param.put("controlType", presetStatusStop);
+                    int presetStatusRunResult = presetMapper.patchPresetStatusSet(param);
+
+                    resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
+                }
+                else{
+                    resultMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
+                }
+            }
+            else{
+                resultMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
+            }
         }
         else if(controlType.equals("applySame")){
             // 프리셋 id가 같을 떄, "적용 버튼" 클릭 >> 레이어당 플레이리스트 id만 업데이트 >> 뷰어는 새로운 플레이리스트 정보를 재생
             
             if(param.containsKey("layerInfoList")){
+                // 레이어당 플레이리스트 업데이트
                 int setPlaylistSelectYnResult = playlistMapper.setPlaylistSelectYn(param);
 
                 // 기존
@@ -291,35 +319,60 @@ public class PresetServiceImpl implements PresetService {
                 }
                 // Set : 프리셋 상태 update
                 else{
-                    // 신규
-                    int refreshPresetUpdateDateNew = presetMapper.refreshPresetUpdateDate(param.get("presetId"));
-
                     // 기존
                     int refreshPresetUpdateDateOld = presetMapper.refreshPresetUpdateDate(runPresetVo.getPresetId());
-
                     // 기존 프리셋 : play -> stop
                     int presetStatusClearResult = presetMapper.patchPresetStatusRunClear();
 
-                    // 신규 프리셋 : (stop, pause, none) -> play
-                    int presetStatusRunResult = presetMapper.patchPresetStatusSet(param);
                     // TODO : presetRun 로직
+                    // Agent Call
+                    webClientResponse = webClientFunction("playAndOld", agentUrl, requestMap);
+
+                    if(webClientResponse.containsKey("data")){
+                        String response = (String) webClientResponse.get("data");
+                        if(response.contains("200")){
+                            // 신규
+                            int refreshPresetUpdateDateNew = presetMapper.refreshPresetUpdateDate(param.get("presetId"));
+                            // 신규 프리셋 : (stop, pause, none) -> play
+                            int presetStatusRunResult = presetMapper.patchPresetStatusSet(param);
+
+                            resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
+                        }
+                        else{
+                            resultMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
+                        }
+                    }
+                    else{
+                        resultMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
+                    }
                 }
             }
             else{
-                // 신규
-                int refreshPresetUpdateDateNew = presetMapper.refreshPresetUpdateDate(param.get("presetId"));
-
                 // 기존
                 int refreshPresetUpdateDateOld = presetMapper.refreshPresetUpdateDate(runPresetVo.getPresetId());
-
                 // 기존 프리셋 : play -> stop
                 int presetStatusClearResult = presetMapper.patchPresetStatusRunClear();
 
-                // 신규 프리셋 : (stop, pause, none) -> play
-                int presetStatusRunResult = presetMapper.patchPresetStatusSet(param);
+                // Agent Call
+                webClientResponse = webClientFunction("playAndNew", agentUrl, requestMap);
 
-                // TODO : presetRun 로직
-                // TODO : 어차피 기존 프리셋 내려가고 신규 프리셋 실행
+                if(webClientResponse.containsKey("data")){
+                    String response = (String) webClientResponse.get("data");
+                    if(response.contains("200")){
+                        // 신규
+                        int refreshPresetUpdateDateNew = presetMapper.refreshPresetUpdateDate(param.get("presetId"));
+                        // 신규 프리셋 : (stop, pause, none) -> play
+                        int presetStatusRunResult = presetMapper.patchPresetStatusSet(param);
+
+                        resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
+                    }
+                    else{
+                        resultMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
+                    }
+                }
+                else{
+                    resultMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
+                }
             }
         }
         else{
@@ -327,116 +380,6 @@ public class PresetServiceImpl implements PresetService {
             resultMap.put("message", ResponseCode.FAIL_UNSUPPORTED_PRESET_CONTROL_TYPE.getMessage());
         }
 
-        // TODO : 예외 처리
-        int presetStatusClearResult = presetMapper.patchPresetStatusRunClear();
-
-        if(param.containsKey("layerInfoList")){
-            int setPlaylistSelectYnResult = playlistMapper.setPlaylistSelectYn(param);
-        }
-
-        // TODO : 프리셋 update_date
-        int refreshPresetUpdateDate = presetMapper.refreshPresetUpdateDate(param.get("presetId"));
-
-        String localIp = "106.245.226.42";
-        String localPort = "9898";
-        String baseUrl = "http://" + localIp + ":" + localPort + "/api-viewer/";
-
-        String playInfoUrl = baseUrl + "playInfo";
-        String updateCheckUrl = baseUrl + "updateAndHealthCheck";
-        String previewImgUrl = baseUrl + "previewImg/10";
-
-        requestBodyMap.put("playInfoUrl", playInfoUrl);
-        requestBodyMap.put("updateCheckUrl", updateCheckUrl);
-        requestBodyMap.put("previewImgUrl", previewImgUrl);
-
-        String screenId = String.valueOf(param.get("screenId"));
-        String presetId = String.valueOf(param.get("presetId"));
-
-        Map<String, Object> screenInfo = screenMapper.getScreen(screenId);
-        String removeKey = "screenNm";
-        screenInfo.remove(removeKey);
-
-        List<LayerToAgentVo>  layerInfos = presetMapper.getPresetLayersToAgent(presetId);
-
-
-        log.info("test");
-        requestBodyMap.put("presetId", param.get("presetId"));
-        requestBodyMap.put("screenInfo", screenInfo);
-        requestBodyMap.put("layers", layerInfos);
-
-        resultMap.put("data", requestBodyMap);
-
-        try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            String json = objectMapper.writeValueAsString(requestBodyMap);
-
-            System.out.println("[presetRun >> WAS to Agent] requestBodyMap = " + json);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        String ip = "192.168.123.12";
-        String port = "8800";
-
-        String agentUrl = "http://" + ip + ":" + port + "/vieweragent/Preset/layer-placement";
-        // WebClient 생성
-        WebClient webClient = WebClient.builder()
-                .clientConnector(new ReactorClientHttpConnector())
-                .baseUrl(agentUrl)
-                .build();
-
-        // 요청 헤더 설정
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
-        // POST 요청 보내기
-        Mono<String> responseMono = webClient.method(HttpMethod.POST)
-                .uri(agentUrl)
-                .headers(httpHeaders -> httpHeaders.addAll(headers))
-                .body(BodyInserters.fromValue(requestBodyMap))
-                .retrieve()
-                .bodyToMono(String.class);
-
-        // 응답 처리
-        // TODO : Agent 예외처리
-        responseMono.subscribe(response -> {
-            String data = response.toString();
-//            System.out.println("data = " + data);
-
-            Map<String, Object> responseMap = new HashMap<>();
-
-            try {
-                ObjectMapper objectMapper = new ObjectMapper();
-                responseMap = objectMapper.readValue(data, Map.class);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            if(responseMap.get("code").equals(200)){
-
-
-                // TODO : [DB] preset Status >> RUN
-                Map<String, Object> queryMap = new HashMap<>();
-                queryMap.put("presetId", param.get("presetId"));
-                queryMap.put("presetStatus", "play");
-                int patchPresetStatusSetResult = presetMapper.patchPresetStatusSet(queryMap);
-
-                if(patchPresetStatusSetResult > 0) {
-                    resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
-                }
-                else{
-                    // TODO : Agent >> 프리셋 상태 업데이트 예외 처리
-//                    resultMap.put("code", ResponseCode.FAIL_UPDATE_DISPLAY.getCode());
-//                    resultMap.put("message", ResponseCode.FAIL_UPDATE_DISPLAY.getMessage());
-                }
-            }
-            else{
-                resultMap.put("code", ResponseCode.FAIL_DISPLAY_SETTING_TO_AGENT.getCode());
-                resultMap.put("message", ResponseCode.FAIL_DISPLAY_SETTING_TO_AGENT.getMessage());
-
-            }
-        });
-
-        // TODO : 위 예외 처리 끝나면 삭제
-        resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
         return resultMap;
     }
 
@@ -461,6 +404,68 @@ public class PresetServiceImpl implements PresetService {
         }
 
         return resultMap;
+    }
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////// Function.
+    public void JsonMapToPrint(Map<String, Object> printMap) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            String json = objectMapper.writeValueAsString(printMap);
+            System.out.println("[presetRun >> WAS to Agent] requestBodyMap = " + json);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public Map<String, Object> webClientFunction(String type, String url, Map<String, Object> requestBodyMap){
+        Map<String, Object> returnMap = new HashMap<>();
+
+        WebClient webClient2 = WebClient.builder()
+                .clientConnector(new ReactorClientHttpConnector())
+                .baseUrl(url)
+                .build();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        String responseMono = webClient2.method(HttpMethod.POST)
+                .headers(httpHeaders -> httpHeaders.addAll(headers))
+                .body(BodyInserters.fromValue(requestBodyMap))
+                .retrieve()
+                .bodyToMono(String.class)
+                .block();
+
+
+        returnMap.put("data", responseMono);
+
+        return returnMap;
+    }
+
+    public Map<String, Object> createRequestBodyMap(Map<String, Object> param) {
+        Map<String, Object> requestBodyMap = new HashMap<>();
+
+        String localIp = "106.245.226.42";
+        String localPort = "9898";
+        String baseUrl = "http://" + localIp + ":" + localPort + "/api-viewer/";
+
+        requestBodyMap.put("playInfoUrl", baseUrl + "playInfo");
+        requestBodyMap.put("updateCheckUrl", baseUrl + "updateAndHealthCheck");
+        requestBodyMap.put("previewImgUrl", baseUrl + "previewImg/10");
+
+        String screenId = String.valueOf(param.get("screenId"));
+        String presetId = String.valueOf(param.get("presetId"));
+
+        Map<String, Object> screenInfo = screenMapper.getScreen(screenId);
+        List<LayerToAgentVo> layerInfos = presetMapper.getPresetLayersToAgent(presetId);
+        String removeKey = "screenNm";
+        screenInfo.remove(removeKey);
+
+        requestBodyMap.put("presetId", param.get("presetId"));
+        requestBodyMap.put("screenInfo", screenInfo);
+        requestBodyMap.put("layers", layerInfos);
+
+        return requestBodyMap;
     }
 
 }
