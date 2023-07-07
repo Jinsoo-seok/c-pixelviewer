@@ -162,6 +162,11 @@ public class PeriodicJob implements Job {
      */
     private boolean checkDay(String nowDate, String runDayWeek) {
 
+        // null일 경우 모든 요일 실행
+        if (runDayWeek == null) {
+            return true;
+        }
+
         if (nowDate.length() > 8) {
             String day = nowDate.substring(8),
                     month = nowDate.substring(5, 7),
@@ -175,6 +180,7 @@ public class PeriodicJob implements Job {
             // 요일이 맞을 경우
             return daysOfWeek.contains(dayOfWeek);
         }
+
         return false;
     }
 

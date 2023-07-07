@@ -123,13 +123,20 @@ public class ScheduleServiceImpl implements ScheduleService {
     }
 
     @Override
-    public Map<String, Object> setLedContent(Map<String, Object> param) {
-        Map<String, Object> resultMap = new HashMap<>();
+    @Transactional(rollbackFor = Exception.class)
+    public Map<String, Object> postLedPlaylist(Map<String, Object> param) {
+        Map<String, Object> responseMap = new HashMap<>();
 
-        // 하드 코딩용
-        resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
+        int insertCount = scheduleMapper.postLedPlaylist(setPowerParam(param));
 
-        return resultMap;
+        if (insertCount > 0) {
+            // 스케줄 등록
+            responseMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
+        } else {
+            responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
+        }
+
+        return responseMap;
     }
 
     @Override
@@ -145,12 +152,12 @@ public class ScheduleServiceImpl implements ScheduleService {
                 .schEndDate(String.valueOf(param.get("endDate")))
                 .timePwrOn(String.valueOf(param.get("startTime")))
                 .timePwrOff(String.valueOf(param.get("endTime")))
-                .runDayWeek(String.valueOf(param.get("scheduleDay")))
+                .runDayWeek(param.get("scheduleDay") == null ? null : String.valueOf(param.get("scheduleDay")))
                 .build();
 
-        int result = scheduleMapper.postLedPower(powerSchedule);
+        int insertCount = scheduleMapper.postLedPower(powerSchedule);
 
-        if (result > 0) {
+        if (insertCount > 0) {
             // 스케줄 등록
             schedulerManager.setJob(powerSchedule, POWER_ON.getValue(), false);
             schedulerManager.setJob(powerSchedule, POWER_OFF.getValue(), false);
@@ -168,9 +175,9 @@ public class ScheduleServiceImpl implements ScheduleService {
     public Map<String, Object> putLedPower(Map<String, Object> param) throws SchedulerException, ParseException {
         Map<String, Object> responseMap = new HashMap<>();
 
-        int result = scheduleMapper.putLedPower(setPowerParam(param));
+        int updateCount = scheduleMapper.putLedPower(setPowerParam(param));
 
-        if (result > 0) {
+        if (updateCount > 0) {
             PowerScheduleVo powerSchedule = PowerScheduleVo.builder()
                     .scheduleId(Long.parseLong(String.valueOf(param.get("scheduleId"))))
                     .schNm(String.valueOf(param.get("scheduleName")))
@@ -178,7 +185,7 @@ public class ScheduleServiceImpl implements ScheduleService {
                     .schEndDate(String.valueOf(param.get("endDate")))
                     .timePwrOn(String.valueOf(param.get("startTime")))
                     .timePwrOff(String.valueOf(param.get("endTime")))
-                    .runDayWeek(String.valueOf(param.get("scheduleDay")))
+                    .runDayWeek(param.get("scheduleDay") == null ? null : String.valueOf(param.get("scheduleDay")))
                     .build();
 
             // 스케줄 수정
@@ -200,9 +207,9 @@ public class ScheduleServiceImpl implements ScheduleService {
 
         Long scheduleId = Long.parseLong(String.valueOf(param.get("scheduleId")));
 
-        int result = scheduleMapper.deleteLedPower(scheduleId);
+        int deleteCount = scheduleMapper.deleteLedPower(scheduleId);
 
-        if (result > 0) {
+        if (deleteCount > 0) {
             // 스케줄 삭제
             schedulerManager.deleteJob(POWER_ON.getValue() + scheduleId);
             schedulerManager.deleteJob(POWER_OFF.getValue() + scheduleId);
@@ -227,13 +234,13 @@ public class ScheduleServiceImpl implements ScheduleService {
                 .schNm(String.valueOf(param.get("scheduleName")))
                 .schStartDate(String.valueOf(param.get("startDate")))
                 .schEndDate(String.valueOf(param.get("endDate")))
-                .runDayWeek(String.valueOf(param.get("scheduleDay")))
+                .runDayWeek(param.get("scheduleDay") == null ? null : String.valueOf(param.get("scheduleDay")))
                 .build();
 
         // 밝기 스케줄 등록
-        int scheduleResult = scheduleMapper.postLight(lightSchedule);
+        int insertLightCount = scheduleMapper.postLight(lightSchedule);
 
-        if (scheduleResult > 0) {
+        if (insertLightCount > 0) {
             List<LightListScheduleVo> lightList = new ArrayList<>();
 
             for (Object brightness : (ArrayList) param.get("brightnessList")) {
@@ -245,15 +252,15 @@ public class ScheduleServiceImpl implements ScheduleService {
             }
 
             // 밝기 제어 리스트 등록
-            int resultList = scheduleMapper.postLightList(lightList);
+            int insertLightListCount = scheduleMapper.postLightList(lightList);
 
-            if (resultList > 0) {
+            if (insertLightListCount > 0) {
                 Map<String, Object> listParam = new HashMap<>();
                 List<LightScheduleVo> lightScheduleList = new ArrayList<>(); // 스케줄 등록 용
 
                 listParam.put("listId", lightList.get(0).getListId());
                 listParam.put("scheduleId", lightSchedule.getScheduleId());
-                listParam.put("count", resultList);
+                listParam.put("count", insertLightListCount);
 
                 List<Long> listId = scheduleMapper.selectListId(listParam); // list id 가져오기
 
@@ -299,9 +306,9 @@ public class ScheduleServiceImpl implements ScheduleService {
         }
 
         // 밝기 스케줄 수정
-        int scheduleResult = scheduleMapper.putLight(param);
+        int updateLightCount = scheduleMapper.putLight(param);
 
-        if (scheduleResult > 0) {
+        if (updateLightCount > 0) {
             List<LightListScheduleVo> insertLightList = new ArrayList<>(),
                     updateLightList = new ArrayList<>();
 
@@ -418,13 +425,13 @@ public class ScheduleServiceImpl implements ScheduleService {
         // 삭제될 listId 조회
         List<Long> deleteList = scheduleMapper.selectLightList(Long.parseLong(String.valueOf(param.get("scheduleId"))));
 
-        int result = scheduleMapper.deleteLight(scheduleId);
+        int deleteCount = scheduleMapper.deleteLight(scheduleId);
 
         for (Long listId : deleteList) { // 스케줄 삭제
             schedulerManager.deleteJob(LIGHT.getValue() + listId);
         }
 
-        if (result > 0) {
+        if (deleteCount > 0) {
             responseMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
 
         } else {
@@ -444,12 +451,16 @@ public class ScheduleServiceImpl implements ScheduleService {
     }
 
     private String parseScheduleDay(Object scheduleDayList) {
-        String scheduleDay = "";
+        if (scheduleDayList != null) {
+            String scheduleDay = "";
 
-        for (Object day : (ArrayList) scheduleDayList) {
-            scheduleDay += "," + day;
+            for (Object day : (ArrayList) scheduleDayList) {
+                scheduleDay += "," + day;
+            }
+
+            return scheduleDay.replaceFirst(",", "");
         }
 
-        return scheduleDay.replaceFirst(",", "");
+        return null;
     }
 }

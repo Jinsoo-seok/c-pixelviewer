@@ -52,7 +52,7 @@ public class SchedulerManager {
             PowerScheduleVo powerSchedule = (PowerScheduleVo) scheduleInfo;
             List<String> scheduleTime = new ArrayList<>();
 
-            if (powerSchedule.getTimePwrOn().length() == 7) {
+            if (powerSchedule.getTimePwrOn().length() == 6) {
                 scheduleTime.add(powerSchedule.getTimePwrOn().substring(0, 2));
                 scheduleTime.add(powerSchedule.getTimePwrOn().substring(2, 4));
                 scheduleTime.add(powerSchedule.getTimePwrOn().substring(4));
@@ -97,7 +97,7 @@ public class SchedulerManager {
                     setSchedule(lightSchedule.getListId(), scheduleTime, jobDataMap);
                 }
             }
-        } else if (type.equals(LED_PLAY.getValue())) {
+        } else if (type.equals(LED_PLAY_LIST.getValue())) {
             System.out.println("LED 영상 play");
         }
     }
@@ -108,7 +108,15 @@ public class SchedulerManager {
     private boolean checkDayTime(String scheduleStartDate, String scheduleEndDate, List<String> scheduleTime, String runDayWeek) {
         if (scheduleStartDate.length() == 8 && scheduleEndDate.length() == 8 && scheduleTime.size() == 3) {
 
-            Set<String> daysOfWeek = new HashSet<>(Arrays.asList(runDayWeek.split(",")));
+            Set<String> daysOfWeek = new HashSet<>();
+
+            if (runDayWeek == null) { // null일 경우 모든 요일 수행
+                for (int i = 0; i < 7; i++) {
+                    daysOfWeek.add(String.valueOf(i));
+                }
+            } else {
+                daysOfWeek = new HashSet<>(Arrays.asList(runDayWeek.split(",")));
+            }
 
             LocalDate startDate = LocalDate.of(Integer.parseInt(scheduleStartDate.substring(0, 4)),
                     Integer.parseInt(scheduleStartDate.substring(4, 6)), Integer.parseInt(scheduleStartDate.substring(6))),

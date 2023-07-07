@@ -3,6 +3,14 @@
 
 <mapper namespace="com.cudo.pixelviewer.schedule.mapper.ScheduleMapper">
 
+    <insert id="postLedPlaylist" parameterType="Map" useGeneratedKeys="true" keyColumn="schedule_id"
+            keyProperty="scheduleId">
+        INSERT INTO playlist_schedule (sch_nm, sch_start_date, sch_end_date, time_start, time_end, run_day_week,
+                                       preset_id, layer_id, playlist_id)
+        VALUES (#{scheduleName}, #{startDate}, #{endDate}, #{startTime}, #{endTime}, #{scheduleDay}, #{presetId}, #{layerId},
+                #{playListId});
+    </insert>
+
     <insert id="postLedPower" parameterType="com.cudo.pixelviewer.vo.PowerScheduleVo" useGeneratedKeys="true"
             keyProperty="scheduleId">
         INSERT INTO led_pwr_schedule (sch_nm, sch_start_date, sch_end_date, time_pwr_on, time_pwr_off, run_day_week)

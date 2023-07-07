@@ -44,7 +44,7 @@ public class ScheduleJob implements Job {
 
             ledControllerClient.sendMessage(lightMessage);
             }
-        } else if (jobDataMap.get(DATA_MAP_KEY.getCode()).equals(LED_PLAY.getValue())) {
+        } else if (jobDataMap.get(DATA_MAP_KEY.getCode()).equals(LED_PLAY_LIST.getValue())) {
             System.out.println("밝기 조절");
         }
     }
