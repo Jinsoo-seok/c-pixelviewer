@@ -294,6 +294,10 @@ public class ScheduleServiceImpl implements ScheduleService {
         List<Long> deleteListId = scheduleMapper.selectLightList(Long.parseLong(String.valueOf(param.get("scheduleId"))));
         Set<Long> deleteSet = new HashSet<>(deleteListId);
 
+        for (Long listId : deleteListId) { // 밝기 전체 스케줄 삭제
+            schedulerManager.deleteJob(LIGHT.getValue() + listId);
+        }
+
         // 밝기 스케줄 수정
         int scheduleResult = scheduleMapper.putLight(param);
 
@@ -303,6 +307,7 @@ public class ScheduleServiceImpl implements ScheduleService {
 
             List<LightScheduleVo> lightScheduleList = new ArrayList<>(); // 스케줄 등록 용
 
+            // 기존/새롭게 추가 구별 해서 list 세팅
             for (Object light : (ArrayList) param.get("brightnessList")) {
                 Map<String, Object> lightInfo = (Map<String, Object>) light;
 
@@ -327,13 +332,10 @@ public class ScheduleServiceImpl implements ScheduleService {
                 }
             }
 
-
+            // 기존에 있던 밝기 중 삭제된 것은 삭제
             if (deleteSet.size() > 0) {
                 List<Long> deleteList = new ArrayList<>(deleteSet);
 
-                for (Long listId : deleteList) { // 스케줄 삭제
-                    schedulerManager.deleteJob(LIGHT.getValue() + listId);
-                }
                 // 기존 밝기 삭제
                 scheduleMapper.deleteLightList(deleteList);
             }

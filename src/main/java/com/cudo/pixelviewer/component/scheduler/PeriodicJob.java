@@ -151,9 +151,9 @@ public class PeriodicJob implements Job {
 
             scheduler.scheduleJob(lightJob, lightTrigger);
 
-            log.info("Light Schedule Register Id : {}", String.valueOf(lightDataMap.get(DATA_MAP_KEY.getCode())) + lightInfo.getScheduleId());
+            log.info("Light Schedule Register Id : {}", String.valueOf(lightDataMap.get(DATA_MAP_KEY.getCode())) + lightInfo.getListId());
         } else {
-            log.info("This is the time when schedule registration is not possible. Light ScheduleId : {}", lightInfo.getScheduleId());
+            log.info("This is the time when schedule registration is not possible. Light ScheduleId : {}", lightInfo.getListId());
         }
     }
 
@@ -170,8 +170,10 @@ public class PeriodicJob implements Job {
             Set<String> daysOfWeek = new HashSet<>(Arrays.asList(runDayWeek.split(",")));
             LocalDate date = LocalDate.of(Integer.parseInt(year), Integer.parseInt(month), Integer.parseInt(day));
 
+            String dayOfWeek = date.getDayOfWeek().getValue() == 7 ? "0" : String.valueOf(date.getDayOfWeek().getValue());
+
             // 요일이 맞을 경우
-            return daysOfWeek.contains(String.valueOf(date.getDayOfWeek().getValue() - 1));
+            return daysOfWeek.contains(dayOfWeek);
         }
         return false;
     }

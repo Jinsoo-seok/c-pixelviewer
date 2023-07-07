@@ -6,21 +6,16 @@ import io.netty.buffer.Unpooled;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.timeout.IdleStateEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 @Component
 @Slf4j
-public class TcpClient {
-
+public class DeviceControllerClient {
     private EventLoopGroup group;
     private Channel channel;
 
@@ -43,11 +38,11 @@ public class TcpClient {
                 });
 
 
-        bootstrap.connect("192.168.0.201", 9999).addListener((ChannelFuture future) -> {
+        bootstrap.connect("192.168.0.15", 6001).addListener((ChannelFuture future) -> {
             if (future.isSuccess()) {
                 channel = future.channel();
             } else {
-                log.error("Failed to connect. Retrying in 5 seconds... Because {}", String.valueOf(future.cause()));
+                log.error("Failed to Device Controller Connect. Retrying in 5 seconds... Because {}", String.valueOf(future.cause()));
 
                 future.channel().eventLoop().schedule(() -> connect(bootstrap, eventLoop), 5, TimeUnit.SECONDS);
             }
@@ -64,19 +59,18 @@ public class TcpClient {
             future.addListener((ChannelFutureListener) future1 -> {
                 if (!future1.isSuccess()) {
                     Throwable cause = future1.cause();
-                    log.error("SEND PACKET TO TCP SERVER FAIL", cause);
+                    log.error("SEND PACKET TO DEVICE CONTROLLER FAIL", cause);
                 } else {
-                    log.info("SEND PACKET {} TO TCP SERVER SUCCESS", message);
+                    log.info("SEND PACKET {} TO DEVICE CONTROLLER SUCCESS", message);
                 }
             });
         } else {
-            log.error("NO ACTIVE TCP CONNECTION");
+            log.error("NO ACTIVE DEVICE CONTROLLER CONNECTION");
         }
     }
 
     @PreDestroy
     public void stop() throws InterruptedException {
-        System.out.println("disconnect TCP server");
         if (channel != null) {
             channel.close().sync();
         }
@@ -87,25 +81,7 @@ public class TcpClient {
 
 
     private class TcpClientHandler extends SimpleChannelInboundHandler<ByteBuf> {
-
-        private final int HEARTBEAT_INTERVAL_SECONDS = 1; // 하트비트 간격
-        private ScheduledFuture<?> heartbeatTask;
         private ChannelHandlerContext ctx;
-
-        /**
-         * * LED 컨트롤러에 하트비트 전송
-         */
-        private void sendHeartbeatMessage() {
-            ByteBuf heartbeatMessage = ctx.alloc().buffer();
-            byte[] heartbeat = {(byte) 0x99, (byte) 0x99, 0x04, 0x00};
-
-            heartbeatMessage.writeBytes(heartbeat);
-
-            // Heartbeat 메시지 전송
-            ctx.writeAndFlush(Unpooled.wrappedBuffer(heartbeatMessage));
-
-            log.info("Heartbeat send to TCP server");
-        }
 
 
         /**
@@ -128,10 +104,7 @@ public class TcpClient {
          */
         @Override
         public void channelInactive(ChannelHandlerContext ctx) {
-            log.error("Lost connection to server. Reconnecting...");
-
-            // 하트비트 전송 작업 취소
-            heartbeatTask.cancel(true);
+            log.error("Lost connection to Device Controller. Reconnecting...");
 
             connect(new Bootstrap(), ctx.channel().eventLoop().parent());
         }
@@ -141,17 +114,8 @@ public class TcpClient {
          */
         @Override
         public void channelActive(ChannelHandlerContext ctx) {
-            log.info("Connected to TCP server");
+            log.info("Connected to Device Controller");
             this.ctx = ctx;
-
-            // 최초 연결 시 스케줄링된 하트비트 전송 작업 생성
-            ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
-            heartbeatTask = executor.scheduleAtFixedRate(
-                    this::sendHeartbeatMessage, // 하트비트 전송 작업
-                    0,
-                    HEARTBEAT_INTERVAL_SECONDS, // 주기적인 간격
-                    TimeUnit.SECONDS
-            );
         }
     }
 }

@@ -90,24 +90,11 @@ public class SchedulerManager {
                     scheduleTime.add(lightSchedule.getRuntime().substring(4));
                 }
                 if (checkDayTime(lightSchedule.getSchStartDate(), lightSchedule.getSchEndDate(), scheduleTime, lightSchedule.getRunDayWeek())) {
+                    JobDataMap jobDataMap = new JobDataMap();
+                    jobDataMap.put(DATA_MAP_KEY.getCode(), type);
+                    jobDataMap.put(LIGHT.getValue(), Float.parseFloat(lightSchedule.getBrightnessVal()) / 100);
 
-                    if (update) { // 밝기 스케줄 수정
-                        boolean scheduleExistCheck = updateTrigger(lightSchedule.getListId(), scheduleTime, type);
-
-                        if (!scheduleExistCheck) {
-                            JobDataMap jobDataMap = new JobDataMap();
-                            jobDataMap.put(DATA_MAP_KEY.getCode(), type);
-                            jobDataMap.put(LIGHT.getValue(), Float.parseFloat(lightSchedule.getBrightnessVal()) / 100);
-
-                            setSchedule(lightSchedule.getListId(), scheduleTime, jobDataMap);
-                        }
-                    } else { // 밝기 스케줄 등록
-                        JobDataMap jobDataMap = new JobDataMap();
-                        jobDataMap.put(DATA_MAP_KEY.getCode(), type);
-                        jobDataMap.put(LIGHT.getValue(), Float.parseFloat(lightSchedule.getBrightnessVal()) / 100);
-
-                        setSchedule(lightSchedule.getListId(), scheduleTime, jobDataMap);
-                    }
+                    setSchedule(lightSchedule.getListId(), scheduleTime, jobDataMap);
                 }
             }
         } else if (type.equals(LED_PLAY.getValue())) {
@@ -134,9 +121,11 @@ public class SchedulerManager {
             LocalTime scheduleLocalTime = LocalTime.of(Integer.parseInt(scheduleTime.get(0)), Integer.parseInt(scheduleTime.get(1)), Integer.parseInt(scheduleTime.get(2)));
             LocalTime nowTime = LocalTime.now();
 
+            String dayOfWeek = nowDate.getDayOfWeek().getValue() == 7 ? "0" : String.valueOf(nowDate.getDayOfWeek().getValue());
+
             // 요일이 맞고 시간이 이후 일 경우
-            return (daysOfWeek.contains(String.valueOf(nowDate.getDayOfWeek().getValue() - 1))
-                    && scheduleLocalTime.isAfter(nowTime) && (startDate.equals(nowDate) || startDate.isBefore(nowDate)) && (endDate.equals(nowDate) || endDate.isAfter(nowDate)));
+            return (daysOfWeek.contains(dayOfWeek) && scheduleLocalTime.isAfter(nowTime)
+                    && (startDate.equals(nowDate) || startDate.isBefore(nowDate)) && (endDate.equals(nowDate) || endDate.isAfter(nowDate)));
         }
 
         return false;
