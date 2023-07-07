@@ -123,13 +123,13 @@
         FROM Layers AS L
         WHERE L.preset_id = #{presetId}
     </select>
-    <update id="patchPresetStatus">
+    <update id="patchPresetStatusSet">
         UPDATE Presets
         SET preset_status = #{controlType}, update_date = NOW()
         WHERE Presets.preset_id = #{presetId}
     </update>
 
-    <update id="patchPresetStatusRun">
+    <update id="patchPresetStatusRunClear">
         UPDATE Presets
         SET preset_status = "stop", update_date = NOW()
         WHERE Presets.preset_status = "play"

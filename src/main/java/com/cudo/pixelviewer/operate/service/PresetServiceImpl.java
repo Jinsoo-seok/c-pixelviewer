@@ -232,12 +232,108 @@ public class PresetServiceImpl implements PresetService {
         Map<String, Object> resultMap = new HashMap<>();
         Map<String, Object> requestBodyMap = new HashMap<>();
 
+        String presetStatusPlay = "play";
+        String presetStatusStop = "stop";
+        String presetStatusPause = "pause";
+        String presetStatusNone = "none";
+
+        PresetVo runPresetVo = presetMapper.getRunPreset();
+        String controlType = (String) param.get("controlType");
+
+        if(controlType.equals("applyNew")){
+            // 프리셋 id가 다를 때, "적용 버튼" 클릭 >> agent->viewer까지 정보를 줘야하니 presetRun로직을 태우면서 상태값은 stop으로 하여 검은화면 표출
+
+
+            // TODO : PresetRun (Status = stop)
+            // 신규
+            int refreshPresetUpdateDateNew = presetMapper.refreshPresetUpdateDate(param.get("presetId"));
+
+            // 기존
+            int refreshPresetUpdateDateOld = presetMapper.refreshPresetUpdateDate(runPresetVo.getPresetId());
+
+            // 기존 프리셋 : play -> stop
+            int presetStatusClearResult = presetMapper.patchPresetStatusRunClear();
+
+            // 신규 프리셋 : (stop, pause, none) -> play
+            param.put("controlType", presetStatusStop);
+            int presetStatusRunResult = presetMapper.patchPresetStatusSet(param);
+
+            // TODO : PresetRun 로직
+        }
+        else if(controlType.equals("applySame")){
+            // 프리셋 id가 같을 떄, "적용 버튼" 클릭 >> 레이어당 플레이리스트 id만 업데이트 >> 뷰어는 새로운 플레이리스트 정보를 재생
+            
+            if(param.containsKey("layerInfoList")){
+                int setPlaylistSelectYnResult = playlistMapper.setPlaylistSelectYn(param);
+
+                // 기존
+                int refreshPresetUpdateDateOld = presetMapper.refreshPresetUpdateDate(runPresetVo.getPresetId());
+
+                resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
+            }
+            else{
+                resultMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
+            }
+        }
+        else if(controlType.equals("play")){
+            // 프리셋 id가 같을 떄, "재생버튼" 클릭 >> 프리셋 id의 db 상태값이 play면 무시, stop/pause이면 play로 변경 >> 실시간으로 정보 요청하던 뷰어들이 play상태를 보고, 플레이리스트를 재생하기 시작.
+            
+            // Check : 기존 프리셋 == 신규 프리셋
+            if(param.get("presetId").equals(runPresetVo.getPresetId())){
+
+                // Check : 기존 상태값 == "play"
+                if(runPresetVo.getPresetStatus().equals(presetStatusPlay)){
+
+                    // Status : 이미 play 중 >> 예외 return
+                    resultMap.put("code", ResponseCode.ALREADY_PLAYING_PRESET.getCode());
+                    resultMap.put("message", ResponseCode.ALREADY_PLAYING_PRESET.getMessage());
+                }
+                // Set : 프리셋 상태 update
+                else{
+                    // 신규
+                    int refreshPresetUpdateDateNew = presetMapper.refreshPresetUpdateDate(param.get("presetId"));
+
+                    // 기존
+                    int refreshPresetUpdateDateOld = presetMapper.refreshPresetUpdateDate(runPresetVo.getPresetId());
+
+                    // 기존 프리셋 : play -> stop
+                    int presetStatusClearResult = presetMapper.patchPresetStatusRunClear();
+
+                    // 신규 프리셋 : (stop, pause, none) -> play
+                    int presetStatusRunResult = presetMapper.patchPresetStatusSet(param);
+                    // TODO : presetRun 로직
+                }
+            }
+            else{
+                // 신규
+                int refreshPresetUpdateDateNew = presetMapper.refreshPresetUpdateDate(param.get("presetId"));
+
+                // 기존
+                int refreshPresetUpdateDateOld = presetMapper.refreshPresetUpdateDate(runPresetVo.getPresetId());
+
+                // 기존 프리셋 : play -> stop
+                int presetStatusClearResult = presetMapper.patchPresetStatusRunClear();
+
+                // 신규 프리셋 : (stop, pause, none) -> play
+                int presetStatusRunResult = presetMapper.patchPresetStatusSet(param);
+
+                // TODO : presetRun 로직
+                // TODO : 어차피 기존 프리셋 내려가고 신규 프리셋 실행
+            }
+        }
+        else{
+            resultMap.put("code", ResponseCode.FAIL_UNSUPPORTED_PRESET_CONTROL_TYPE.getCode());
+            resultMap.put("message", ResponseCode.FAIL_UNSUPPORTED_PRESET_CONTROL_TYPE.getMessage());
+        }
+
         // TODO : 예외 처리
-        int presetStatusClearResult = presetMapper.patchPresetStatusRun(param);
+        int presetStatusClearResult = presetMapper.patchPresetStatusRunClear();
 
         if(param.containsKey("layerInfoList")){
             int setPlaylistSelectYnResult = playlistMapper.setPlaylistSelectYn(param);
         }
+
+        // TODO : 프리셋 update_date
         int refreshPresetUpdateDate = presetMapper.refreshPresetUpdateDate(param.get("presetId"));
 
         String localIp = "106.245.226.42";
@@ -320,9 +416,9 @@ public class PresetServiceImpl implements PresetService {
                 Map<String, Object> queryMap = new HashMap<>();
                 queryMap.put("presetId", param.get("presetId"));
                 queryMap.put("presetStatus", "play");
-                int patchPresetStatusResult = presetMapper.patchPresetStatus(queryMap);
+                int patchPresetStatusSetResult = presetMapper.patchPresetStatusSet(queryMap);
 
-                if(patchPresetStatusResult > 0) {
+                if(patchPresetStatusSetResult > 0) {
                     resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
                 }
                 else{
@@ -349,9 +445,9 @@ public class PresetServiceImpl implements PresetService {
         Map<String, Object> resultMap = new HashMap<>();
 
         if(param.get("controlType").equals("pause") || param.get("controlType").equals("stop")) {
-            int patchPresetStatusResult = presetMapper.patchPresetStatus(param);
+            int patchPresetStatusSetResult = presetMapper.patchPresetStatusSet(param);
 
-            if (patchPresetStatusResult > 0) {
+            if (patchPresetStatusSetResult > 0) {
                 resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
             } else {
                 resultMap.put("code", ResponseCode.FAIL_UPDATE_PRESET_STATUS.getCode());

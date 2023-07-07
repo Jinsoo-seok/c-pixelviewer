@@ -34,9 +34,9 @@ public interface PresetMapper {
 
     // Preset Run
     List<LayerToAgentVo> getPresetLayersToAgent(String presetId);
-    int patchPresetStatus(Map<String, Object> param);
+    int patchPresetStatusSet(Map<String, Object> param);
 
-    int patchPresetStatusRun(Map<String, Object> param);
+    int patchPresetStatusRunClear();
 
     int refreshPresetUpdateDate(Object presetId);
 }
