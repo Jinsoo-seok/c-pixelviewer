@@ -322,21 +322,24 @@ public class PresetServiceImpl implements PresetService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Map<String, Object> patchPresetStop(Map<String, Object> param) {
+    public Map<String, Object> patchPresetControl(Map<String, Object> param) {
         Map<String, Object> resultMap = new HashMap<>();
 
-        String ip = "192.168.123.12";
-        String port = "8800";
+        if(param.get("controlType").equals("pause") || param.get("controlType").equals("stop")) {
+            int patchPresetStatusResult = presetMapper.patchPresetStatus(param);
 
-        String agentUrl = "http://" + ip + ":" + port + "/vieweragent/Preset/layer-placement";
+            if (patchPresetStatusResult > 0) {
+                resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
+            } else {
+                resultMap.put("code", ResponseCode.FAIL_UPDATE_PRESET_STATUS.getCode());
+                resultMap.put("message", ResponseCode.FAIL_UPDATE_PRESET_STATUS.getMessage());
+            }
+        }
+        else{
+            resultMap.put("code", ResponseCode.FAIL_UNSUPPORTED_PRESET_STATUS.getCode());
+            resultMap.put("message", ResponseCode.FAIL_UNSUPPORTED_PRESET_STATUS.getMessage());
+        }
 
-        Map<String, Object> queryMap = new HashMap<>();
-        queryMap.put("presetId", param.get("presetId"));
-        queryMap.put("presetStatus", "WAIT");
-         int patchPresetStatusResult = presetMapper.patchPresetStatus(queryMap);
-
-
-        resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
         return resultMap;
     }
 

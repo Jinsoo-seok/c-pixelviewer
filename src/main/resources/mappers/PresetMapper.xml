@@ -119,7 +119,7 @@
     </select>
     <update id="patchPresetStatus">
         UPDATE Presets
-        SET preset_status = #{presetStatus}
+        SET preset_status = #{controlType}
         WHERE Presets.preset_id = #{presetId}
     </update>
 

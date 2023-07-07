@@ -18,6 +18,6 @@ public interface PresetService {
 
     Map<String, Object> patchPresetRun(Map<String, Object> param);
 
-    Map<String, Object> patchPresetStop(Map<String, Object> param);
+    Map<String, Object> patchPresetControl(Map<String, Object> param);
 
 }

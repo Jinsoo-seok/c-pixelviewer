@@ -53,6 +53,8 @@ public enum ResponseCode {
     FAIL_NOT_EXIST_PRESET(3304, "FailedNotExistPreset", "Failed Not Exist Preset"),
     FAIL_DELETE_PRESET_ALLOCATE_LAYERS(3305, "FailedDeletePresetAllocateLayers", "Failed Delete Preset Allocate Layers"),
     FAIL_INSERT_PRESET_ALLOCATE_LAYERS(3306, "FailedInsertPresetAllocateLayers", "Failed Insert Preset Allocate Layers"),
+    FAIL_UPDATE_PRESET_STATUS(3307, "FailedUpdatePresetStatus", "Failed Update Preset Status"),
+    FAIL_UNSUPPORTED_PRESET_STATUS(3308, "FailedUnsupportedPresetStatus", "Failed Unsupported Preset Status"),
 
     // Layer : 3400
     FAIL_INSERT_LAYER(3400, "FailedInsertLayer", "Failed Insert Layer"),

@@ -232,12 +232,13 @@ public class PresetController {
         Map<String, Object> responseMap = new HashMap<>();
         responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
 
-        String[] keyList = {"screenId", "presetId"};
+        String[] keyList = {"screenId", "presetId", "layerInfoList"};
 
         try {
             parameterValidation(param, keyList);
             parameterInt("screenId", param.get("screenId"), true);
             parameterInt("presetId", param.get("presetId"), true);
+            parameterArray("layerInfoList", param.get("layerInfoList"), true);
 
             responseMap = presetService.patchPresetRun(param);
         }
@@ -258,8 +259,8 @@ public class PresetController {
         return responseMap;
     }
 
-    @PatchMapping("/stop")
-    public Map<String, Object> patchPresetStop(HttpServletRequest request
+    @PatchMapping("/control")
+    public Map<String, Object> patchPresetControl(HttpServletRequest request
             , @RequestBody Map<String, Object> param) {
         long startTime = System.currentTimeMillis();
         String apiInfo = "["+ request.getRequestURI() + "] [" + request.getMethod() + "]";
@@ -268,14 +269,15 @@ public class PresetController {
         Map<String, Object> responseMap = new HashMap<>();
         responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
 
-        String[] keyList = {"screenId", "presetId"};
+        String[] keyList = {"screenId", "presetId", "controlType"};
 
         try {
             parameterValidation(param, keyList);
             parameterInt("screenId", param.get("screenId"), true);
             parameterInt("presetId", param.get("presetId"), true);
+            parameterString("controlType", param.get("controlType"), true, 0, null);
 
-            responseMap = presetService.patchPresetStop(param);
+            responseMap = presetService.patchPresetControl(param);
         }
         catch (ParamException paramException){
             log.error("[paramException][patchPresetStop] - {}", paramException.getMessage());
