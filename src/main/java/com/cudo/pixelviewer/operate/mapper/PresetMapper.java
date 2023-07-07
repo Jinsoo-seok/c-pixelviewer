@@ -2,6 +2,7 @@ package com.cudo.pixelviewer.operate.mapper;
 
 import com.cudo.pixelviewer.vo.LayerToAgentVo;
 import com.cudo.pixelviewer.vo.LayerVo;
+import com.cudo.pixelviewer.vo.PresetStatusRunVo;
 import com.cudo.pixelviewer.vo.PresetVo;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -16,7 +17,7 @@ public interface PresetMapper {
     PresetVo getPreset(String presetId);
     List<LayerVo> getPresetLayers(String presetId);
 
-    PresetVo getRunPreset();
+    PresetStatusRunVo getRunPreset();
 
     int postPresetValid(Map<String, Object> param);
     int postPreset(Map<String, Object> param);

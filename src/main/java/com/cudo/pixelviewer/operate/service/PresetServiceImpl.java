@@ -8,6 +8,7 @@ import com.cudo.pixelviewer.util.ParameterUtils;
 import com.cudo.pixelviewer.util.ResponseCode;
 import com.cudo.pixelviewer.vo.LayerToAgentVo;
 import com.cudo.pixelviewer.vo.LayerVo;
+import com.cudo.pixelviewer.vo.PresetStatusRunVo;
 import com.cudo.pixelviewer.vo.PresetVo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -84,7 +85,7 @@ public class PresetServiceImpl implements PresetService {
         Map<String, Object> resultMap = new HashMap<>();
         Map<String, Object> dataMap = new HashMap<>();
 
-        PresetVo runPresetVo = presetMapper.getRunPreset();
+        PresetStatusRunVo runPresetVo = presetMapper.getRunPreset();
 
         if(runPresetVo != null){
             dataMap.put("preset", runPresetVo);
@@ -237,7 +238,7 @@ public class PresetServiceImpl implements PresetService {
         String presetStatusPause = "pause";
         String presetStatusNone = "none";
 
-        PresetVo runPresetVo = presetMapper.getRunPreset();
+        PresetStatusRunVo runPresetVo = presetMapper.getRunPreset();
         String controlType = (String) param.get("controlType");
 
         if(controlType.equals("applyNew")){
