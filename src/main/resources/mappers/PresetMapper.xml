@@ -119,9 +119,16 @@
     </select>
     <update id="patchPresetStatus">
         UPDATE Presets
-        SET preset_status = #{controlType}
+        SET preset_status = #{controlType}, update_date = NOW()
         WHERE Presets.preset_id = #{presetId}
     </update>
+
+    <update id="patchPresetStatusRun">
+        UPDATE Presets
+        SET preset_status = "stop", update_date = NOW()
+        WHERE Presets.preset_status = "play"
+    </update>
+
 
     <update id="refreshPresetUpdateDate">
         UPDATE Presets

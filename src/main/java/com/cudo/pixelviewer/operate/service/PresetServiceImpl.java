@@ -213,6 +213,8 @@ public class PresetServiceImpl implements PresetService {
         Map<String, Object> resultMap = new HashMap<>();
         Map<String, Object> requestBodyMap = new HashMap<>();
 
+        // TODO : 예외 처리
+        int presetStatusClearResult = presetMapper.patchPresetStatusRun(param);
 
         if(param.containsKey("layerInfoList")){
             int setPlaylistSelectYnResult = playlistMapper.setPlaylistSelectYn(param);
@@ -296,7 +298,7 @@ public class PresetServiceImpl implements PresetService {
                 // TODO : [DB] preset Status >> RUN
                 Map<String, Object> queryMap = new HashMap<>();
                 queryMap.put("presetId", param.get("presetId"));
-                queryMap.put("presetStatus", "RUN");
+                queryMap.put("presetStatus", "play");
                 int patchPresetStatusResult = presetMapper.patchPresetStatus(queryMap);
 
                 if(patchPresetStatusResult > 0) {
