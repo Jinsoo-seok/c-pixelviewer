@@ -79,14 +79,14 @@ public class ScheduleController {
                 throw new ParamException(ResponseCode.INVALID_PARAM_VALUE, "type");
             }
 
-            responseMap = scheduleService.getScheduleStatus(param);
+            responseMap = scheduleService.selectScheduleStatus(param);
         } catch (ParamException paramException) {
-            log.error("[paramException][patchLayerTopMost] - {}", paramException.getMessage());
+            log.error("[paramException] - {}", paramException.getMessage());
 
             responseMap.put("code", paramException.getCode());
             responseMap.put("message", paramException.getMessage());
         } catch (Exception exception) {
-            log.error("[Exception][getPlaylistList] - {}", exception.getMessage());
+            log.error("[Exception] - {}", exception.getMessage());
 
             responseMap.put("exceptionMessage", exception.getMessage());
         }

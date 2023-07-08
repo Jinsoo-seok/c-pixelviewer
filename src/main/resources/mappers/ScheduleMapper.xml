@@ -3,6 +3,32 @@
 
 <mapper namespace="com.cudo.pixelviewer.schedule.mapper.ScheduleMapper">
 
+    <select id="selectPlaylistInfoSchedule" parameterType="Long" resultType="Map">
+        SELECT *
+        FROM playlist_schedule
+        WHERE schedule_id = #{scheduleId}
+    </select>
+
+    <select id="selectPowerInfoSchedule" parameterType="Long" resultType="Map">
+        SELECT *
+        FROM led_pwr_schedule
+        WHERE schedule_id = #{scheduleId}
+    </select>
+
+    <select id="selectLightInfoSchedule" parameterType="Long" resultType="Map">
+        SELECT bs.schedule_id     AS schedule_id,
+               bs.sch_nm          AS sch_nm,
+               bs.sch_start_date  AS sch_start_date,
+               bs.sch_end_date    AS sch_end_date,
+               bs.run_day_week    AS run_day_week,
+               bcl.list_id        AS list_id,
+               bcl.runtime        AS runtime,
+               bcl.Brightness_val AS Brightness_val
+        FROM brightness_schedule AS bs
+                 INNER JOIN brightness_control_lists AS bcl on bs.schedule_id = bcl.schedule_id
+        WHERE bs.schedule_id = #{scheduleId}
+    </select>
+
     <insert id="postLedPlaylistSchedule" parameterType="Map" useGeneratedKeys="true" keyColumn="schedule_id"
             keyProperty="scheduleId">
         INSERT INTO playlist_schedule (sch_nm, sch_start_date, sch_end_date, time_start, time_end, run_day_week,

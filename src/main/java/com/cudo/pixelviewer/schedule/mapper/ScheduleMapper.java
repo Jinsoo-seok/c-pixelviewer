@@ -10,6 +10,10 @@ import java.util.Map;
 
 @Mapper
 public interface ScheduleMapper {
+    Map<String, Object> selectPlaylistInfoSchedule(Long scheduleId);
+    Map<String, Object> selectPowerInfoSchedule(Long scheduleId);
+    List<Map<String, Object>> selectLightInfoSchedule(Long scheduleId);
+
     int postLedPlaylistSchedule(Map<String, Object> param);
     int putLedPlaylistSchedule(Map<String, Object> param);
     int deleteLedPower(Long scheduleId);
