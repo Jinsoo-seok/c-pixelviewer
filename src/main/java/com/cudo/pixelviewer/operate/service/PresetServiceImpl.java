@@ -242,7 +242,6 @@ public class PresetServiceImpl implements PresetService {
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> patchPresetRun(Map<String, Object> param) {
         Map<String, Object> resultMap = new HashMap<>();
-        Map<String, Object> requestBodyMap = new HashMap<>();
         Map<String, Object> webClientResponse = new HashMap<>();
 
         String presetStatusPlay = "play";
@@ -254,8 +253,7 @@ public class PresetServiceImpl implements PresetService {
         String controlType = (String) param.get("controlType");
 
 
-        // Set Agent
-
+        //////////////////////////////////////////////////////////////////// Set Agent
         // URL
         String agentUrl = protocol + agentIp + ":" + agentPort + agentPath;
         // request Body
@@ -263,125 +261,120 @@ public class PresetServiceImpl implements PresetService {
         JsonMapToPrint(requestMap);
         resultMap.put("data", requestMap);
 
-        // 프리셋 id가 다를 때, "적용 버튼" 클릭 >> agent->viewer까지 정보를 줘야하니 presetRun로직을 태우면서 상태값은 stop으로 하여 검은화면 표출
-        if(controlType.equals("applyNew")){
-            // 기존
-            int refreshPresetUpdateDateOld = presetMapper.refreshPresetUpdateDate(runPresetVo.getPresetId());
-            // 기존 프리셋 : play -> stop
-            int presetStatusClearResult = presetMapper.patchPresetStatusRunClear();
+        Boolean callYn = false;
 
-            // TODO : PresetRun (Status = stop)
-            // Agent Call
-            webClientResponse = webClientFunction("applyAndNew", agentUrl, requestMap);
+        if(callYn) {
+            // 프리셋 id가 다를 때, "적용 버튼" 클릭 >> agent->viewer까지 정보를 줘야하니 presetRun로직을 태우면서 상태값은 stop으로 하여 검은화면 표출
+            if (controlType.equals("applyNew")) {
+                // 기존
+                int refreshPresetUpdateDateOld = presetMapper.refreshPresetUpdateDate(runPresetVo.getPresetId());
+                // 기존 프리셋 : play -> stop
+                int presetStatusClearResult = presetMapper.patchPresetStatusRunClear();
 
-            if(webClientResponse.containsKey("data")){
-                String response = (String) webClientResponse.get("data");
-                if(response.contains("200")){
-                    // 신규
-                    int refreshPresetUpdateDateNew = presetMapper.refreshPresetUpdateDate(param.get("presetId"));
-                    // 신규 프리셋 : (stop, pause, none) -> play
-                    param.put("controlType", presetStatusStop);
-                    int presetStatusRunResult = presetMapper.patchPresetStatusSet(param);
+                // TODO : PresetRun (Status = stop)
+                // Agent Call
+                webClientResponse = webClientFunction("applyAndNew", agentUrl, requestMap);
 
-                    resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
-                }
-                else{
+                if (webClientResponse.containsKey("data")) {
+                    String response = (String) webClientResponse.get("data");
+                    if (response.contains("200")) {
+                        // 신규
+                        int refreshPresetUpdateDateNew = presetMapper.refreshPresetUpdateDate(param.get("presetId"));
+                        // 신규 프리셋 : (stop, pause, none) -> play
+                        param.put("controlType", presetStatusStop);
+                        int presetStatusRunResult = presetMapper.patchPresetStatusSet(param);
+
+                        resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
+                    } else {
+                        resultMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
+                    }
+                } else {
                     resultMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
                 }
             }
-            else{
-                resultMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
-            }
-        }
-        // 프리셋 id가 같을 때, "적용 버튼" 클릭 >> 레이어당 플레이리스트 id만 업데이트 >> 뷰어는 새로운 플레이리스트 정보를 재생
-        else if(controlType.equals("applySame")){
+            // 프리셋 id가 같을 때, "적용 버튼" 클릭 >> 레이어당 플레이리스트 id만 업데이트 >> 뷰어는 새로운 플레이리스트 정보를 재생
+            else if (controlType.equals("applySame")) {
 
-            if(param.containsKey("layerInfoList")){
-                // 레이어당 플레이리스트 업데이트
-                int setPlaylistSelectYnResult = playlistMapper.setPlaylistSelectYn(param);
-                // 기존
-                int refreshPresetUpdateDateOld = presetMapper.refreshPresetUpdateDate(runPresetVo.getPresetId());
+                if (param.containsKey("layerInfoList")) {
+                    // 레이어당 플레이리스트 업데이트
+                    int setPlaylistSelectYnResult = playlistMapper.setPlaylistSelectYn(param);
+                    // 기존
+                    int refreshPresetUpdateDateOld = presetMapper.refreshPresetUpdateDate(runPresetVo.getPresetId());
 
-                resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
-            }
-            else{
-                resultMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
-            }
-        }
-        // 프리셋 id가 같을 때, "재생 버튼" 클릭 >> 프리셋 id의 db 상태값이 play면 무시, stop/pause이면 play로 변경 >> 실시간으로 정보 요청하던 뷰어들이 play상태를 보고, 플레이리스트를 재생하기 시작.
-        else if(controlType.equals("play")){
-
-            // Check : 기존 프리셋 == 신규 프리셋
-            if(param.get("presetId").equals(runPresetVo.getPresetId())){
-
-                // Check : 기존 상태값 == "play"
-                if(runPresetVo.getPresetStatus().equals(presetStatusPlay)){
-
-                    // Status : 이미 play 중 >> 예외 return
-                    resultMap.put("code", ResponseCode.ALREADY_PLAYING_PRESET.getCode());
-                    resultMap.put("message", ResponseCode.ALREADY_PLAYING_PRESET.getMessage());
+                    resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
+                } else {
+                    resultMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
                 }
-                // Set : 프리셋 상태 update
-                else{
+            }
+            // 프리셋 id가 같을 때, "재생 버튼" 클릭 >> 프리셋 id의 db 상태값이 play면 무시, stop/pause이면 play로 변경 >> 실시간으로 정보 요청하던 뷰어들이 play상태를 보고, 플레이리스트를 재생하기 시작.
+            else if (controlType.equals("play")) {
+
+                // Check : 기존 프리셋 == 신규 프리셋
+                if (param.get("presetId").equals(runPresetVo.getPresetId())) {
+
+                    // Check : 기존 상태값 == "play"
+                    if (runPresetVo.getPresetStatus().equals(presetStatusPlay)) {
+
+                        // Status : 이미 play 중 >> 예외 return
+                        resultMap.put("code", ResponseCode.ALREADY_PLAYING_PRESET.getCode());
+                        resultMap.put("message", ResponseCode.ALREADY_PLAYING_PRESET.getMessage());
+                    }
+                    // Set : 프리셋 상태 update
+                    else {
+                        // 기존
+                        int refreshPresetUpdateDateOld = presetMapper.refreshPresetUpdateDate(runPresetVo.getPresetId());
+                        // 기존 프리셋 : play -> stop
+                        int presetStatusClearResult = presetMapper.patchPresetStatusRunClear();
+
+                        // TODO : presetRun 로직
+                        // Agent Call
+                        webClientResponse = webClientFunction("playAndOld", agentUrl, requestMap);
+
+                        if (webClientResponse.containsKey("data")) {
+                            String response = (String) webClientResponse.get("data");
+                            if (response.contains("200")) {
+                                // 신규
+                                int refreshPresetUpdateDateNew = presetMapper.refreshPresetUpdateDate(param.get("presetId"));
+                                // 신규 프리셋 : (stop, pause, none) -> play
+                                int presetStatusRunResult = presetMapper.patchPresetStatusSet(param);
+
+                                resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
+                            } else {
+                                resultMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
+                            }
+                        } else {
+                            resultMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
+                        }
+                    }
+                } else {
                     // 기존
                     int refreshPresetUpdateDateOld = presetMapper.refreshPresetUpdateDate(runPresetVo.getPresetId());
                     // 기존 프리셋 : play -> stop
                     int presetStatusClearResult = presetMapper.patchPresetStatusRunClear();
 
-                    // TODO : presetRun 로직
                     // Agent Call
-                    webClientResponse = webClientFunction("playAndOld", agentUrl, requestMap);
+                    webClientResponse = webClientFunction("playAndNew", agentUrl, requestMap);
 
-                    if(webClientResponse.containsKey("data")){
+                    if (webClientResponse.containsKey("data")) {
                         String response = (String) webClientResponse.get("data");
-                        if(response.contains("200")){
+                        if (response.contains("200")) {
                             // 신규
                             int refreshPresetUpdateDateNew = presetMapper.refreshPresetUpdateDate(param.get("presetId"));
                             // 신규 프리셋 : (stop, pause, none) -> play
                             int presetStatusRunResult = presetMapper.patchPresetStatusSet(param);
 
                             resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
-                        }
-                        else{
+                        } else {
                             resultMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
                         }
-                    }
-                    else{
+                    } else {
                         resultMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
                     }
                 }
+            } else {
+                resultMap.put("code", ResponseCode.FAIL_UNSUPPORTED_PRESET_CONTROL_TYPE.getCode());
+                resultMap.put("message", ResponseCode.FAIL_UNSUPPORTED_PRESET_CONTROL_TYPE.getMessage());
             }
-            else{
-                // 기존
-                int refreshPresetUpdateDateOld = presetMapper.refreshPresetUpdateDate(runPresetVo.getPresetId());
-                // 기존 프리셋 : play -> stop
-                int presetStatusClearResult = presetMapper.patchPresetStatusRunClear();
-
-                // Agent Call
-                webClientResponse = webClientFunction("playAndNew", agentUrl, requestMap);
-
-                if(webClientResponse.containsKey("data")){
-                    String response = (String) webClientResponse.get("data");
-                    if(response.contains("200")){
-                        // 신규
-                        int refreshPresetUpdateDateNew = presetMapper.refreshPresetUpdateDate(param.get("presetId"));
-                        // 신규 프리셋 : (stop, pause, none) -> play
-                        int presetStatusRunResult = presetMapper.patchPresetStatusSet(param);
-
-                        resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
-                    }
-                    else{
-                        resultMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
-                    }
-                }
-                else{
-                    resultMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
-                }
-            }
-        }
-        else{
-            resultMap.put("code", ResponseCode.FAIL_UNSUPPORTED_PRESET_CONTROL_TYPE.getCode());
-            resultMap.put("message", ResponseCode.FAIL_UNSUPPORTED_PRESET_CONTROL_TYPE.getMessage());
         }
         return resultMap;
     }
