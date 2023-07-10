@@ -11,11 +11,9 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.cudo.pixelviewer.component.scheduler.ScheduleCode.LIGHT;
 import static com.cudo.pixelviewer.util.ParameterUtils.*;
 
 @Slf4j
@@ -31,7 +29,7 @@ public class ScheduleController {
      * * 스케줄 상태 조회
      */
     @GetMapping("/calender-status")
-    public Map<String, Object> getCalenderStatus(HttpServletRequest request, @RequestParam Map<String, Object> param) {
+    public Map<String, Object> selectCalenderStatus(HttpServletRequest request, @RequestParam Map<String, Object> param) {
         long startTime = System.currentTimeMillis();
         String apiInfo = "[" + request.getRequestURI() + "] [" + request.getMethod() + "]";
         log.info("{} [START] [{}]", apiInfo, startTime);
@@ -41,7 +39,7 @@ public class ScheduleController {
         responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
 
         try {
-            responseMap = scheduleService.getCalenderStatus(param);
+            responseMap = scheduleService.selectCalenderStatus(param);
         } catch (Exception exception) {
             log.error("[Exception] - {}", exception.getMessage());
 
@@ -79,14 +77,14 @@ public class ScheduleController {
                 throw new ParamException(ResponseCode.INVALID_PARAM_VALUE, "type");
             }
 
-            responseMap = scheduleService.getScheduleStatus(param);
+            responseMap = scheduleService.selectScheduleStatus(param);
         } catch (ParamException paramException) {
-            log.error("[paramException][patchLayerTopMost] - {}", paramException.getMessage());
+            log.error("[paramException] - {}", paramException.getMessage());
 
             responseMap.put("code", paramException.getCode());
             responseMap.put("message", paramException.getMessage());
         } catch (Exception exception) {
-            log.error("[Exception][getPlaylistList] - {}", exception.getMessage());
+            log.error("[Exception] - {}", exception.getMessage());
 
             responseMap.put("exceptionMessage", exception.getMessage());
         }

@@ -11,10 +11,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.text.ParseException;
+import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.cudo.pixelviewer.component.scheduler.ScheduleCode.*;
-import static com.cudo.pixelviewer.util.ParameterUtils.*;
 
 @Service
 @RequiredArgsConstructor
@@ -24,102 +25,115 @@ public class ScheduleServiceImpl implements ScheduleService {
     final SchedulerManager schedulerManager;
 
     @Override
-    public Map<String, Object> getCalenderStatus(Map<String, Object> param) {
-        Map<String, Object> resultMap = new HashMap<>();
+    public Map<String, Object> selectCalenderStatus(Map<String, Object> param) {
+        Map<String, Object> responseMap = new HashMap<>();
+        String startDate = (String) param.get("startDate"),
+                endDate = (String) param.get("endDate");
 
-        // 하드 코딩용
-        List<ScheduleVo> playList = new ArrayList<>();
+        if (startDate == null) {
+            LocalDate firstDayOfYear = LocalDate.now().withDayOfYear(1);
+            param.put("startDate", firstDayOfYear);
+        }
 
-        playList.add(ScheduleVo.builder()
-                .scheduleId(1L)
-                .scheduleName("플레이리스트1")
-                .startDate("20230601")
-                .endDate("20230603")
-                .startTime("09:00")
-                .endTime("18:00")
-                .type("playlist")
-                .build());
+        if (endDate == null) {
+            LocalDate lastDayOfYear = LocalDate.now().withDayOfYear(365);
+            param.put("endDate", lastDayOfYear);
+        }
 
-        playList.add(ScheduleVo.builder()
-                .scheduleId(2L)
-                .scheduleName("플레이리스트2")
-                .startDate("20230605")
-                .endDate("20230606")
-                .startTime("09:00")
-                .endTime("18:00")
-                .type("playlist")
-                .build());
+        List<ScheduleVo> scheduleList = scheduleMapper.selectCalenderStatus(param);
 
-        playList.add(ScheduleVo.builder()
-                .scheduleId(3L)
-                .scheduleName("LED 전원1")
-                .startDate("20230601")
-                .endDate("20230603")
-                .startTime("09:00")
-                .endTime("18:00")
-                .type("power")
-                .build());
+        if (scheduleList.size() > 0) {
+            responseMap.put("data", scheduleList);
+            responseMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
+        } else {
+            responseMap.putAll(ParameterUtils.responseOption(ResponseCode.NO_CONTENT.getCodeName()));
+        }
 
-        playList.add(ScheduleVo.builder()
-                .scheduleId(4L)
-                .scheduleName("LED 전원2")
-                .startDate("20230605")
-                .endDate("20230606")
-                .startTime("09:00")
-                .endTime("18:00")
-                .type("power")
-                .build());
-
-        playList.add(ScheduleVo.builder()
-                .scheduleId(5L)
-                .scheduleName("밝기1")
-                .startDate("20230601")
-                .endDate("20230603")
-                .type("light")
-                .build());
-
-        playList.add(ScheduleVo.builder()
-                .scheduleId(6L)
-                .scheduleName("밝기2")
-                .startDate("20230601")
-                .endDate("20230603")
-                .type("light")
-                .build());
-
-        resultMap.put("data", CalenderStatusVo.builder()
-                .schedule(playList)
-                .build());
-
-        resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
-
-        return resultMap;
+        return responseMap;
     }
 
     @Override
-    public Map<String, Object> getScheduleStatus(Map<String, Object> param) {
+    public Map<String, Object> selectScheduleStatus(Map<String, Object> param) {
+        Map<String, Object> responseMap = new HashMap<>();
+
         Map<String, Object> resultMap = new HashMap<>();
+        Long scheduleId = Long.parseLong(String.valueOf(param.get("scheduleId")));
+        Object data = null;
 
-        // 하드 코딩용
-        List<Integer> scheduleDay = new ArrayList<>();
+        if (param.get("type").equals("0")) { // LED 플레이리스트 스케줄
+            resultMap = scheduleMapper.selectPlaylistInfoSchedule(scheduleId);
 
-        scheduleDay.add(0);
-        scheduleDay.add(1);
-        scheduleDay.add(2);
+            if (resultMap != null) {
+                data = PlaylistStatusVo.builder()
+                        .scheduleId(Long.parseLong(String.valueOf(resultMap.get("schedule_id"))))
+                        .presetId(Long.parseLong(String.valueOf(resultMap.get("preset_id"))))
+                        .layerId(Long.parseLong(String.valueOf(resultMap.get("layer_id"))))
+                        .playListId(Long.parseLong(String.valueOf(resultMap.get("playlist_id"))))
+                        .scheduleName(String.valueOf(resultMap.get("sch_nm")))
+                        .startDate(String.valueOf(resultMap.get("sch_start_date")).substring(0, 10).replace("-", ""))
+                        .endDate(String.valueOf(resultMap.get("sch_end_date")).substring(0, 10).replace("-", ""))
+                        .startTime(String.valueOf(resultMap.get("time_start")).substring(0, 5).replace(":", ""))
+                        .endTime(String.valueOf(resultMap.get("time_end")).substring(0, 5).replace(":", ""))
+                        .scheduleDay(resultMap.get("run_day_week") == null ?
+                                null : Arrays.stream(String.valueOf(resultMap.get("run_day_week")).split(","))
+                                .map(Integer::parseInt)
+                                .collect(Collectors.toList()))
+                        .build();
+            }
 
-        resultMap.put("data", PlayListDetailScheduleVo.builder()
-                .scheduleId(1L)
-                .preset(2)
-                .playList(1)
-                .scheduleName("플레이리스트 1")
-                .startDate("20230601")
-                .endDate("20230603")
-                .startTime("09:00")
-                .endTime("18:00")
-                .scheduleDay(scheduleDay)
-                .build());
-        resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
+        } else if (param.get("type").equals("1")) { // 전원 스케줄
+            resultMap = scheduleMapper.selectPowerInfoSchedule(scheduleId);
 
-        return resultMap;
+            if (resultMap != null) {
+                data = PowerStatusVo.builder()
+                        .scheduleId(Long.parseLong(String.valueOf(resultMap.get("schedule_id"))))
+                        .scheduleName(String.valueOf(resultMap.get("sch_nm")))
+                        .startDate(String.valueOf(resultMap.get("sch_start_date")).substring(0, 10).replace("-", ""))
+                        .endDate(String.valueOf(resultMap.get("sch_end_date")).substring(0, 10).replace("-", ""))
+                        .powerOnTime(String.valueOf(resultMap.get("time_pwr_on")).substring(0, 5).replace(":", ""))
+                        .powerOffTime(String.valueOf(resultMap.get("time_pwr_off")).substring(0, 5).replace(":", ""))
+                        .scheduleDay(resultMap.get("run_day_week") == null ?
+                                null : Arrays.stream(String.valueOf(resultMap.get("run_day_week")).split(","))
+                                .map(Integer::parseInt)
+                                .collect(Collectors.toList()))
+                        .build();
+            }
+        } else if (param.get("type").equals("2")) { // 밝기 스케줄
+            List<Map<String, Object>> resultList = scheduleMapper.selectLightInfoSchedule(scheduleId);
+
+            List<LightListStatusVo> lightList = new ArrayList<>();
+
+            for (Map<String, Object> lightInf : resultList) {
+                lightList.add(LightListStatusVo.builder()
+                        .listId(Long.parseLong(String.valueOf(lightInf.get("list_id"))))
+                        .time(String.valueOf(lightInf.get("runtime")).substring(0, 5).replace(":", ""))
+                        .brightness(String.valueOf(lightInf.get("Brightness_val")))
+                        .build());
+            }
+
+            if (resultList.size() > 0) {
+                data = LightStatusVo.builder()
+                        .scheduleId(Long.parseLong(String.valueOf(resultList.get(0).get("schedule_id"))))
+                        .scheduleName(String.valueOf(resultList.get(0).get("sch_nm")))
+                        .startDate(String.valueOf(resultList.get(0).get("sch_start_date")).substring(0, 10).replace("-", ""))
+                        .endDate(String.valueOf(resultList.get(0).get("sch_end_date")).substring(0, 10).replace("-", ""))
+                        .scheduleDay(resultList.get(0).get("run_day_week") == null ?
+                                null : Arrays.stream(String.valueOf(resultList.get(0).get("run_day_week")).split(","))
+                                .map(Integer::parseInt)
+                                .collect(Collectors.toList()))
+                        .brightnessList(lightList)
+                        .build();
+            }
+        }
+
+        if (data != null) {
+            responseMap.put("data", data);
+            responseMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
+        } else {
+            responseMap.putAll(ParameterUtils.responseOption(ResponseCode.NO_CONTENT.getCodeName()));
+        }
+
+        return responseMap;
     }
 
     @Override

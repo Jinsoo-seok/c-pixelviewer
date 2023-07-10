@@ -6,6 +6,7 @@ import io.netty.buffer.Unpooled;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.util.ReferenceCountUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -18,26 +19,32 @@ import java.util.concurrent.TimeUnit;
 public class DeviceControllerClient {
     private EventLoopGroup group;
     private Channel channel;
+    private DeviceClientHandler deviceClientHandler;
+    private Object responseLock; // 동기화를 위한 객체
+    private ByteBuf response;
 
     @PostConstruct
     public void start() throws Exception {
         group = new NioEventLoopGroup();
+        deviceClientHandler = new DeviceClientHandler();
+        responseLock = new Object();
 
         connect(new Bootstrap(), group);
     }
 
     private void connect(Bootstrap bootstrap, EventLoopGroup eventLoop) {
+        log.info("Device Controller Connect Start");
         bootstrap.group(eventLoop)
                 .channel(NioSocketChannel.class)
                 .handler(new ChannelInitializer<Channel>() {
                     @Override
                     protected void initChannel(Channel ch) {
                         ChannelPipeline pipeline = ch.pipeline();
-                        pipeline.addLast(new TcpClientHandler());
+                        pipeline.addLast(deviceClientHandler);
                     }
                 });
 
-
+        // TODO 재연결 예외처리 추가 필요
         bootstrap.connect("192.168.0.15", 6001).addListener((ChannelFuture future) -> {
             if (future.isSuccess()) {
                 channel = future.channel();
@@ -79,24 +86,60 @@ public class DeviceControllerClient {
         }
     }
 
+    public String getResponse() {
+        synchronized (responseLock) {
+            try {
+                while (response == null) {
+                    responseLock.wait(); // 응답이 도착할 때까지 대기
+                }
 
-    private class TcpClientHandler extends SimpleChannelInboundHandler<ByteBuf> {
+                // 응답 처리 로직을 여기에 작성
+                byte[] responseByte = new byte[response.readableBytes()];
+                response.readBytes(responseByte);
+
+                StringBuilder hexString = new StringBuilder();
+                for (byte responseValue : responseByte) {
+                    String hex = String.format("%02X", responseValue);
+                    hexString.append(hex);
+                }
+
+                // 응답 처리가 완료되었으므로 response 변수 초기화
+                response = null;
+
+                return hexString.toString();
+
+            } catch (InterruptedException e) {
+                log.error("Device Controller Response Interrupted", e);
+                Thread.currentThread().interrupt();
+
+                return "";
+            }
+        }
+    }
+
+    @ChannelHandler.Sharable
+    private class DeviceClientHandler extends ChannelInboundHandlerAdapter {
         private ChannelHandlerContext ctx;
-
 
         /**
          * * TCP 통신 후 Response 값 처리
          */
         @Override
-        protected void channelRead0(ChannelHandlerContext ctx, ByteBuf msg) {
+        public void channelRead(ChannelHandlerContext ctx, Object msg) {
+            ByteBuf response = (ByteBuf) msg; // 수신한 응답을 임시로 저장할 변수
 
-            byte[] responseByte = new byte[msg.readableBytes()];
-            msg.readBytes(responseByte);
+            synchronized (responseLock) {
+                if (response != null) {
+                    if (DeviceControllerClient.this.response != null) {
+                        DeviceControllerClient.this.response.release();
+                    }
+                    DeviceControllerClient.this.response = response.retain(); // 새로운 응답을 response 변수에 할당하고 참조 카운트를 유지
+                    responseLock.notify(); // 대기 중인 getResponse() 메소드에 신호를 보냄
+                }
+            }
 
-            // TODO Response 값 활용
-
-            // Send a response back to the client
-            ctx.writeAndFlush(responseByte);
+            ctx.writeAndFlush(msg);
+            ReferenceCountUtil.release(msg);
         }
 
         /**
