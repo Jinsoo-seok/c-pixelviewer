@@ -2,6 +2,38 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.cudo.pixelviewer.schedule.mapper.ScheduleMapper">
+    <select id="selectCalenderStatus" parameterType="Map" resultType="com.cudo.pixelviewer.vo.ScheduleVo">
+        SELECT ps.schedule_id                           AS scheduleId,
+               ps.sch_nm                                AS scheduleName,
+               DATE_FORMAT(ps.sch_start_date, '%y%m%d') AS startDate,
+               DATE_FORMAT(ps.sch_end_date, '%y%m%d')   AS endDate,
+               DATE_FORMAT(ps.time_start, '%H:%i')      AS startTime,
+               DATE_FORMAT(ps.time_end, '%H:%i')        AS endTime,
+               'playList'                               AS type
+        FROM playlist_schedule as ps
+        WHERE (ps.sch_start_date >= #{startDate}) AND (ps.sch_end_date <![CDATA[<=]]> #{endDate})
+        UNION ALL
+        SELECT lps.schedule_id,
+               lps.sch_nm,
+               DATE_FORMAT(lps.sch_start_date, '%y%m%d'),
+               DATE_FORMAT(lps.sch_end_date, '%y%m%d'),
+               DATE_FORMAT(lps.time_pwr_on, '%H:%i'),
+               DATE_FORMAT(lps.time_pwr_off, '%H:%i'),
+               'power'
+        FROM led_pwr_schedule as lps
+        WHERE (lps.sch_start_date >= #{startDate}) AND (lps.sch_end_date <![CDATA[<=]]> #{endDate})
+        UNION ALL
+        SELECT bs.schedule_id,
+               bs.sch_nm,
+               DATE_FORMAT(bs.sch_start_date, '%y%m%d'),
+               DATE_FORMAT(bs.sch_end_date, '%y%m%d'),
+               null,
+               null,
+               'light'
+        FROM brightness_schedule as bs
+        WHERE (bs.sch_start_date >= #{startDate}) AND (bs.sch_end_date <![CDATA[<=]]> #{endDate})
+    </select>
+
 
     <select id="selectPlaylistInfoSchedule" parameterType="Long" resultType="Map">
         SELECT *
