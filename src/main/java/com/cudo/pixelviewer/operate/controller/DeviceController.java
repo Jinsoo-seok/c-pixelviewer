@@ -45,12 +45,12 @@ public class DeviceController {
 
             responseMap = deviceService.setDevicePower((Integer) param.get("powerState"));
         } catch (ParamException paramException) {
-            log.error("[paramException][patchLayerTopMost] - {}", paramException.getMessage());
+            log.error("[paramException] - {}", paramException.getMessage());
 
             responseMap.put("code", paramException.getCode());
             responseMap.put("message", paramException.getMessage());
         } catch (Exception exception) {
-            log.error("[Exception][getPlaylistList] - {}", exception.getMessage());
+            log.error("[Exception] - {}", exception.getMessage());
 
             responseMap.put("exceptionMessage", exception.getMessage());
         }
@@ -63,10 +63,10 @@ public class DeviceController {
     }
 
     /**
-     * * 온도/습도 값 확인
+     * * 온도/습도 값 조회
      */
     @GetMapping("/temphumi")
-    public Map<String, Object> getTemphumi(HttpServletRequest request) {
+    public Map<String, Object> getTempHumi(HttpServletRequest request) {
         long startTime = System.currentTimeMillis();
         String apiInfo = "[" + request.getRequestURI() + "] [" + request.getMethod() + "]";
         log.info("{} [START] [{}]", apiInfo, startTime);
@@ -76,9 +76,9 @@ public class DeviceController {
         responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
 
         try {
-            responseMap = deviceService.getTemphumi();
+            responseMap = deviceService.getTempHumi();
         } catch (Exception exception) {
-            log.error("[Exception][getPlaylistList] - {}", exception.getMessage());
+            log.error("[Exception] - {}", exception.getMessage());
 
             responseMap.put("exceptionMessage", exception.getMessage());
         }

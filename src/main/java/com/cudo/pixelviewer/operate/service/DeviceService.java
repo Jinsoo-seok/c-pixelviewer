@@ -5,5 +5,5 @@ import java.util.Map;
 public interface DeviceService {
     Map<String, Object> setDevicePower(Integer power);
 
-    Map<String, Object> getTemphumi();
+    Map<String, Object> getTempHumi();
 }

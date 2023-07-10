@@ -32,6 +32,7 @@ public class LedControllerClient {
     }
 
     private void connect(Bootstrap bootstrap, EventLoopGroup eventLoop) {
+        log.info("Led Controller Connect Start {} : {}",bootstrap, eventLoop);
         bootstrap.group(eventLoop)
                 .channel(NioSocketChannel.class)
                 .handler(new ChannelInitializer<Channel>() {

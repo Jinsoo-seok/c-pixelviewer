@@ -103,7 +103,7 @@ public class ScheduleServiceImpl implements ScheduleService {
         Long scheduleId = Long.parseLong(String.valueOf(param.get("scheduleId")));
         Object data = null;
 
-        if (param.get("type").equals("0")) {
+        if (param.get("type").equals("0")) { // LED 플레이리스트 스케줄
             resultMap = scheduleMapper.selectPlaylistInfoSchedule(scheduleId);
 
             if (resultMap != null) {
@@ -124,7 +124,7 @@ public class ScheduleServiceImpl implements ScheduleService {
                         .build();
             }
 
-        } else if (param.get("type").equals("1")) {
+        } else if (param.get("type").equals("1")) { // 전원 스케줄
             resultMap = scheduleMapper.selectPowerInfoSchedule(scheduleId);
 
             if (resultMap != null) {
@@ -141,7 +141,7 @@ public class ScheduleServiceImpl implements ScheduleService {
                                 .collect(Collectors.toList()))
                         .build();
             }
-        } else if (param.get("type").equals("2")) {
+        } else if (param.get("type").equals("2")) { // 밝기 스케줄
             List<Map<String, Object>> resultList = scheduleMapper.selectLightInfoSchedule(scheduleId);
 
             List<LightListStatusVo> lightList = new ArrayList<>();
