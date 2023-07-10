@@ -28,4 +28,8 @@ public interface LayerMapper {
     int putLayerValid(Map<String, Object> param);
     int putLayer(Map<String, Object> param);
 
+
+    // Viewer Status
+    int updateViewerStatus(Map<String, Object> param);
+
 }

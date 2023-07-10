@@ -103,4 +103,10 @@
         WHERE Layers.layer_id = #{layerId}
     </update>
 
+    <update id="updateViewerStatus">
+        UPDATE Layers
+        SET viewer_status = #{viewerStatus}, viewer_yn = #{viewerYn}
+        WHERE layer_id = #{layerId}
+    </update>
+
 </mapper>

@@ -249,6 +249,8 @@ public class PresetServiceImpl implements PresetService {
         String presetStatusPause = "pause";
         String presetStatusNone = "none";
 
+
+        // TODO : run Preset이 없는 경우 예외 처리
         PresetStatusRunVo runPresetVo = presetMapper.getRunPreset();
         String controlType = (String) param.get("controlType");
 
@@ -338,14 +340,13 @@ public class PresetServiceImpl implements PresetService {
                 // 1-2
                 // 현재 프리셋 != 신규 프리셋
                 else{
-
-                    // 전체 레이어 업데이트??
-
                     // 현재 프리셋 상태 stop, 버전 업데이트
 
                     int refreshPresetUpdateDateOld = presetMapper.refreshPresetUpdateDate(runPresetVo.getPresetId()); //[UPDATE] 기존 프리셋 버전
                     int presetStatusClearResult = presetMapper.patchPresetStatusRunClear();// 기존 프리셋 : play -> stop
 
+                    // 전체 레이어 업데이트
+                    int setPlaylistSelectYnResult = playlistMapper.setPlaylistSelectYn(param); //[UPDATE] 레이어 >> 플레이리스트
 
                     // 신규 프리셋 PresetRun
 
