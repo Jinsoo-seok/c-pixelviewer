@@ -1,18 +1,23 @@
 package com.cudo.pixelviewer.operate.service;
 
 import com.cudo.pixelviewer.component.DeviceControllerClient;
+import com.cudo.pixelviewer.operate.mapper.DeviceMapper;
 import com.cudo.pixelviewer.util.ParameterUtils;
 import com.cudo.pixelviewer.util.ResponseCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
 public class DeviceServiceImpl implements DeviceService {
     final DeviceControllerClient deviceControllerClient;
+
+    final DeviceMapper deviceMapper;
 
     @Override
     public Map<String, Object> setDevicePower(Integer power) {
@@ -39,6 +44,50 @@ public class DeviceServiceImpl implements DeviceService {
             int powerState = Integer.parseInt(hexResponse.substring(index, index + 2));
 
             dataMap.put("powerState", powerState);
+        }
+
+        if (dataMap.size() > 0) {
+//            responseMap.put("data", dataMap);
+            responseMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
+        } else {
+            responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
+        }
+
+        return responseMap;
+    }
+
+    @Override
+    public Map<String, Object> getDevicePower() {
+        Map<String, Object> responseMap = new HashMap<>();
+        Map<String, Object> dataMap = new HashMap<>();
+        byte[] message = {0x02, (byte) 0xFF, (byte) 0x24, 0x00, 0x00, (byte) 0xDB, 0x03}; // 전원 상태 확인
+        List<Map<String, Object>> powerStateList = new ArrayList<>();
+
+        List<Map<String, Object>> devicePowerList = deviceMapper.getDeviceIpPort(); // 디바이스 목록 조회
+
+//        deviceControllerClient.sendMessage(message); // 전원 제어
+        // TODO 하드코딩 삭제 / 여러개의 값 동시에 진행
+//        String hexResponse = deviceControllerClient.getResponse();
+        String hexResponse = "02FF0600022401DE03";
+
+        int index = hexResponse.indexOf("24") + 2;
+
+        if (hexResponse.length() > (index + 2)) {
+            int powerState = Integer.parseInt(hexResponse.substring(index, index + 2));
+
+
+            for (Map<String, Object> devicePower : devicePowerList) {
+                Map<String, Object> powerMap = new HashMap<>();
+
+                // 하드 코딩
+                powerMap.put("deviceId", devicePower.get("deviceId"));
+                powerMap.put("type", devicePower.get("type"));
+                powerMap.put("state", powerState);
+
+                powerStateList.add(powerMap);
+            }
+
+            dataMap.put("powerState", powerStateList);
         }
 
         if (dataMap.size() > 0) {

@@ -25,6 +25,35 @@ public class DeviceController {
     final DeviceService deviceService;
 
     /**
+     * * LED 전광판 전원 상태 확인
+     */
+    @GetMapping("/power")
+    public Map<String, Object> getDevicePower(HttpServletRequest request) {
+        long startTime = System.currentTimeMillis();
+        String apiInfo = "[" + request.getRequestURI() + "] [" + request.getMethod() + "]";
+        log.info("{} [START] [{}]", apiInfo, startTime);
+
+        Map<String, Object> responseMap = new HashMap<>();
+
+        responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
+
+
+        try {
+            responseMap = deviceService.getDevicePower();
+        } catch (Exception exception) {
+            log.error("[Exception] - {}", exception.getMessage());
+
+            responseMap.put("exceptionMessage", exception.getMessage());
+        }
+
+        long endTime = System.currentTimeMillis();
+        long procTime = endTime - startTime;
+        log.info("{} [END] [{}] - {}", apiInfo, procTime, responseMap.get("code"));
+
+        return responseMap;
+    }
+
+    /**
      * * LED 전광판 전원 제어
      */
     @PatchMapping("/power")

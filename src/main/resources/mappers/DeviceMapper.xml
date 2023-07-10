@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cudo.pixelviewer.operate.mapper.DeviceMapper">
+    <select id="getDeviceIpPort" resultType="Map">
+        SELECT dc.condevice_id AS deviceId,
+               dc.ip           AS ip,
+               dc.port         AS port,
+               'unit'          AS type
+        FROM Device_Controls as dc
+        UNION ALL
+        SELECT lc.led_controller_id,
+               lc.ip,
+               lc.port,
+               'led'
+        FROM LED_Controls as lc;
+    </select>
+</mapper>

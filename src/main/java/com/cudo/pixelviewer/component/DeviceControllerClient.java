@@ -44,7 +44,7 @@ public class DeviceControllerClient {
                     }
                 });
 
-
+        // TODO 재연결 예외처리 추가 필요
         bootstrap.connect("192.168.0.15", 6001).addListener((ChannelFuture future) -> {
             if (future.isSuccess()) {
                 channel = future.channel();
