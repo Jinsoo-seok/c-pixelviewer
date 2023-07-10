@@ -44,6 +44,15 @@ public class PresetServiceImpl implements PresetService {
 
     final PlaylistMapper playlistMapper;
 
+    private static final String protocol = "http://";
+
+    private static final String wasIp = "106.245.226.42";
+    private static final String wasPort = "9898";
+    private static final String wasPath = "/api-viewer/";
+
+    private static final String agentIp = "192.168.123.12";
+    private static final String agentPort = "8800";
+    private static final String agentPath = "/vieweragent/Preset/layer-placement";
 
     @Override
     public Map<String, Object> getPresetList() {
@@ -246,22 +255,18 @@ public class PresetServiceImpl implements PresetService {
 
 
         // Set Agent
-        String ip = "192.168.123.12";
-        String port = "8800";
 
-        String agentUrl = "http://" + ip + ":" + port + "/vieweragent/Preset/layer-placement";
-
-        // To Agent
+        // URL
+        String agentUrl = protocol + agentIp + ":" + agentPort + agentPath;
+        // request Body
         Map<String, Object> requestMap = createRequestBodyMap(param);
         JsonMapToPrint(requestMap);
         resultMap.put("data", requestMap);
 
+        // 프리셋 id가 다를 때, "적용 버튼" 클릭 >> agent->viewer까지 정보를 줘야하니 presetRun로직을 태우면서 상태값은 stop으로 하여 검은화면 표출
         if(controlType.equals("applyNew")){
-            // 프리셋 id가 다를 때, "적용 버튼" 클릭 >> agent->viewer까지 정보를 줘야하니 presetRun로직을 태우면서 상태값은 stop으로 하여 검은화면 표출
-
             // 기존
             int refreshPresetUpdateDateOld = presetMapper.refreshPresetUpdateDate(runPresetVo.getPresetId());
-
             // 기존 프리셋 : play -> stop
             int presetStatusClearResult = presetMapper.patchPresetStatusRunClear();
 
@@ -288,13 +293,12 @@ public class PresetServiceImpl implements PresetService {
                 resultMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
             }
         }
+        // 프리셋 id가 같을 때, "적용 버튼" 클릭 >> 레이어당 플레이리스트 id만 업데이트 >> 뷰어는 새로운 플레이리스트 정보를 재생
         else if(controlType.equals("applySame")){
-            // 프리셋 id가 같을 떄, "적용 버튼" 클릭 >> 레이어당 플레이리스트 id만 업데이트 >> 뷰어는 새로운 플레이리스트 정보를 재생
-            
+
             if(param.containsKey("layerInfoList")){
                 // 레이어당 플레이리스트 업데이트
                 int setPlaylistSelectYnResult = playlistMapper.setPlaylistSelectYn(param);
-
                 // 기존
                 int refreshPresetUpdateDateOld = presetMapper.refreshPresetUpdateDate(runPresetVo.getPresetId());
 
@@ -304,9 +308,9 @@ public class PresetServiceImpl implements PresetService {
                 resultMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
             }
         }
+        // 프리셋 id가 같을 때, "재생 버튼" 클릭 >> 프리셋 id의 db 상태값이 play면 무시, stop/pause이면 play로 변경 >> 실시간으로 정보 요청하던 뷰어들이 play상태를 보고, 플레이리스트를 재생하기 시작.
         else if(controlType.equals("play")){
-            // 프리셋 id가 같을 떄, "재생버튼" 클릭 >> 프리셋 id의 db 상태값이 play면 무시, stop/pause이면 play로 변경 >> 실시간으로 정보 요청하던 뷰어들이 play상태를 보고, 플레이리스트를 재생하기 시작.
-            
+
             // Check : 기존 프리셋 == 신규 프리셋
             if(param.get("presetId").equals(runPresetVo.getPresetId())){
 
@@ -379,7 +383,6 @@ public class PresetServiceImpl implements PresetService {
             resultMap.put("code", ResponseCode.FAIL_UNSUPPORTED_PRESET_CONTROL_TYPE.getCode());
             resultMap.put("message", ResponseCode.FAIL_UNSUPPORTED_PRESET_CONTROL_TYPE.getMessage());
         }
-
         return resultMap;
     }
 
@@ -445,9 +448,7 @@ public class PresetServiceImpl implements PresetService {
     public Map<String, Object> createRequestBodyMap(Map<String, Object> param) {
         Map<String, Object> requestBodyMap = new HashMap<>();
 
-        String localIp = "106.245.226.42";
-        String localPort = "9898";
-        String baseUrl = "http://" + localIp + ":" + localPort + "/api-viewer/";
+        String baseUrl = protocol + wasIp + ":" + wasPort + wasPath;
 
         requestBodyMap.put("playInfoUrl", baseUrl + "playInfo");
         requestBodyMap.put("updateCheckUrl", baseUrl + "updateAndHealthCheck");
