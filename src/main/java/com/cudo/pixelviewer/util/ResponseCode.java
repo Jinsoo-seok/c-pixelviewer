@@ -57,7 +57,8 @@ public enum ResponseCode {
     FAIL_UNSUPPORTED_PRESET_STATUS(3308, "FailedUnsupportedPresetStatus", "Failed Unsupported Preset Status"),
     FAIL_UNSUPPORTED_PRESET_CONTROL_TYPE(3309, "FailedUnsupportedPresetControlType", "Failed Unsupported Preset Control Type"),
 
-    ALREADY_PLAYING_PRESET(3310, "AlreadyPlayingPreset", "Already Playing Preset"),
+    FAIL_UPDATE_NOT_EXIST_PLAYLIST(3310, "FailedUpdateNotExistPlaylist", "Failed Update Not Exist Playlist"),
+    ALREADY_PLAYING_PRESET(3311, "AlreadyPlayingPreset", "Already Playing Preset"),
 
     // Layer : 3400
     FAIL_INSERT_LAYER(3400, "FailedInsertLayer", "Failed Insert Layer"),

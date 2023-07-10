@@ -266,10 +266,8 @@ public class PresetServiceImpl implements PresetService {
         if(callYn) {
             // 프리셋 id가 다를 때, "적용 버튼" 클릭 >> agent->viewer까지 정보를 줘야하니 presetRun로직을 태우면서 상태값은 stop으로 하여 검은화면 표출
             if (controlType.equals("applyNew")) {
-                // 기존
-                int refreshPresetUpdateDateOld = presetMapper.refreshPresetUpdateDate(runPresetVo.getPresetId());
-                // 기존 프리셋 : play -> stop
-                int presetStatusClearResult = presetMapper.patchPresetStatusRunClear();
+                int refreshPresetUpdateDateOld = presetMapper.refreshPresetUpdateDate(runPresetVo.getPresetId()); //[UPDATE] 기존 프리셋 버전
+                int presetStatusClearResult = presetMapper.patchPresetStatusRunClear();// 기존 프리셋 : play -> stop
 
                 // TODO : PresetRun (Status = stop)
                 // Agent Call
@@ -294,16 +292,75 @@ public class PresetServiceImpl implements PresetService {
             }
             // 프리셋 id가 같을 때, "적용 버튼" 클릭 >> 레이어당 플레이리스트 id만 업데이트 >> 뷰어는 새로운 플레이리스트 정보를 재생
             else if (controlType.equals("applySame")) {
-
                 if (param.containsKey("layerInfoList")) {
                     // 레이어당 플레이리스트 업데이트
                     int setPlaylistSelectYnResult = playlistMapper.setPlaylistSelectYn(param);
-                    // 기존
-                    int refreshPresetUpdateDateOld = presetMapper.refreshPresetUpdateDate(runPresetVo.getPresetId());
-
+                    int refreshPresetUpdateDateOld = presetMapper.refreshPresetUpdateDate(runPresetVo.getPresetId()); //[UPDATE] 기존 프리셋 버전
                     resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
                 } else {
                     resultMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
+                }
+            }
+            // TODO : 적용 버튼 하나로 통일, 로직 확인 및 테스트 필요
+            // 프론트에서는 프리셋의 정보가 확실치 않으니 여기서 판단
+            // 1. 프리셋 play와 현재 프리셋id 매칭 확인
+            // 1-1 같으면 레이어 for문으로 업데이트 할 레이어만 업데이트
+            // 1-2 다르면 레이어 전체 업데이트 후, presetRun
+            else if (controlType.equals("apply")) {
+
+                // 1-1
+                // 현재 프리셋 == 신규 프리셋
+                if (param.get("presetId").equals(runPresetVo.getPresetId())) {
+                    List<Map<String, Object>> tempLayerInfoList = (List<Map<String, Object>>) param.get("layerInfoList");
+                    List<Map<String, Object>> resultLayerInfoList = new ArrayList<>();
+
+
+                    // 업데이트 레이어 추출
+                    for(Map<String, Object> layerInfo : tempLayerInfoList){
+                        if((Boolean) layerInfo.get("updateYn")){
+                            resultLayerInfoList.add(layerInfo);
+                        }
+                    }
+
+                    // 레이어 업데이트
+                    if(resultLayerInfoList.size() > 0){
+                        param.put("layerInfoList", resultLayerInfoList);
+                        int setPlaylistSelectYnResult = playlistMapper.setPlaylistSelectYn(param); //[UPDATE] 레이어 >> 플레이리스트
+                        int refreshPresetUpdateDateOld = presetMapper.refreshPresetUpdateDate(runPresetVo.getPresetId()); // 기존 프리셋 버전 업데이트
+
+                        resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
+                    }
+                    else{
+                        resultMap.put("code", ResponseCode.FAIL_UPDATE_NOT_EXIST_PLAYLIST.getCode());
+                        resultMap.put("message", ResponseCode.FAIL_UPDATE_NOT_EXIST_PLAYLIST.getMessage());
+                    }
+                }
+                // 1-2
+                // 현재 프리셋 != 신규 프리셋
+                else{
+
+                    // 전체 레이어 업데이트??
+
+                    // 현재 프리셋 상태 stop, 버전 업데이트
+
+                    int refreshPresetUpdateDateOld = presetMapper.refreshPresetUpdateDate(runPresetVo.getPresetId()); //[UPDATE] 기존 프리셋 버전
+                    int presetStatusClearResult = presetMapper.patchPresetStatusRunClear();// 기존 프리셋 : play -> stop
+
+
+                    // 신규 프리셋 PresetRun
+
+                    webClientResponse = webClientFunction("apply", agentUrl, requestMap);
+                    if (webClientResponse.containsKey("data")) {
+                        String response = (String) webClientResponse.get("data");
+                        if (response.contains("200")) {
+                            int refreshPresetUpdateDateNew = presetMapper.refreshPresetUpdateDate(param.get("presetId")); //[UPDATE] 신규 프리셋 버전
+                            resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
+                        } else {
+                            resultMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
+                        }
+                    } else {
+                        resultMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
+                    }
                 }
             }
             // 프리셋 id가 같을 때, "재생 버튼" 클릭 >> 프리셋 id의 db 상태값이 play면 무시, stop/pause이면 play로 변경 >> 실시간으로 정보 요청하던 뷰어들이 play상태를 보고, 플레이리스트를 재생하기 시작.
@@ -321,10 +378,8 @@ public class PresetServiceImpl implements PresetService {
                     }
                     // Set : 프리셋 상태 update
                     else {
-                        // 기존
-                        int refreshPresetUpdateDateOld = presetMapper.refreshPresetUpdateDate(runPresetVo.getPresetId());
-                        // 기존 프리셋 : play -> stop
-                        int presetStatusClearResult = presetMapper.patchPresetStatusRunClear();
+                        int refreshPresetUpdateDateOld = presetMapper.refreshPresetUpdateDate(runPresetVo.getPresetId()); //[UPDATE] 기존 프리셋 버전
+                        int presetStatusClearResult = presetMapper.patchPresetStatusRunClear();// 기존 프리셋 : play -> stop
 
                         // TODO : presetRun 로직
                         // Agent Call
@@ -347,10 +402,8 @@ public class PresetServiceImpl implements PresetService {
                         }
                     }
                 } else {
-                    // 기존
-                    int refreshPresetUpdateDateOld = presetMapper.refreshPresetUpdateDate(runPresetVo.getPresetId());
-                    // 기존 프리셋 : play -> stop
-                    int presetStatusClearResult = presetMapper.patchPresetStatusRunClear();
+                    int refreshPresetUpdateDateOld = presetMapper.refreshPresetUpdateDate(runPresetVo.getPresetId()); //[UPDATE] 기존 프리셋 버전
+                    int presetStatusClearResult = presetMapper.patchPresetStatusRunClear();// 기존 프리셋 : play -> stop
 
                     // Agent Call
                     webClientResponse = webClientFunction("playAndNew", agentUrl, requestMap);
