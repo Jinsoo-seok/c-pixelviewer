@@ -5,8 +5,8 @@
     <select id="selectCalenderStatus" parameterType="Map" resultType="com.cudo.pixelviewer.vo.ScheduleVo">
         SELECT ps.schedule_id                           AS scheduleId,
                ps.sch_nm                                AS scheduleName,
-               DATE_FORMAT(ps.sch_start_date, '%y%m%d') AS startDate,
-               DATE_FORMAT(ps.sch_end_date, '%y%m%d')   AS endDate,
+               DATE_FORMAT(ps.sch_start_date, '%Y%m%d') AS startDate,
+               DATE_FORMAT(ps.sch_end_date, '%Y%m%d')   AS endDate,
                DATE_FORMAT(ps.time_start, '%H:%i')      AS startTime,
                DATE_FORMAT(ps.time_end, '%H:%i')        AS endTime,
                'playList'                               AS type
@@ -15,8 +15,8 @@
         UNION ALL
         SELECT lps.schedule_id,
                lps.sch_nm,
-               DATE_FORMAT(lps.sch_start_date, '%y%m%d'),
-               DATE_FORMAT(lps.sch_end_date, '%y%m%d'),
+               DATE_FORMAT(lps.sch_start_date, '%Y%m%d'),
+               DATE_FORMAT(lps.sch_end_date, '%Y%m%d'),
                DATE_FORMAT(lps.time_pwr_on, '%H:%i'),
                DATE_FORMAT(lps.time_pwr_off, '%H:%i'),
                'power'
@@ -25,8 +25,8 @@
         UNION ALL
         SELECT bs.schedule_id,
                bs.sch_nm,
-               DATE_FORMAT(bs.sch_start_date, '%y%m%d'),
-               DATE_FORMAT(bs.sch_end_date, '%y%m%d'),
+               DATE_FORMAT(bs.sch_start_date, '%Y%m%d'),
+               DATE_FORMAT(bs.sch_end_date, '%Y%m%d'),
                null,
                null,
                'light'
