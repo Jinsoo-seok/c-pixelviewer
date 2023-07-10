@@ -1,6 +1,6 @@
 package com.cudo.pixelviewer.operate.mapper;
 
-import com.cudo.pixelviewer.vo.LayerVo;
+import com.cudo.pixelviewer.vo.LayerStatusRunVo;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -31,5 +31,8 @@ public interface LayerMapper {
 
     // Viewer Status
     int updateViewerStatus(Map<String, Object> param);
+
+    // Running Preset >> Allocates Layers status
+    List<LayerStatusRunVo> getRunLayersStatus(Integer presetId);
 
 }

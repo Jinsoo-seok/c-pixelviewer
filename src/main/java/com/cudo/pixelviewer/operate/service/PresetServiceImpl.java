@@ -6,26 +6,19 @@ import com.cudo.pixelviewer.operate.mapper.PresetMapper;
 import com.cudo.pixelviewer.operate.mapper.ScreenMapper;
 import com.cudo.pixelviewer.util.ParameterUtils;
 import com.cudo.pixelviewer.util.ResponseCode;
-import com.cudo.pixelviewer.vo.LayerToAgentVo;
-import com.cudo.pixelviewer.vo.LayerVo;
-import com.cudo.pixelviewer.vo.PresetStatusRunVo;
-import com.cudo.pixelviewer.vo.PresetVo;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.cudo.pixelviewer.vo.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -100,7 +93,16 @@ public class PresetServiceImpl implements PresetService {
 
         if(runPresetVo != null){
             dataMap.put("preset", runPresetVo);
-            resultMap.put("data", dataMap);
+            List<LayerStatusRunVo> runLayerVoList = layerMapper.getRunLayersStatus(runPresetVo.getPresetId());
+            if(runLayerVoList.size() > 0){
+                dataMap.put("layerInfoList", runLayerVoList);
+                resultMap.put("data", dataMap);
+            }
+            else{
+                // TODO : no content layers
+                resultMap.put("code", ResponseCode.FAIL_INSERT_PRESET.getCode());
+                resultMap.put("message", ResponseCode.FAIL_INSERT_PRESET.getMessage());
+            }
 
             resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
         }
