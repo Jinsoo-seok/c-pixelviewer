@@ -50,17 +50,6 @@
         WHERE S.playlist_id = #{playlistId}
     </update>
 
-    <select id="patchPlaylistNameValid" resultType="int">
-        SELECT COUNT(playlist_id)
-        FROM Playlists
-        WHERE Playlists.playlist_id = #{playlistId}
-    </select>
-    <update id="patchPlaylistName">
-        UPDATE Playlists
-        SET playlist_nm = #{playlistNm}, update_date = NOW()
-        WHERE Playlists.playlist_id = #{playlistId}
-    </update>
-
     <select id="putPlaylistValid" resultType="int">
         SELECT COUNT(playlist_id)
         FROM Playlists
@@ -71,11 +60,7 @@
         SET playlist_nm = #{playlistNm}, content_id_list = #{contentIdList}, update_date = NOW()
         WHERE Playlists.playlist_id = #{playlistId}
     </update>
-    <update id="putPlaylist2">
-        UPDATE Playlists
-        SET playlist_nm = #{playlistNm}, content_id_list = #{contentIdList}, update_date = NOW()
-        WHERE Playlists.playlist_id = #{playlistId}
-    </update>
+
 
     <select id="getIncludedList" resultType="com.cudo.pixelviewer.vo.contentIncludedVo">
         SELECT PL.playlist_id, PL.playlist_nm, P.preset_id, P.preset_nm, L.layer_id, L.layer_nm

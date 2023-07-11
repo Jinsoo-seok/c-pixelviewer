@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -192,8 +193,44 @@ public class ViewerServiceImpl implements ViewerService {
         Map<String, Object> resultMap = new HashMap<>();
         Map<String, Object> dataMap = new HashMap<>();
         Map<String, Object> tempPresetMap = new HashMap<>();
-        String presetId = String.valueOf(param.get("presetId"));
 
+        Map<String, Object> tempViewerMap = (Map<String, Object>) param.get("viewerStatus");
+        String viewerCurrentTime = (String) tempViewerMap.get("currentTime");
+        String viewerStatus = (String) tempViewerMap.get("playState");
+
+        LocalDateTime localDateTime = LocalDateTime.now();
+        DateTimeFormatter formatterViewer = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String localCurrentTime = localDateTime.format(formatterViewer);
+
+        LocalDateTime viewerTime = LocalDateTime.parse(viewerCurrentTime, formatterViewer);
+        LocalDateTime localTime = LocalDateTime.parse(localCurrentTime, formatterViewer);
+
+        Duration duration = Duration.between(viewerTime, localTime);
+        long minutesDifference = duration.toMinutes();
+
+        Integer diffCheckMin = 3;
+        Boolean diffYn = false;
+
+        if (minutesDifference >= diffCheckMin) {
+            diffYn = false;
+        } else {
+            diffYn = true;
+        }
+
+        Map<String, Object> viewerParam = new HashMap<>();
+        viewerParam.put("viewerStatus", viewerStatus);
+        viewerParam.put("viewerYn", diffYn);
+        viewerParam.put("layerId", param.get("layerId"));
+
+        int updateViewerStatusResult = layerMapper.updateViewerStatus(viewerParam);
+        if(updateViewerStatusResult > 0){
+            // TODO : 예외 처리
+        }
+        else{
+            // TODO : 예외 처리
+        }
+
+        String presetId = String.valueOf(param.get("presetId"));
         PresetVo presetVo = presetMapper.getPreset(presetId);
 
         if(presetVo != null){

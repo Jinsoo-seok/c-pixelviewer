@@ -8,6 +8,8 @@ public interface PresetService {
 
     Map<String, Object> getPreset(String screenId);
 
+    Map<String, Object> getRunPreset();
+
     Map<String, Object> postPreset(Map<String, Object> param);
 
     Map<String, Object> deletePreset(Map<String, Object> param);
@@ -18,6 +20,6 @@ public interface PresetService {
 
     Map<String, Object> patchPresetRun(Map<String, Object> param);
 
-    Map<String, Object> patchPresetStop(Map<String, Object> param);
+    Map<String, Object> patchPresetControl(Map<String, Object> param);
 
 }

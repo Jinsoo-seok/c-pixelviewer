@@ -58,6 +58,7 @@ public class SubtitleServiceImpl implements SubtitleService {
                 int putSubtitleResult = subtitleMapper.putSubtitle(param);
 
                 if (putSubtitleResult == 1) { // Success : 1
+                    int refreshPresetUpdateDate = presetMapper.refreshPresetUpdateDate(param.get("presetId"));
                     YN = true;
                     resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
                 } else {
@@ -197,6 +198,7 @@ public class SubtitleServiceImpl implements SubtitleService {
             int patchSubtitleTextResult = subtitleMapper.patchSubtitleStyle(param);
 
             if(patchSubtitleTextResult == 1){ // Success : 1
+                int refreshPresetUpdateDate = presetMapper.refreshPresetUpdateDate(param.get("presetId"));
                 resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
             }
             else{

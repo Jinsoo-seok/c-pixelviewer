@@ -19,6 +19,19 @@
         WHERE L.preset_id = #{presetId}
     </select>
 
+    <select id="getRunPreset" resultType="com.cudo.pixelviewer.vo.PresetStatusRunVo">
+        SELECT *
+        FROM Presets AS P
+        WHERE P.preset_status = "play"
+    </select>
+    <select id="getRunPreset2" resultType="Map">
+        SELECT screen_id AS screenId, preset_id AS presetId, preset_nm AS presetNm
+             , preset_status AS presetStatus, update_date AS updateDate
+        FROM Presets AS P
+        WHERE P.preset_status = "play"
+    </select>
+
+
     <select id="postPresetValid" resultType="int">
         SELECT count(preset_id)
         FROM Presets
@@ -34,7 +47,7 @@
         )
         VALUES
         (
-            #{screenId}, #{presetNm}, 0, 0, false, "WAIT", NOW()
+            #{screenId}, #{presetNm}, 0, 0, false, "none", NOW()
         )
     </insert>
 
@@ -77,7 +90,7 @@
           , rowsize = #{rowsize}
           , columnsize = #{columnsize}
           , user_style_yn = #{userStyleYn}
-          , preset_status = "WAIT"
+          , preset_status = "none"
           , update_date = NOW()
         WHERE Presets.preset_id = #{presetId}
     </update>
@@ -117,11 +130,18 @@
         FROM Layers AS L
         WHERE L.preset_id = #{presetId}
     </select>
-    <update id="patchPresetStatus">
+    <update id="patchPresetStatusSet">
         UPDATE Presets
-        SET preset_status = #{presetStatus}
+        SET preset_status = #{controlType}, update_date = NOW()
         WHERE Presets.preset_id = #{presetId}
     </update>
+
+    <update id="patchPresetStatusRunClear">
+        UPDATE Presets
+        SET preset_status = "stop", update_date = NOW()
+        WHERE Presets.preset_status = "play"
+    </update>
+
 
     <update id="refreshPresetUpdateDate">
         UPDATE Presets

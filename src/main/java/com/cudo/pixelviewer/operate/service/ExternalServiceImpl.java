@@ -65,6 +65,7 @@ public class ExternalServiceImpl implements ExternalService {
                 int putExternalResult = externalMapper.putExternalVideo(param);
 
                 if (putExternalResult == 1) { // Success : 1
+                    int refreshPresetUpdateDate = presetMapper.refreshPresetUpdateDate(param.get("presetId"));
                     dataMap.put("externalId", param.get("externalId"));
                     resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
                     resultMap.put("data", dataMap);

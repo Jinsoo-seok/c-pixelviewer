@@ -22,8 +22,6 @@ public interface PlaylistMapper {
     int deletePlaylistValid(Map<String, Object> param);
     int deletePlaylist(Map<String, Object> param);
 
-    int patchPlaylistNameValid(Map<String, Object> param);
-    int patchPlaylistName(Map<String, Object> param);
 
     int putPlaylistValid(Map<String, Object> param);
     int putPlaylist(Map<String, Object> param);

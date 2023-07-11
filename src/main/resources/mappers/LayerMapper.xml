@@ -103,4 +103,16 @@
         WHERE Layers.layer_id = #{layerId}
     </update>
 
+    <update id="updateViewerStatus">
+        UPDATE Layers
+        SET viewer_status = #{viewerStatus}, viewer_yn = #{viewerYn}
+        WHERE layer_id = #{layerId}
+    </update>
+
+    <select id="getRunLayersStatus" resultType="com.cudo.pixelviewer.vo.LayerStatusRunVo">
+        SELECT *
+        FROM Layers AS L
+        WHERE L.preset_id = #{presetId}
+    </select>
+
 </mapper>
