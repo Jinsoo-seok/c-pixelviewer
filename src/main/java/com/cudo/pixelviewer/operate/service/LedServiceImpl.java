@@ -63,16 +63,24 @@ public class LedServiceImpl implements LedService {
 
     @Override
     public Map<String, Object> loadPreset(String presetNumber) {
-        Map<String, Object> resultMap = new HashMap<>();
+        Map<String, Object> responseMap = new HashMap<>();
 
-        // 하드 코딩용
-        Map<String, Object> tempMap = new HashMap<>();
-        tempMap.put("inputSource", presetNumber);
+        try {
+            byte[] message = {0x74, 0x00, 0x11, 0x00, 0x00, 0x00, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF,
+                    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 
-        resultMap.put("data", tempMap);
-        resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
+            int presetValue = Integer.decode(String.format("%02x",Integer.parseInt(presetNumber) - 1));
+            message[16] = (byte) presetValue;
 
-        return resultMap;
+//            ledControllerClient.sendMessage(message);
+
+            responseMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
+        } catch (Exception e) {
+            responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
+            responseMap.put("exceptionMessage", e.getMessage());
+        }
+
+        return responseMap;
     }
 
     @Override
