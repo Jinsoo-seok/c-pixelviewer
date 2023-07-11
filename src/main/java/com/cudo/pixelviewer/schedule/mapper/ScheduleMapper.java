@@ -3,7 +3,6 @@ package com.cudo.pixelviewer.schedule.mapper;
 import com.cudo.pixelviewer.vo.LightListScheduleVo;
 import com.cudo.pixelviewer.vo.LightScheduleVo;
 import com.cudo.pixelviewer.vo.PowerScheduleVo;
-import com.cudo.pixelviewer.vo.ScheduleVo;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -11,7 +10,7 @@ import java.util.Map;
 
 @Mapper
 public interface ScheduleMapper {
-    List<ScheduleVo> selectCalenderStatus(Map<String, Object> param);
+    List<Map<String, Object>> selectCalenderStatus(Map<String, Object> param);
     Map<String, Object> selectPlaylistInfoSchedule(Long scheduleId);
     Map<String, Object> selectPowerInfoSchedule(Long scheduleId);
     List<Map<String, Object>> selectLightInfoSchedule(Long scheduleId);
