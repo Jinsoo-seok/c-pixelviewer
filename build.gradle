@@ -2,6 +2,7 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '2.7.12'
     id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+    id 'war'
 }
 
 group = 'com.cudo'
@@ -10,6 +11,9 @@ sourceCompatibility = '11'
 
 jar {
     archiveFileName = 'pixel_viewer.jar'
+}
+war {
+    archiveFileName = 'pixel_viewer.war'
 }
 configurations {
     compileOnly {
@@ -52,7 +56,9 @@ dependencies {
     // quartz
     implementation 'org.springframework.boot:spring-boot-starter-quartz:2.7.11'
 }
-
+tasks.named('jar').configure {
+    enabled = false
+}
 tasks.named('test') {
     useJUnitPlatform()
 }
