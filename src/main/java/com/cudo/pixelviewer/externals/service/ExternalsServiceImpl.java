@@ -15,12 +15,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-// TODO : 시간별 파라미터 변경해야함 >> 이후 스케줄
+// TODO : restTemplate으로 해보기
+// TODO : 이후 스케줄
+// TODO : 시간 올림처리
 
 @Service
 @RequiredArgsConstructor
@@ -34,6 +38,13 @@ public class ExternalsServiceImpl implements ExternalsService {
     public Map<String, Object> getExternalWeather() {
         Map<String, Object> resultMap = new HashMap<>();
 
+        String[] baseTimes = {"0200", "0500", "0800", "1100", "1400", "1700", "2000", "2300"};
+
+
+        LocalDateTime dateTime = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
+        String localDateTime = dateTime.format(formatter);
+
         String coordsKey = "coords";
         String coords = adminSettingMapper.getValue(coordsKey);
         String[] coordsSplit = coords.split(",");
@@ -45,14 +56,45 @@ public class ExternalsServiceImpl implements ExternalsService {
         String pageNo = "1";
         String numOfRows = "36";
         String dataType = "JSON";
-        String baseDate = "20230706";
-        String baseTime = "1700";
+        String baseDate = localDateTime.substring(0, 8);
+        String baseTime = localDateTime.substring(8, 12);
+//        String baseTime = "2000";
         String nx = coordsSplit[0];
         String ny = coordsSplit[1];
+
+        String selectedBaseTime = "";
+
+        for (String time : baseTimes) {
+            if (baseTime.compareTo(time) >= 0) {
+                selectedBaseTime = time;
+            } else {
+                break;
+            }
+        }
+
+        if (!selectedBaseTime.equals("")) {
+            int selectedTime = Integer.parseInt(selectedBaseTime);
+            if (selectedTime % 100 != 0) {
+                selectedTime = (selectedTime / 100 + 1) * 100;
+                selectedBaseTime = String.format("%04d", selectedTime);
+            }
+        }
+
+        System.out.println("Selected Base Time: " + selectedBaseTime);
 
 
         String tempUrl = apisDataUrl + "?" +
                 "ServiceKey=" + serviceKey +
+                "&pageNo=" + pageNo +
+                "&numOfRows=" + numOfRows +
+                "&dataType=" + dataType +
+                "&base_date=" + baseDate +
+                "&base_time=" + baseTime +
+                "&nx=" + nx +
+                "&ny=" + ny;
+
+        String tempUrl2 = apisDataUrl + "?" +
+                "ServiceKey=" + serviceKey2 +
                 "&pageNo=" + pageNo +
                 "&numOfRows=" + numOfRows +
                 "&dataType=" + dataType +
@@ -67,16 +109,7 @@ public class ExternalsServiceImpl implements ExternalsService {
         if(webClientResponseMap != null){
             System.out.println("[First]webClientResponseMap = " + webClientResponseMap);
             if(webClientResponseMap.get("webClient").equals(false)){
-                tempUrl = apisDataUrl + "?" +
-                        "ServiceKey=" + serviceKey +
-                        "&pageNo=" + pageNo +
-                        "&numOfRows=" + numOfRows +
-                        "&dataType=" + dataType +
-                        "&base_date=" + baseDate +
-                        "&base_time=" + baseTime +
-                        "&nx=" + nx +
-                        "&ny=" + ny;
-                webClientResponseMap = webClientFunction(type, tempUrl);
+                webClientResponseMap = webClientFunction(type, tempUrl2);
                 System.out.println("[Second] webClientResponseMap = " + webClientResponseMap);
             }
             if(!webClientResponseMap.get("webClient").equals(false)) {
@@ -110,10 +143,10 @@ public class ExternalsServiceImpl implements ExternalsService {
                 System.out.println("[fail]webClientResponseMap = " + webClientResponseMap);
                 resultMap.put("code", ResponseCode.FAIL_EXTERNALS_WEATHER.getCode());
                 resultMap.put("message", ResponseCode.FAIL_EXTERNALS_WEATHER.getMessage());
+                resultMap.put("data", webClientResponseMap.get("data"));
+
             }
         }
-
-        resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
         return resultMap;
     }
 
@@ -136,19 +169,20 @@ public class ExternalsServiceImpl implements ExternalsService {
                 + "&dataTerm=" + dataTerm
                 + "&ver=" + ver;
 
+        String tempUrl2 = apisDataUrl + "?"
+                + "serviceKey=" + serviceKey2
+                + "&returnType=" + returnType
+                + "&stationName=" + stationName
+                + "&dataTerm=" + dataTerm
+                + "&ver=" + ver;
+
         String type = "대기";
         Map<String, Object> webClientResponseMap = webClientFunction(type, tempUrl);
 
         if(webClientResponseMap != null){
             System.out.println("[First]webClientResponseMap = " + webClientResponseMap);
             if(webClientResponseMap.get("webClient").equals(false)){
-                tempUrl = apisDataUrl + "?"
-                        + "serviceKey=" + serviceKey2
-                        + "&returnType=" + returnType
-                        + "&stationName=" + stationName
-                        + "&dataTerm=" + dataTerm
-                        + "&ver=" + ver;
-                webClientResponseMap = webClientFunction(type, tempUrl);
+                webClientResponseMap = webClientFunction(type, tempUrl2);
                 System.out.println("[Second] webClientResponseMap = " + webClientResponseMap);
             }
             if(!webClientResponseMap.get("webClient").equals(false)) {
@@ -161,8 +195,10 @@ public class ExternalsServiceImpl implements ExternalsService {
                 }
             }
             else{
+                System.out.println("[fail]webClientResponseMap = " + webClientResponseMap);
                 resultMap.put("code", ResponseCode.FAIL_EXTERNALS_AIR.getCode());
                 resultMap.put("message", ResponseCode.FAIL_EXTERNALS_AIR.getMessage());
+                resultMap.put("data", webClientResponseMap.get("data"));
             }
         }
 
@@ -188,6 +224,7 @@ public class ExternalsServiceImpl implements ExternalsService {
 
         if(responseMono.startsWith("<")){
             returnMap.put("webClient", false);
+            returnMap.put("data", responseMono);
             return returnMap;
         }
 
