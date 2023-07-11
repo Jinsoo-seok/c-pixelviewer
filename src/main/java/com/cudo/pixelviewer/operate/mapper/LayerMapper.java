@@ -35,4 +35,6 @@ public interface LayerMapper {
     // Running Preset >> Allocates Layers status
     List<LayerStatusRunVo> getRunLayersStatus(Integer presetId);
 
+    Map<String, Object> getLayerObject(Integer layerId);
+
 }

@@ -115,4 +115,94 @@
         WHERE L.preset_id = #{presetId}
     </select>
 
+
+    <resultMap id="externalInfoResultMap" type="com.cudo.pixelviewer.vo.ExternalInfoVo">
+        <id property="layerId" column="layer_id"/>
+        <result property="exInfoId" column="we_ex_info_id"/>
+        <result property="posX" column="we_pos_x"/>
+        <result property="posY" column="we_pos_y"/>
+        <result property="width" column="we_width"/>
+        <result property="height" column="we_height"/>
+        <result property="ord" column="we_ord"/>
+        <result property="imagePath" column="we_image_path"/>
+        <result property="fontNm" column="we_font_nm"/>
+        <result property="fontSize" column="we_font_size"/>
+        <result property="fontColor" column="we_font_color"/>
+        <result property="borderSize" column="we_border_size"/>
+        <result property="borderColor" column="we_border_color"/>
+        <result property="backColor" column="we_back_color"/>
+        <result property="backColor" column="we_back_color"/>
+        <result property="updateDate" column="we_update_date"/>
+    </resultMap>
+    <resultMap id="externalInfo2ResultMap" type="com.cudo.pixelviewer.vo.ExternalInfoVo">
+        <id property="layerId" column="air_layer_id"/>
+        <result property="exInfoId" column="air_ex_info_id"/>
+        <result property="posX" column="air_pos_x"/>
+        <result property="posY" column="air_pos_y"/>
+        <result property="width" column="air_width"/>
+        <result property="height" column="air_height"/>
+        <result property="ord" column="air_ord"/>
+        <result property="imagePath" column="air_image_path"/>
+        <result property="fontNm" column="air_font_nm"/>
+        <result property="fontSize" column="air_font_size"/>
+        <result property="fontColor" column="air_font_color"/>
+        <result property="borderSize" column="air_border_size"/>
+        <result property="borderColor" column="air_border_color"/>
+        <result property="backColor" column="air_back_color"/>
+        <result property="updateDate" column="air_update_date"/>
+    </resultMap>
+    <resultMap id="externalVideoResultMap" type="com.cudo.pixelviewer.vo.ExternalVideoVo">
+        <id property="layerId" column="layer_id"/>
+        <result property="exVideoId" column="ex_video_id"/>
+        <result property="objectId" column="ex_object_id"/>
+        <result property="type" column="ex_type"/>
+        <result property="posX" column="ex_pos_x"/>
+        <result property="posY" column="ex_pos_y"/>
+        <result property="width" column="ex_width"/>
+        <result property="height" column="ex_height"/>
+        <result property="ord" column="ex_ord"/>
+        <result property="rtspUrl" column="ex_rtsp_url"/>
+        <result property="videoNm" column="ex_video_nm"/>
+        <result property="videoFormat" column="ex_video_format"/>
+    </resultMap>
+    <resultMap id="subtitlesResultMap" type="String">
+        <result property="subtitleStyle" column="st_subtitle_style"/>
+    </resultMap>
+    <resultMap id="finalResultMap" type="java.util.HashMap">
+        <association property="weatherInfo" resultMap="externalInfoResultMap"/>
+        <association property="airInfo" resultMap="externalInfo2ResultMap"/>
+        <association property="exVideoInfo" resultMap="externalVideoResultMap"/>
+        <association property="subtitleStyleInfo" resultMap="subtitlesResultMap"/>
+    </resultMap>
+    <select id="getLayerObject" resultMap="finalResultMap">
+        SELECT L.layer_id,
+               EI.ex_info_id AS we_ex_info_id,
+               EI.pos_x AS we_pos_x, EI.pos_y AS we_pos_y, EI.width AS we_width, EI.height AS we_height, EI.ord AS we_ord,
+               EI.image_path AS we_image_path, EI.font_nm AS we_font_nm, EI.font_size AS we_font_size, EI.font_color AS we_font_color,
+               EI.border_size AS we_border_size, EI.border_color AS we_border_color, EI.back_color AS we_back_color,
+               EI.update_date AS we_update_date,
+
+               EI2.ex_info_id AS air_ex_info_id,
+               EI2.pos_x AS air_pos_x, EI2.pos_y AS air_pos_y, EI2.width AS air_width,  EI2.height AS air_height, EI2.ord AS air_ord,
+               EI2.image_path AS air_image_path, EI2.font_nm AS air_font_nm, EI2.font_size AS air_font_size, EI2.font_color AS air_font_color,
+               EI2.border_size AS air_border_size, EI2.border_color AS air_border_color, EI2.back_color AS air_back_color,
+               EI2.update_date AS air_update_date,
+
+               EV.ex_video_id, EV.object_id AS ex_object_id,
+               EV.type AS ex_type, EV.pos_x AS ex_pos_x, EV.pos_y AS ex_pos_y, EV.width AS ex_width, EV.height AS ex_height, EV.ord AS ex_ord,
+               EV.rtsp_url AS ex_rtsp_url, EV.video_nm AS ex_video_nm, EV.video_format AS ex_video_format,
+
+               ST.subtitle_style AS st_subtitle_style
+        FROM Layers AS L
+                 LEFT JOIN External_Info EI ON L.layer_id = EI.layer_id
+                                                AND L.weather_en = 1 and EI.type = 20
+                 LEFT JOIN External_Info EI2 ON L.layer_id = EI2.layer_id
+                                                AND L.air_en = 1 and EI2.type = 40
+                 LEFT JOIN ExternalVideo EV ON L.layer_id = EV.layer_id
+                                                AND L.ex_video_en = 1
+                 LEFT JOIN Subtitles ST ON L.layer_id = ST.layer_id
+                                                AND (L.sub_first_en = 1 OR L.sub_second_en = 1)
+        WHERE L.layer_id = #{layerId}
+    </select>
+
 </mapper>
