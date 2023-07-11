@@ -6,12 +6,12 @@ import io.netty.buffer.Unpooled;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.util.ReferenceCountUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 @Component
@@ -20,14 +20,12 @@ public class DeviceControllerClient {
     private EventLoopGroup group;
     private Channel channel;
     private DeviceClientHandler deviceClientHandler;
-    private Object responseLock; // 동기화를 위한 객체
-    private ByteBuf response;
+    private CompletableFuture<String> responseFuture;
 
     @PostConstruct
     public void start() throws Exception {
         group = new NioEventLoopGroup();
         deviceClientHandler = new DeviceClientHandler();
-        responseLock = new Object();
 
         connect(new Bootstrap(), group);
     }
@@ -56,24 +54,31 @@ public class DeviceControllerClient {
         });
     }
 
-    public void sendMessage(byte[] message) {
+    public CompletableFuture<String> sendMessage(byte[] message) {
+        CompletableFuture<String> future = new CompletableFuture<>();
+        responseFuture = future;
+
         // send it to the server
         if (channel != null && channel.isActive()) {
             ByteBuf buffer = Unpooled.wrappedBuffer(message);
 
-            ChannelFuture future = channel.writeAndFlush(buffer);
+            ChannelFuture channelFuture = channel.writeAndFlush(buffer);
 
-            future.addListener((ChannelFutureListener) future1 -> {
+            channelFuture.addListener((ChannelFutureListener) future1 -> {
                 if (!future1.isSuccess()) {
                     Throwable cause = future1.cause();
                     log.error("SEND PACKET TO DEVICE CONTROLLER FAIL", cause);
+                    future.completeExceptionally(cause);
                 } else {
                     log.info("SEND PACKET {} TO DEVICE CONTROLLER SUCCESS", message);
                 }
             });
         } else {
             log.error("NO ACTIVE DEVICE CONTROLLER CONNECTION");
+            future.completeExceptionally(new RuntimeException("No active LED controller connection"));
         }
+
+        return future;
     }
 
     @PreDestroy
@@ -86,60 +91,28 @@ public class DeviceControllerClient {
         }
     }
 
-    public String getResponse() {
-        synchronized (responseLock) {
-            try {
-                while (response == null) {
-                    responseLock.wait(); // 응답이 도착할 때까지 대기
-                }
-
-                // 응답 처리 로직을 여기에 작성
-                byte[] responseByte = new byte[response.readableBytes()];
-                response.readBytes(responseByte);
-
-                StringBuilder hexString = new StringBuilder();
-                for (byte responseValue : responseByte) {
-                    String hex = String.format("%02X", responseValue);
-                    hexString.append(hex);
-                }
-
-                // 응답 처리가 완료되었으므로 response 변수 초기화
-                response = null;
-
-                return hexString.toString();
-
-            } catch (InterruptedException e) {
-                log.error("Device Controller Response Interrupted", e);
-                Thread.currentThread().interrupt();
-
-                return "";
-            }
-        }
-    }
-
     @ChannelHandler.Sharable
-    private class DeviceClientHandler extends ChannelInboundHandlerAdapter {
+    private class DeviceClientHandler extends SimpleChannelInboundHandler<ByteBuf> {
         private ChannelHandlerContext ctx;
 
         /**
          * * TCP 통신 후 Response 값 처리
          */
         @Override
-        public void channelRead(ChannelHandlerContext ctx, Object msg) {
-            ByteBuf response = (ByteBuf) msg; // 수신한 응답을 임시로 저장할 변수
+        public void channelRead0(ChannelHandlerContext ctx, ByteBuf msg) {
+            byte[] responseByte = new byte[msg.readableBytes()];
+            msg.readBytes(responseByte);
 
-            synchronized (responseLock) {
-                if (response != null) {
-                    if (DeviceControllerClient.this.response != null) {
-                        DeviceControllerClient.this.response.release();
-                    }
-                    DeviceControllerClient.this.response = response.retain(); // 새로운 응답을 response 변수에 할당하고 참조 카운트를 유지
-                    responseLock.notify(); // 대기 중인 getResponse() 메소드에 신호를 보냄
-                }
+            StringBuilder hexString = new StringBuilder();
+
+            for (byte responseValue : responseByte) {
+                String hex = String.format("%02X", responseValue);
+                hexString.append(hex);
             }
 
-            ctx.writeAndFlush(msg);
-            ReferenceCountUtil.release(msg);
+            if (responseFuture != null) {
+                responseFuture.complete(hexString.toString());
+            }
         }
 
         /**

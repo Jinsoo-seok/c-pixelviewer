@@ -40,10 +40,28 @@ public class ScheduleServiceImpl implements ScheduleService {
             param.put("endDate", lastDayOfYear);
         }
 
-        List<ScheduleVo> scheduleList = scheduleMapper.selectCalenderStatus(param);
+        List<Map<String, Object>> scheduleList = scheduleMapper.selectCalenderStatus(param);
 
         if (scheduleList.size() > 0) {
-            responseMap.put("data", scheduleList);
+            List<ScheduleVo> dataList = new ArrayList<>();
+
+            for (Map<String, Object> schedule : scheduleList) {
+                dataList.add(ScheduleVo.builder()
+                        .scheduleId(Long.parseLong(String.valueOf(schedule.get("scheduleId"))))
+                        .scheduleName((String) schedule.get("scheduleName"))
+                        .startDate((String) schedule.get("startDate"))
+                        .endDate((String) schedule.get("endDate"))
+                        .startTime(schedule.get("startTime") == null ? null : (String) schedule.get("startTime"))
+                        .endTime(schedule.get("endTime") == null ? null : (String) schedule.get("endTime"))
+                        .type((String) schedule.get("type"))
+                        .scheduleDay((schedule.get("scheduleDay") == null || schedule.get("scheduleDay").equals(""))
+                                ? null : Arrays.stream(String.valueOf(schedule.get("scheduleDay")).split(","))
+                                .map(Integer::parseInt)
+                                .collect(Collectors.toCollection(ArrayList::new)))
+                        .build());
+            }
+
+            responseMap.put("data", dataList);
             responseMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
         } else {
             responseMap.putAll(ParameterUtils.responseOption(ResponseCode.NO_CONTENT.getCodeName()));

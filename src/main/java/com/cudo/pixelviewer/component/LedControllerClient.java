@@ -6,16 +6,12 @@ import io.netty.buffer.Unpooled;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.timeout.IdleStateEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 @Component
 @Slf4j
@@ -23,23 +19,27 @@ public class LedControllerClient {
 
     private EventLoopGroup group;
     private Channel channel;
+    private TcpClientHandler tcpClientHandler;
+    private CompletableFuture<String> responseFuture;
+
 
     @PostConstruct
     public void start() throws Exception {
         group = new NioEventLoopGroup();
+        tcpClientHandler = new TcpClientHandler();
 
         connect(new Bootstrap(), group);
     }
 
     private void connect(Bootstrap bootstrap, EventLoopGroup eventLoop) {
-        log.info("Led Controller Connect Start {} : {}",bootstrap, eventLoop);
+        log.info("Led Controller Connect Start {} : {}", bootstrap, eventLoop);
         bootstrap.group(eventLoop)
                 .channel(NioSocketChannel.class)
                 .handler(new ChannelInitializer<Channel>() {
                     @Override
                     protected void initChannel(Channel ch) {
                         ChannelPipeline pipeline = ch.pipeline();
-                        pipeline.addLast(new TcpClientHandler());
+                        pipeline.addLast(tcpClientHandler);
                     }
                 });
 
@@ -55,24 +55,31 @@ public class LedControllerClient {
         });
     }
 
-    public void sendMessage(byte[] message) {
+    public CompletableFuture<String> sendMessage(byte[] message) {
+        CompletableFuture<String> future = new CompletableFuture<>();
+        responseFuture = future;
+
         // send it to the server
         if (channel != null && channel.isActive()) {
             ByteBuf buffer = Unpooled.wrappedBuffer(message);
 
-            ChannelFuture future = channel.writeAndFlush(buffer);
+            ChannelFuture channelFuture = channel.writeAndFlush(buffer);
 
-            future.addListener((ChannelFutureListener) future1 -> {
+            channelFuture.addListener((ChannelFutureListener) future1 -> {
                 if (!future1.isSuccess()) {
                     Throwable cause = future1.cause();
                     log.error("SEND PACKET TO LED CONTROLLER FAIL", cause);
+                    future.completeExceptionally(cause);
                 } else {
                     log.info("SEND PACKET {} TO LED CONTROLLER SUCCESS", message);
                 }
             });
         } else {
             log.error("NO ACTIVE LED CONTROLLER CONNECTION");
+            future.completeExceptionally(new RuntimeException("No active LED controller connection"));
         }
+
+        return future;
     }
 
     @PreDestroy
@@ -85,7 +92,7 @@ public class LedControllerClient {
         }
     }
 
-
+    @ChannelHandler.Sharable
     private class TcpClientHandler extends SimpleChannelInboundHandler<ByteBuf> {
 
         private final int HEARTBEAT_INTERVAL_SECONDS = 1; // 하트비트 간격
@@ -112,15 +119,19 @@ public class LedControllerClient {
          * * TCP 통신 후 Response 값 처리
          */
         @Override
-        protected void channelRead0(ChannelHandlerContext ctx, ByteBuf msg) {
-
+        public void channelRead0(ChannelHandlerContext ctx, ByteBuf msg) {
             byte[] responseByte = new byte[msg.readableBytes()];
             msg.readBytes(responseByte);
 
-            // TODO Response 값 활용
+            StringBuilder hexString = new StringBuilder();
+            for (byte responseValue : responseByte) {
+                String hex = String.format("%02X", responseValue);
+                hexString.append(hex);
+            }
 
-            // Send a response back to the client
-            ctx.writeAndFlush(responseByte);
+            if (responseFuture != null && !hexString.toString().equals("99990400")) {
+                responseFuture.complete(hexString.toString());
+            }
         }
 
         /**

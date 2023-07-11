@@ -32,25 +32,32 @@ public class DeviceServiceImpl implements DeviceService {
             message[5] = (byte) onOffHexValue;
             message[6] = (byte) crcHexValue;
         }
+//        CompletableFuture<String> future = deviceControllerClient.sendMessage(message); // 전원 제어
 
-//        deviceControllerClient.sendMessage(message); // 전원 제어
-        // TODO 하드코딩 삭제
-//        String hexResponse = deviceControllerClient.getResponse();
-        String hexResponse = power == 1 ? "02FF060002B1014B03" : "02FF060002B1004A03";
+        try {
+//            future.get(10, TimeUnit.SECONDS); // 응답 값 타임아웃 설정
+//            String hexResponse = future.join(); // 응답 값 비동기 수신
 
-        int index = hexResponse.indexOf("B1") + 2;
+            // TODO 하드코딩 삭제
+            String hexResponse = power == 1 ? "02FF060002B1014B03" : "02FF060002B1004A03";
 
-        if (hexResponse.length() > (index + 2)) {
-            int powerState = Integer.parseInt(hexResponse.substring(index, index + 2));
+            int index = hexResponse.indexOf("B1") + 2;
 
-            dataMap.put("powerState", powerState);
-        }
+            if (hexResponse.length() > (index + 2)) {
+                int powerState = Integer.parseInt(hexResponse.substring(index, index + 2));
 
-        if (dataMap.size() > 0) {
-//            responseMap.put("data", dataMap);
-            responseMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
-        } else {
+                dataMap.put("powerState", powerState);
+            }
+
+            if (dataMap.size() > 0) {
+                responseMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
+            } else {
+                responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
+            }
+
+        } catch (Exception e) {
             responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
+            responseMap.put("exceptionMessage", e.getMessage());
         }
 
         return responseMap;
@@ -65,36 +72,44 @@ public class DeviceServiceImpl implements DeviceService {
 
         List<Map<String, Object>> devicePowerList = deviceMapper.getDeviceIpPort(); // 디바이스 목록 조회
 
-//        deviceControllerClient.sendMessage(message); // 전원 제어
-        // TODO 하드코딩 삭제 / 여러개의 값 동시에 진행
-//        String hexResponse = deviceControllerClient.getResponse();
-        String hexResponse = "02FF0600022401DE03";
+//        CompletableFuture<String> future = deviceControllerClient.sendMessage(message); // 전원 상태 값 조회
 
-        int index = hexResponse.indexOf("24") + 2;
+        try {
+//            future.get(10, TimeUnit.SECONDS); // 응답 값 타임아웃 설정
+//            String hexResponse = future.join(); // 응답 값 비동기 수신
 
-        if (hexResponse.length() > (index + 2)) {
-            int powerState = Integer.parseInt(hexResponse.substring(index, index + 2));
+            // TODO 하드코딩 삭제 / 여러개의 값 동시에 진행
+            String hexResponse = "02FF0600022401DE03";
 
+            int index = hexResponse.indexOf("24") + 2;
 
-            for (Map<String, Object> devicePower : devicePowerList) {
-                Map<String, Object> powerMap = new HashMap<>();
+            if (hexResponse.length() > (index + 2)) {
+                int powerState = Integer.parseInt(hexResponse.substring(index, index + 2));
 
-                // 하드 코딩
-                powerMap.put("deviceId", devicePower.get("deviceId"));
-                powerMap.put("type", devicePower.get("type"));
-                powerMap.put("state", powerState);
+                for (Map<String, Object> devicePower : devicePowerList) {
+                    Map<String, Object> powerMap = new HashMap<>();
 
-                powerStateList.add(powerMap);
+                    // 하드 코딩
+                    powerMap.put("deviceId", devicePower.get("deviceId"));
+                    powerMap.put("type", devicePower.get("type"));
+                    powerMap.put("state", powerState);
+
+                    powerStateList.add(powerMap);
+                }
+
+                dataMap.put("powerState", powerStateList);
             }
 
-            dataMap.put("powerState", powerStateList);
-        }
+            if (dataMap.size() > 0) {
+                responseMap.put("data", dataMap);
+                responseMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
+            } else {
+                responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
+            }
 
-        if (dataMap.size() > 0) {
-            responseMap.put("data", dataMap);
-            responseMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
-        } else {
+        } catch (Exception e) {
             responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
+            responseMap.put("exceptionMessage", e.getMessage());
         }
 
         return responseMap;
@@ -107,51 +122,60 @@ public class DeviceServiceImpl implements DeviceService {
 
         byte[] message = {0x02, (byte) 0xFF, (byte) 0x6A, 0x00, 0x00, (byte) 0x95, 0x03};
 
-//        deviceControllerClient.sendMessage(message); // 온습도 확인
+//        CompletableFuture<String> future = deviceControllerClient.sendMessage(message); // 온습도 조회
 
-        // TODO 하드코딩 삭제
-//        String hexString = deviceControllerClient.getResponse();
-        String hexString = "02FF06000A6A2B0003010504050702B203";
-        int index = hexString.indexOf("6A") + 2;
+        try {
+//            future.get(10, TimeUnit.SECONDS); // 응답 값 타임아웃 설정
+//            String hexResponse = future.join(); // 응답 값 비동기 수신
 
-        String tempHumi = "";
+            // TODO 하드코딩 삭제
+          String hexResponse = "02FF06000A6A2B0003010504050702B203";
 
-        StringBuilder temperature = new StringBuilder();
-        StringBuilder humidity = new StringBuilder();
+            int index = hexResponse.indexOf("6A") + 2;
 
-        if (hexString.length() > (index + 18)) { // 응답 값 길이 체크
-            int minusCheck = 1;
+            String tempHumi = "";
 
-            tempHumi = hexString.substring(index, index + 18);
+            StringBuilder temperature = new StringBuilder();
+            StringBuilder humidity = new StringBuilder();
 
-            if (tempHumi.startsWith("2B")) {
-                minusCheck = -1;
-                tempHumi = tempHumi.substring(2);
+            if (hexResponse.length() > (index + 18)) { // 응답 값 길이 체크
+                int minusCheck = 1;
+
+                tempHumi = hexResponse.substring(index, index + 18);
+
+                if (tempHumi.startsWith("2B")) {
+                    minusCheck = -1;
+                    tempHumi = tempHumi.substring(2);
+                }
+
+                // 온도 파싱
+                temperature.append(Integer.parseInt(tempHumi.substring(0, 2)));
+                temperature.append(Integer.parseInt(tempHumi.substring(2, 4))).append(".");
+
+                temperature.append(Integer.parseInt(tempHumi.substring(4, 6)));
+                temperature.append(Integer.parseInt(tempHumi.substring(6, 8)));
+
+                // 습도 파싱
+                humidity.append(Integer.parseInt(tempHumi.substring(8, 10)));
+                humidity.append(Integer.parseInt(tempHumi.substring(10, 12))).append(".");
+
+                humidity.append(Integer.parseInt(tempHumi.substring(12, 14)));
+                humidity.append(Integer.parseInt(tempHumi.substring(14, 16)));
+
+                dataMap.put("temperature", Double.parseDouble(temperature.toString()) * minusCheck);
+                dataMap.put("humidity", Double.parseDouble(humidity.toString()));
             }
 
-            // 온도 파싱
-            temperature.append(Integer.parseInt(tempHumi.substring(0, 2)));
-            temperature.append(Integer.parseInt(tempHumi.substring(2, 4))).append(".");
+            if (dataMap.size() > 0) {
+                responseMap.put("data", dataMap);
+                responseMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
+            } else {
+                responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
+            }
 
-            temperature.append(Integer.parseInt(tempHumi.substring(4, 6)));
-            temperature.append(Integer.parseInt(tempHumi.substring(6, 8)));
-
-            // 습도 파싱
-            humidity.append(Integer.parseInt(tempHumi.substring(8, 10)));
-            humidity.append(Integer.parseInt(tempHumi.substring(10, 12))).append(".");
-
-            humidity.append(Integer.parseInt(tempHumi.substring(12, 14)));
-            humidity.append(Integer.parseInt(tempHumi.substring(14, 16)));
-
-            dataMap.put("temperature", Double.parseDouble(temperature.toString()) * minusCheck);
-            dataMap.put("humidity", Double.parseDouble(humidity.toString()));
-        }
-
-        if (dataMap.size() > 0) {
-            responseMap.put("data", dataMap);
-            responseMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
-        } else {
+        } catch (Exception e) {
             responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
+            responseMap.put("exceptionMessage", e.getMessage());
         }
 
         return responseMap;

@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static com.cudo.pixelviewer.util.ParameterUtils.*;
+import static com.cudo.pixelviewer.util.TcpClientUtil.getInputSourceCode;
 
 @Slf4j
 @RestController
@@ -41,14 +42,14 @@ public class LedController {
             parameterValidation(param, keyList);
             parameterDouble("brightness", param.get("brightness"), true, 1.0);
 
-            responseMap = ledService.setBrightness((Double) param.get("brightness"));
+            responseMap = ledService.setBrightness(Float.parseFloat(String.valueOf(param.get("brightness"))));
         } catch (ParamException paramException) {
-            log.error("[paramException][patchLayerTopMost] - {}", paramException.getMessage());
+            log.error("[paramException] - {}", paramException.getMessage());
 
             responseMap.put("code", paramException.getCode());
             responseMap.put("message", paramException.getMessage());
         } catch (Exception exception) {
-            log.error("[Exception][getPlaylistList] - {}", exception.getMessage());
+            log.error("[Exception] - {}", exception.getMessage());
 
             responseMap.put("exceptionMessage", exception.getMessage());
         }
@@ -78,15 +79,16 @@ public class LedController {
         try {
             parameterValidation(param, keyList);
             parameterString("inputSource", param.get("inputSource"), true, 0, null);
+            getInputSourceCode((String) param.get("inputSource"));
 
             responseMap = ledService.setInputSource(String.valueOf(param.get("inputSource")));
         } catch (ParamException paramException) {
-            log.error("[paramException][patchLayerTopMost] - {}", paramException.getMessage());
+            log.error("[paramException] - {}", paramException.getMessage());
 
             responseMap.put("code", paramException.getCode());
             responseMap.put("message", paramException.getMessage());
         } catch (Exception exception) {
-            log.error("[Exception][getPlaylistList] - {}", exception.getMessage());
+            log.error("[Exception] - {}", exception.getMessage());
 
             responseMap.put("exceptionMessage", exception.getMessage());
         }
@@ -111,20 +113,24 @@ public class LedController {
 
         responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
 
-        String[] keyList = {"presetId"};
+        String[] keyList = {"presetNumber"};
 
         try {
             parameterValidation(param, keyList);
-            parameterString("presetId", param.get("presetId"), true, 0, null);
+            parameterInt("presetNumber", param.get("presetNumber"), true);
+
+            if (Integer.parseInt(String.valueOf(param.get("presetNumber"))) <= 0 || Integer.parseInt(String.valueOf(param.get("presetNumber"))) > 16) {
+                throw new ParamException(ResponseCode.INVALID_PARAM_VALUE, "presetNumber");
+            }
 
             responseMap = ledService.loadPreset(String.valueOf(param.get("presetNumber")));
         } catch (ParamException paramException) {
-            log.error("[paramException][patchLayerTopMost] - {}", paramException.getMessage());
+            log.error("[paramException] - {}", paramException.getMessage());
 
             responseMap.put("code", paramException.getCode());
             responseMap.put("message", paramException.getMessage());
         } catch (Exception exception) {
-            log.error("[Exception][getPlaylistList] - {}", exception.getMessage());
+            log.error("[Exception] - {}", exception.getMessage());
 
             responseMap.put("exceptionMessage", exception.getMessage());
         }
@@ -152,7 +158,7 @@ public class LedController {
         try {
             responseMap = ledService.getLedStatus();
         } catch (Exception exception) {
-            log.error("[Exception][getPlaylistList] - {}", exception.getMessage());
+            log.error("[Exception] - {}", exception.getMessage());
 
             responseMap.put("exceptionMessage", exception.getMessage());
         }
