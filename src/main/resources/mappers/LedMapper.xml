@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cudo.pixelviewer.operate.mapper.LedMapper">
+    <insert id="postLedPreset" parameterType="Map">
+        INSERT INTO LED_Preset_Info
+        (preset_number, preset_name)
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.presetNumber}, #{item.presetName})
+        </foreach>
+    </insert>
+
+    <delete id="deleteLedPreset">
+        DELETE
+        FROM LED_Preset_Info
+    </delete>
+
+    <update id="putLedPreset" parameterType="String">
+        UPDATE LED_Preset_Info
+        SET last_load_time = NOW()
+        WHERE preset_number = #{presetNumber}
+    </update>
+
+    <select id="getLastLoadPreset" resultType="String">
+        SELECT preset_number
+        FROM LED_Preset_Info
+        ORDER BY last_load_time DESC LIMIT 1
+    </select>
+
+    <select id="getLedPresetList" resultType="Map">
+        SELECT preset_number AS presetNumber,
+               preset_name AS presetName
+        FROM LED_Preset_Info
+    </select>
+
+    <update id="putLedPresetName" parameterType="Map">
+        UPDATE LED_Preset_Info
+        SET preset_name = #{presetName}
+        WHERE preset_number = #{presetNumber}
+    </update>
+</mapper>

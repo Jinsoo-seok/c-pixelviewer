@@ -20,7 +20,7 @@ public class LedControllerClient {
     private EventLoopGroup group;
     private Channel channel;
     private TcpClientHandler tcpClientHandler;
-    private CompletableFuture<String> responseFuture;
+    private CompletableFuture<byte[]> responseFuture;
 
 
     @PostConstruct
@@ -55,8 +55,8 @@ public class LedControllerClient {
         });
     }
 
-    public CompletableFuture<String> sendMessage(byte[] message) {
-        CompletableFuture<String> future = new CompletableFuture<>();
+    public CompletableFuture<byte[]> sendMessage(byte[] message) {
+        CompletableFuture<byte[]> future = new CompletableFuture<>();
         responseFuture = future;
 
         // send it to the server
@@ -130,7 +130,7 @@ public class LedControllerClient {
             }
 
             if (responseFuture != null && !hexString.toString().equals("99990400")) {
-                responseFuture.complete(hexString.toString());
+                responseFuture.complete(responseByte);
             }
         }
 

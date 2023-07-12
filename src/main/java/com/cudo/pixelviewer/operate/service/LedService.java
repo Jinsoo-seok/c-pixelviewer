@@ -10,4 +10,6 @@ public interface LedService {
     Map<String, Object> loadPreset(String presetNumber);
     Map<String, Object> getLedStatus();
     Map<String, Object> getLedPreset();
+
+    Map<String, Object> putLedPresetName(Map<String, Object> param);
 }
