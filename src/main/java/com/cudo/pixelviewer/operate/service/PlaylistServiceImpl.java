@@ -9,16 +9,16 @@ import com.cudo.pixelviewer.vo.PlaylistVo;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PlaylistServiceImpl implements PlaylistService {
@@ -77,33 +77,18 @@ public class PlaylistServiceImpl implements PlaylistService {
                     e.printStackTrace();
                 }
 
-                // TODO : [진행중] 중복 id 처리 시, 데이터 꼬임 현상 있음
                 List<Map<String, Object>> playlistContentList = playlistMapper.getPlaylistContentList(queryTemp);
                 Long order = 1L;
-                if (playlistContentList.size() != 0) {
-                    List<Map<String, Object>> tempContentArray = new ArrayList<>();
 
-                    for (int i = 0; i < tempContentIdList.size(); i++) {
-                        for (int x = 0; x < tempContentIdList.size(); x++) {
-                            Long tempOrder = (Long) tempContentIdList.get(x).get("order");
-                            if (tempOrder == order) {
-                                Long orderContentId = (Long) tempContentIdList.get(x).get("contentId");
-                                for (Map<String, Object> playlistContent : playlistContentList) {
-                                    Integer dbContentId = (Integer) playlistContent.get("contentId");
-                                    if (orderContentId.equals(dbContentId.longValue())) {
-                                        System.out.println("orderContentId == dbContentId");
-                                        playlistContent.put("weatherFl", tempContentIdList.get(x).get("weatherFl"));
-                                        playlistContent.put("airInfoFl", tempContentIdList.get(x).get("airInfoFl"));
-                                        playlistContent.put("stretch", tempContentIdList.get(x).get("stretch"));
-                                        playlistContent.put("order", tempContentIdList.get(x).get("order"));
-                                        tempContentArray.add(playlistContent);
-                                    }
-                                }
-                                order++;
-                            }
-                        }
+                if(playlistContentList.size() > 0){
+                    List<Map<String, Object>> resultContentList = contentMatchingAndOrderByOrder(tempContentIdList, playlistContentList);
+                    if(resultContentList.size() > 0){
+                        playlist.put("contentArray", resultContentList);
                     }
-                    playlist.put("contentArray", tempContentArray);
+                    else{
+                        playlist.put("contentArray", tempContentIdList);
+                        log.info("[FAIL][getPlaylist] resultContentList");
+                    }
                     String removeKey = "contentIdList";
                     playlist.remove(removeKey);
                 }
@@ -370,6 +355,23 @@ public class PlaylistServiceImpl implements PlaylistService {
             resultMap.put("message", ResponseCode.FAIL_NOT_EXIST_PLAYLIST_CONTENTS.getMessage());
         }
         return resultMap;
+    }
+
+    public List<Map<String, Object>> contentMatchingAndOrderByOrder (List<Map<String, Object>> playlistContentList,  List<Map<String, Object>> realContentList){
+        for(Map<String, Object> playlistContent : playlistContentList){
+            for(Map<String, Object> realContent : realContentList){
+                Integer tempId = (Integer) realContent.get("contentId");
+                Long realContentId = tempId != null ? tempId.longValue() : null;
+                if(playlistContent.get("contentId") == realContentId ){
+                    playlistContent.putAll(realContent);
+                }
+            }
+        }
+        List<Map<String, Object>> sortedList = playlistContentList.stream()
+                .sorted(Comparator.comparingInt(m -> Math.toIntExact((Long) m.get("order"))))
+                .collect(Collectors.toList());
+
+        return sortedList;
     }
 
 }
