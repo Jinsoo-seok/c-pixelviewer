@@ -272,6 +272,8 @@ public class PresetServiceImpl implements PresetService {
 
         PresetStatusRunVo runPresetVo = presetMapper.getRunPreset();
         String controlType = (String) param.get("controlType");
+        Object newPresetId = param.get("presetId");
+
 
         Boolean runPresetYn = false;
         if(runPresetVo != null){
@@ -321,20 +323,13 @@ public class PresetServiceImpl implements PresetService {
                     // 현재 프리셋 != 신규 프리셋 >> 현재 프리셋 stop, 레이어 정보 업데이트, 신규 프리셋을 stop 상태로 presetRun
                     else {
                         // 현재 프리셋 상태 stop, 버전 업데이트
-                        Map<String, Object> runPresetParam = new HashMap<>();
-                        runPresetParam.put("presetId", runPresetVo.getPresetId());
-                        runPresetParam.put("controlType", presetStatusStop);
-                        int runPresetSetResult = presetMapper.patchPresetStatusSet(runPresetParam);
-
+                        int runPresetSetResult = presetMapper.patchPresetStatusSet(presetStatusMap(runPresetVo.getPresetId(), presetStatusStop));
 
                         // 전체 레이어 업데이트
                         int setPlaylistSelectYnResult = playlistMapper.setPlaylistSelectYn(param); //[UPDATE] 레이어 >> 플레이리스트
 
                         // 신규 프리셋 PresetRun
-                        Map<String, Object> stopPresetParam = new HashMap<>();
-                        stopPresetParam.put("presetId", param.get("presetId"));
-                        stopPresetParam.put("controlType", presetStatusStop);
-                        int stopPresetSetResult = presetMapper.patchPresetStatusSet(stopPresetParam);
+                        int stopPresetSetResult = presetMapper.patchPresetStatusSet(presetStatusMap(newPresetId, presetStatusStop));
 
                         webClientResponse = webClientFunction("apply", agentUrl, requestMap);
                         if (webClientResponse.containsKey("data")) {
@@ -353,10 +348,7 @@ public class PresetServiceImpl implements PresetService {
                 // TODO : [완료] 실행중인 프리셋이 없을 때 >> 신규 프리셋 stop 상태로 PresetRun
                 else{
                     // 신규 프리셋 PresetRun
-                    Map<String, Object> stopPresetParam = new HashMap<>();
-                    stopPresetParam.put("presetId", param.get("presetId"));
-                    stopPresetParam.put("controlType", presetStatusStop);
-                    int stopPresetSetResult = presetMapper.patchPresetStatusSet(stopPresetParam);
+                    int stopPresetSetResult = presetMapper.patchPresetStatusSet(presetStatusMap(newPresetId, presetStatusStop));
 
                     webClientResponse = webClientFunction("apply", agentUrl, requestMap);
                     if (webClientResponse.containsKey("data")) {
@@ -386,10 +378,7 @@ public class PresetServiceImpl implements PresetService {
                         }
                         // 2. 기존 상태값 >> "play"
                         else {
-                            Map<String, Object> runPresetParam = new HashMap<>();
-                            runPresetParam.put("presetId", runPresetVo.getPresetId());
-                            runPresetParam.put("controlType", presetStatusPlay);
-                            int runPresetSetResult = presetMapper.patchPresetStatusSet(runPresetParam);
+                            int runPresetSetResult = presetMapper.patchPresetStatusSet(presetStatusMap(runPresetVo.getPresetId(), presetStatusPlay));
 
                             resultMap.put("data", runPresetVo.getPresetId());
                             resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
@@ -399,16 +388,10 @@ public class PresetServiceImpl implements PresetService {
                     // Check : 기존 프리셋 != 신규 프리셋
                     else {
                         // 기존 프리셋 Status >> stop
-                        Map<String, Object> stopPresetParam = new HashMap<>();
-                        stopPresetParam.put("presetId", runPresetVo.getPresetId());
-                        stopPresetParam.put("controlType", presetStatusStop);
-                        int stopPresetSetResult = presetMapper.patchPresetStatusSet(stopPresetParam);
+                        int stopPresetSetResult = presetMapper.patchPresetStatusSet(presetStatusMap(runPresetVo.getPresetId(), presetStatusStop));
 
                         // 신규 프리셋 Status >> play
-                        Map<String, Object> runPresetParam = new HashMap<>();
-                        runPresetParam.put("presetId", param.get("presetId"));
-                        runPresetParam.put("controlType", presetStatusPlay);
-                        int runPresetSetResult = presetMapper.patchPresetStatusSet(runPresetParam);
+                        int runPresetSetResult = presetMapper.patchPresetStatusSet(presetStatusMap(newPresetId, presetStatusPlay));
 
                         // 신규 프리셋 >> run
                         // Agent Call
@@ -429,10 +412,7 @@ public class PresetServiceImpl implements PresetService {
                 // TODO : [완료] 실행중인 프리셋이 없을 때
                 else {
                     // 신규 프리셋 >> play
-                    Map<String, Object> runPresetParam = new HashMap<>();
-                    runPresetParam.put("presetId", param.get("presetId"));
-                    runPresetParam.put("controlType", presetStatusPlay);
-                    int runPresetSetResult = presetMapper.patchPresetStatusSet(runPresetParam);
+                    int runPresetSetResult = presetMapper.patchPresetStatusSet(presetStatusMap(newPresetId, presetStatusPlay));
 
                     // 신규 프리셋 >> run
                     // Agent Call
@@ -540,6 +520,14 @@ public class PresetServiceImpl implements PresetService {
         requestBodyMap.put("layers", layerInfos);
 
         return requestBodyMap;
+    }
+
+    public Map<String, Object> presetStatusMap (Object presetId, String targetStatus){
+        Map<String, Object> queryMap = new HashMap<>();
+        queryMap.put("presetId", presetId);
+        queryMap.put("controlType", targetStatus);
+
+        return queryMap;
     }
 
 }
