@@ -59,7 +59,7 @@ public class LedconController {
         responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
 
 
-        // TODO : 추후 확장 예정
+        // TODO : [고도화] 확장 예정
 //        String[] keyList = {"ip", "port", "modelNm", "serialNo", "version", "firmwareVer"
 //                , "state", "spec1", "spec2", "spec3"
 //                , "connectFl", "videoinputMode"
@@ -139,7 +139,7 @@ public class LedconController {
         Map<String, Object> responseMap = new HashMap<>();
         responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
 
-        // TODO : 추후 확장 예정
+        // TODO : [고도화] 확장 예정
 //        String[] keyList = {
 //                "ledControllerId",
 //                "ip", "port", "modelNm", "version", "serialNo", "firmwareVer", "state",

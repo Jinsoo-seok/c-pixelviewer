@@ -77,7 +77,7 @@ public class PlaylistServiceImpl implements PlaylistService {
                     e.printStackTrace();
                 }
 
-                // TODO : 중복 id 처리 시, 데이터 꼬임 현상 있음
+                // TODO : [진행중] 중복 id 처리 시, 데이터 꼬임 현상 있음
                 List<Map<String, Object>> playlistContentList = playlistMapper.getPlaylistContentList(queryTemp);
                 Long order = 1L;
                 if (playlistContentList.size() != 0) {

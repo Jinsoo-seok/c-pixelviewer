@@ -241,10 +241,10 @@ public class ViewerServiceImpl implements ViewerService {
 
         int updateViewerStatusResult = layerMapper.updateViewerStatus(viewerParam);
         if(updateViewerStatusResult > 0){
-            // TODO : 예외 처리
+            log.info("[SUCCESS] [UPDATE] - Viewer Status");
         }
         else{
-            // TODO : 예외 처리
+            log.info("[FAIL] [UPDATE] - Viewer Status");
         }
 
         String presetId = String.valueOf(param.get("presetId"));
@@ -275,7 +275,7 @@ public class ViewerServiceImpl implements ViewerService {
                     }
                     if(obj != null) {
                         if (externalType.equals("날씨")) {
-                            // TODO : 시간별 분기처리
+                            // TODO : [미완료] 시간별 분기처리
                             Map<String, Object> tempMap = (Map<String, Object>) obj;
 
                             Map<String, Object> weatherMap = (Map<String, Object>) tempMap.get("weather12");

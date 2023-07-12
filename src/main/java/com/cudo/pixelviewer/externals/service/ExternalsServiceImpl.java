@@ -22,9 +22,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-// TODO : restTemplate으로 해보기
-// TODO : 이후 스케줄
-// TODO : 시간 올림처리
+// TODO : [미완료]restTemplate으로 해보기
+//  이후 스케줄
+//  시간 올림처리
 
 @Service
 @RequiredArgsConstructor
