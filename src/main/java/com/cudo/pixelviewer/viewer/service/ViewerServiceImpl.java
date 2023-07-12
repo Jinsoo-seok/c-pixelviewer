@@ -14,6 +14,7 @@ import org.apache.commons.io.FileUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -40,6 +41,8 @@ public class ViewerServiceImpl implements ViewerService {
     final ExternalsMapper externalsMapper;
 
     final AdminSettingMapper adminSettingMapper;
+    
+    final Environment environment;
 
 //    final ViewerMapper viewerMapper;
 
@@ -282,6 +285,9 @@ public class ViewerServiceImpl implements ViewerService {
     @Override
     public Map<String, Object> postPreviewImgUpload(String type, String name, MultipartFile file) {
         Map<String, Object> resultMap = new HashMap<>();
+        
+        String os = environment.getProperty("os.name");
+        System.out.println("os = " + os);
 
         if (file != null && !file.isEmpty()) {
             try {
@@ -294,14 +300,18 @@ public class ViewerServiceImpl implements ViewerService {
                 LocalDateTime localDateTime = LocalDateTime.now();
                 String formattedDateTime = localDateTime.format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
 
-                Boolean agentCatureType = false;
+                Boolean agentCaptureType = false;
                 Boolean contentsType = false;
                 Boolean weatherType = false;
+
+                if(os.equals("Linux")){
+                    filePath = "/usr/local/tomcat/webapps/";
+                }
 
                 switch(type) {
                     // Agent Capture Img
                     case "10": {
-                        agentCatureType = true;
+                        agentCaptureType = true;
                         filePath += "agent" + File.separator + name + extension;
                         break;
                     }
@@ -329,7 +339,7 @@ public class ViewerServiceImpl implements ViewerService {
                 FileUtils.copyInputStreamToFile(file.getInputStream(), destFile);
 
 
-                if(agentCatureType || contentsType){
+                if(agentCaptureType || contentsType){
                     Map<String, Object> dataMap = new HashMap<>();
                     dataMap.put("filePath", filePath);
                     resultMap.put("data", dataMap);

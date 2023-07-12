@@ -10,7 +10,7 @@ public class ExternalVideoVo implements Serializable {
     private static final long serialVersionUID = -2146168113004076236L;
 
     private Integer exVideoId;
-
+    private Integer layerId;
     private Integer objectId;
 
     private Integer type;

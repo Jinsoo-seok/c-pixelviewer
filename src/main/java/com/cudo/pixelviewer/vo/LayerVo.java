@@ -3,6 +3,7 @@ package com.cudo.pixelviewer.vo;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.Map;
 
 @Data
 public class LayerVo implements Serializable {
@@ -31,4 +32,5 @@ public class LayerVo implements Serializable {
     private Boolean weatherEn;
     private Boolean airEn;
 
+    private Map<String, Object> layerObjectList;
 }

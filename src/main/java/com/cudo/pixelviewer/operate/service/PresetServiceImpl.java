@@ -10,6 +10,8 @@ import com.cudo.pixelviewer.vo.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
@@ -69,13 +71,30 @@ public class PresetServiceImpl implements PresetService {
         Map<String, Object> dataMap = new HashMap<>();
 
         PresetVo presetVo = presetMapper.getPreset(presetId);
-        List<LayerVo> layerVoList = presetMapper.getPresetLayers(presetId);
 
         if(presetVo != null){
             dataMap.put("preset", presetVo);
-            dataMap.put("layerList", layerVoList);
-            resultMap.put("data", dataMap);
 
+            List<LayerVo> layerVoList = presetMapper.getPresetLayers(presetId);
+            if(layerVoList.size() > 0){
+                for(LayerVo layer : layerVoList){
+                    Map<String, Object> tempLayerObject = layerMapper.getLayerObject(layer.getLayerId());
+                    if(tempLayerObject.containsKey("subtitleStyleInfo")){
+                        String temp = (String) tempLayerObject.get("subtitleStyleInfo");
+                        try {
+                            JSONParser parser = new JSONParser();
+                            Object obj = parser.parse(temp);
+                            tempLayerObject.put("subtitleStyleInfo", obj);
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    layer.setLayerObjectList(tempLayerObject);
+                }
+                dataMap.put("layerList", layerVoList);
+            }
+
+            resultMap.put("data", dataMap);
             resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
         }
         else{
