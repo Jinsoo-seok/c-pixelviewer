@@ -44,6 +44,11 @@ public class ViewerServiceImpl implements ViewerService {
     
     final Environment environment;
 
+    private static final String protocol = "http://";
+
+    private static final String wasIp = "106.245.226.42";
+    private static final String wasPort = "9898";
+
 //    final ViewerMapper viewerMapper;
 
     @Override
@@ -263,7 +268,14 @@ public class ViewerServiceImpl implements ViewerService {
                         if (externalType.equals("날씨")) {
                             // TODO : 시간별 분기처리
                             Map<String, Object> tempMap = (Map<String, Object>) obj;
-                            dataMap.put("weatherInfo", tempMap.get("weather12"));
+
+                            Map<String, Object> weatherMap = (Map<String, Object>) tempMap.get("weather12");
+
+                            String weatherPath = "weather";
+                            String weatherImage = weatherImageBranch(weatherMap.get("rainStatus"), weatherMap.get("skyStatus"));
+
+                            weatherMap.put("imagePath", protocol + wasIp + ":" + wasPort + "/" + weatherPath + "/" + adminSettingMapper.getValue(weatherImage));
+                            dataMap.put("weatherInfo", weatherMap);
                         }
                         else if (externalType.equals("대기")) {
                             dataMap.put("airInfo", obj);
@@ -424,5 +436,40 @@ public class ViewerServiceImpl implements ViewerService {
         returnMap.put("fontStyle", tempStyleMap);
 
         return returnMap;
+    }
+
+    public String weatherImageBranch (Object rainStatus, Object skyStatus){
+
+        if(rainStatus.equals(0L)){
+            if(skyStatus.equals(4L)){
+                return "weatherCloudy";
+            }
+            else if(skyStatus.equals(3L)){
+                return "weatherManyCloudy";
+            }
+            else if(skyStatus.equals(1L)){
+                return "weatherSunny";
+            }
+            else {
+                System.out.println("[WARN] skyStatus = " + skyStatus);
+                return "weatherSunny";
+            }
+        }
+        else if (rainStatus.equals(1L)){
+            return "weatherRain";
+        }
+        else if (rainStatus.equals(2L)){
+            return "weatherRainSnow";
+        }
+        else if (rainStatus.equals(3L)){
+            return "weatherSnow";
+        }
+        else if (rainStatus.equals(4L)){
+            return "weatherShower";
+        }
+        else{
+            System.out.println("[WARN] rainStatus = " + rainStatus);
+            return "weatherRain";
+        }
     }
 }

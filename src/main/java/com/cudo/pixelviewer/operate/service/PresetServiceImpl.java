@@ -289,7 +289,7 @@ public class PresetServiceImpl implements PresetService {
         ////////////////////////////////////////////////////////////////////
 
         // test 타입 >> 실제 연동이 필요 시, true
-        Boolean callYn = false;
+        Boolean callYn = true;
 
         if(callYn) {
             if (controlType.equals("apply")) {
@@ -324,8 +324,8 @@ public class PresetServiceImpl implements PresetService {
                         // 현재 프리셋 상태 stop, 버전 업데이트
                         int runPresetSetResult = presetMapper.patchPresetStatusSet(presetStatusMap(runPresetVo.getPresetId(), presetStatusStop));
 
-                        // 전체 레이어 업데이트
-                        int setPlaylistSelectYnResult = playlistMapper.setPlaylistSelectYn(param); //[UPDATE] 레이어 >> 플레이리스트
+                        // 전체 레이어(해당 플레이리스트) 업데이트
+                        int setPlaylistSelectYnResult = playlistMapper.setPlaylistSelectYn(param);
 
                         // 신규 프리셋 PresetRun
                         int stopPresetSetResult = presetMapper.patchPresetStatusSet(presetStatusMap(newPresetId, presetStatusStop));
