@@ -61,6 +61,10 @@ public enum ResponseCode {
     FAIL_UPDATE_NOT_EXIST_PLAYLIST(3311, "FailedUpdateNotExistPlaylist", "Failed Update Not Exist Playlist"),
     ALREADY_PLAYING_PRESET(3312, "AlreadyPlayingPreset", "Already Playing Preset"),
 
+    FAIL_PRESET_RUN_TO_AGENT(3314, "FailedPresetRunToAgent", "Failed Preset Run To Agent"),
+    FAIL_AGENT_TO_VIEWER(3315, "FailedAgentToViewer", "Failed Agent To Viewer"),
+
+
     // Layer : 3400
     FAIL_INSERT_LAYER(3400, "FailedInsertLayer", "Failed Insert Layer"),
     FAIL_UPDATE_LAYER(3401, "FailedUpdateLayer", "Failed Update Layer"),

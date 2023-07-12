@@ -49,6 +49,11 @@ public class PresetServiceImpl implements PresetService {
     private static final String agentPort = "8800";
     private static final String agentPath = "/vieweragent/Preset/layer-placement";
 
+    String presetStatusPlay = "play";
+    String presetStatusStop = "stop";
+    String presetStatusPause = "pause";
+    String presetStatusNone = "none";
+
     @Override
     public Map<String, Object> getPresetList() {
         Map<String, Object> resultMap = new HashMap<>();
@@ -264,21 +269,16 @@ public class PresetServiceImpl implements PresetService {
         Map<String, Object> resultMap = new HashMap<>();
         Map<String, Object> webClientResponse = new HashMap<>();
 
-        String presetStatusPlay = "play";
-        String presetStatusStop = "stop";
-        String presetStatusPause = "pause";
-        String presetStatusNone = "none";
 
-
+        // Check : Running Preset
         PresetStatusRunVo runPresetVo = presetMapper.getRunPreset();
-        String controlType = (String) param.get("controlType");
-        Object newPresetId = param.get("presetId");
-
-
         Boolean runPresetYn = false;
         if(runPresetVo != null){
             runPresetYn = true;
         };
+
+        String controlType = (String) param.get("controlType");
+        Object newPresetId = param.get("presetId");
 
         //////////////////////////////////////////////////////////////////// Set Agent
         // URL
@@ -286,14 +286,13 @@ public class PresetServiceImpl implements PresetService {
         // request Body
         Map<String, Object> requestMap = createRequestBodyMap(param);
         JsonMapToPrint(requestMap);
-        resultMap.put("data", requestMap);
+        ////////////////////////////////////////////////////////////////////
 
+        // test 타입 >> 실제 연동이 필요 시, true
         Boolean callYn = false;
 
         if(callYn) {
-            // TODO : 적용 버튼 하나로 통일, 로직 확인 및 테스트 필요
             if (controlType.equals("apply")) {
-
                 // TODO : [완료] 실행중인 프리셋이 있을 때
                 if(runPresetYn) {
                     // 현재 프리셋 == 신규 프리셋 >> 레이어 정보 업데이트
@@ -332,16 +331,7 @@ public class PresetServiceImpl implements PresetService {
                         int stopPresetSetResult = presetMapper.patchPresetStatusSet(presetStatusMap(newPresetId, presetStatusStop));
 
                         webClientResponse = webClientFunction("apply", agentUrl, requestMap);
-                        if (webClientResponse.containsKey("data")) {
-                            String response = (String) webClientResponse.get("data");
-                            if (response.contains("200")) {
-                                resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
-                            } else {
-                                resultMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
-                            }
-                        } else {
-                            resultMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
-                        }
+                        resultMap = agentCallResult(webClientResponse);
                     }
                 }
 
@@ -351,16 +341,7 @@ public class PresetServiceImpl implements PresetService {
                     int stopPresetSetResult = presetMapper.patchPresetStatusSet(presetStatusMap(newPresetId, presetStatusStop));
 
                     webClientResponse = webClientFunction("apply", agentUrl, requestMap);
-                    if (webClientResponse.containsKey("data")) {
-                        String response = (String) webClientResponse.get("data");
-                        if (response.contains("200")) {
-                            resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
-                        } else {
-                            resultMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
-                        }
-                    } else {
-                        resultMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
-                    }
+                    resultMap = agentCallResult(webClientResponse);
                 }
             }
 
@@ -396,16 +377,7 @@ public class PresetServiceImpl implements PresetService {
                         // 신규 프리셋 >> run
                         // Agent Call
                         webClientResponse = webClientFunction("playAndNew", agentUrl, requestMap);
-                        if (webClientResponse.containsKey("data")) {
-                            String response = (String) webClientResponse.get("data");
-                            if (response.contains("200")) {
-                                resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
-                            } else {
-                                resultMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
-                            }
-                        } else {
-                            resultMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
-                        }
+                        resultMap = agentCallResult(webClientResponse);
                     }
                 }
 
@@ -417,18 +389,8 @@ public class PresetServiceImpl implements PresetService {
                     // 신규 프리셋 >> run
                     // Agent Call
                     webClientResponse = webClientFunction("playAndNew", agentUrl, requestMap);
-                    if (webClientResponse.containsKey("data")) {
-                        String response = (String) webClientResponse.get("data");
-                        if (response.contains("200")) {
-                            resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
-                        } else {
-                            resultMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
-                        }
-                    } else {
-                        resultMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
-                    }
+                    resultMap = agentCallResult(webClientResponse);
                 }
-
             }
 
             else {
@@ -528,6 +490,26 @@ public class PresetServiceImpl implements PresetService {
         queryMap.put("controlType", targetStatus);
 
         return queryMap;
+    }
+
+    public Map<String, Object> agentCallResult (Map<String, Object> agentResponseMap){
+        Map<String, Object> agentResultMap = new HashMap<>();
+
+        if (agentResponseMap.containsKey("data")) {
+            String response = (String) agentResponseMap.get("data");
+            if (response.contains("200")) {
+                agentResultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
+            }
+            else {
+                agentResultMap.put("code", ResponseCode.FAIL_AGENT_TO_VIEWER.getCode());
+                agentResultMap.put("message", ResponseCode.FAIL_AGENT_TO_VIEWER.getMessage());
+            }
+        } else {
+            agentResultMap.put("code", ResponseCode.FAIL_PRESET_RUN_TO_AGENT.getCode());
+            agentResultMap.put("message", ResponseCode.FAIL_PRESET_RUN_TO_AGENT.getMessage());
+        }
+
+        return agentResultMap;
     }
 
 }
