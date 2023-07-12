@@ -8,8 +8,8 @@ import lombok.*;
 @Builder
 public class LedStatusVo {
     private Integer powerState;
-    private Integer presetNumber;
+    private String presetNumber;
     private String inputSource;
-    private Double brightness;
+    private Float brightness;
 
 }

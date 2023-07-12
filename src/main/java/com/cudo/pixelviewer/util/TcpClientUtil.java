@@ -23,6 +23,26 @@ public class TcpClientUtil {
         return "0x" + hexString.toString().toUpperCase();
     }
 
+    public static float hexToFloat(String hexString) {
+        int binaryValue = Integer.parseInt(hexString, 16);
+        String binaryString = Integer.toBinaryString(binaryValue);
+        binaryString = String.format("%32s", binaryString).replace(' ', '0');
+
+        int signBit = binaryString.charAt(0) - '0';
+        int exponent = Integer.parseInt(binaryString.substring(1, 9), 2) - 127;
+        float fraction = 1.0f;
+
+        for (int i = 9, j = 0; i < 32; i++, j++) {
+            int bit = binaryString.charAt(i) - '0';
+            fraction += bit * Math.pow(2, -j);
+        }
+
+        float result = (float) (Math.pow(-1, signBit) * fraction * Math.pow(2, exponent));
+
+        return result;
+    }
+
+
     public static byte[] getLightByte(String light) {
         byte[] lightMessage = {};
 

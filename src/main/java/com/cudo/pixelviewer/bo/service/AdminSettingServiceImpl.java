@@ -1,6 +1,7 @@
 package com.cudo.pixelviewer.bo.service;
 
 import com.cudo.pixelviewer.bo.mapper.AdminSettingMapper;
+import com.cudo.pixelviewer.operate.mapper.LedMapper;
 import com.cudo.pixelviewer.util.ParameterUtils;
 import com.cudo.pixelviewer.util.ResponseCode;
 import com.cudo.pixelviewer.vo.DisplaySettingVo;
@@ -19,6 +20,9 @@ public class AdminSettingServiceImpl implements AdminSettingService {
 
     final AdminSettingMapper adminSettingMapper;
 
+    final LedMapper ledMapper;
+
+    final static String PRESET_NAME_PREFIX = "프리셋";
 
     @Override
     public Map<String, Object> getAdminSettingList() {
@@ -94,6 +98,23 @@ public class AdminSettingServiceImpl implements AdminSettingService {
                 System.out.println(key + " is of an unknown type: " + value);
             }
             tempArray.add(queryMap);
+        }
+
+        if(param.containsKey("ledPresetCount")) {
+            List<Map<String, Object>> presetList = new ArrayList<>();
+            Integer presetCount = Integer.parseInt(String.valueOf(param.get("ledPresetCount")));
+
+            if (presetCount > 0) {
+                for (int i = 0; i < presetCount; i++) {
+                    Map<String, Object> presetInfo = new HashMap<>();
+
+                    presetInfo.put("presetNumber", String.format("%02X", i));
+                    presetInfo.put("presetName", PRESET_NAME_PREFIX + (i + 1));
+                    presetList.add(presetInfo);
+                }
+                Integer deletePresetCount = ledMapper.deleteLedPreset();
+                Integer insertPresetCount = ledMapper.postLedPreset(presetList);
+            }
         }
 
         int putAdminSettingResult = adminSettingMapper.putAdminSetting(tempArray);

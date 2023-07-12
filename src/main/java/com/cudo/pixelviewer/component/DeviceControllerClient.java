@@ -20,7 +20,7 @@ public class DeviceControllerClient {
     private EventLoopGroup group;
     private Channel channel;
     private DeviceClientHandler deviceClientHandler;
-    private CompletableFuture<String> responseFuture;
+    private CompletableFuture<byte[]> responseFuture;
 
     @PostConstruct
     public void start() throws Exception {
@@ -54,8 +54,8 @@ public class DeviceControllerClient {
         });
     }
 
-    public CompletableFuture<String> sendMessage(byte[] message) {
-        CompletableFuture<String> future = new CompletableFuture<>();
+    public CompletableFuture<byte[]> sendMessage(byte[] message) {
+        CompletableFuture<byte[]> future = new CompletableFuture<>();
         responseFuture = future;
 
         // send it to the server
@@ -103,15 +103,8 @@ public class DeviceControllerClient {
             byte[] responseByte = new byte[msg.readableBytes()];
             msg.readBytes(responseByte);
 
-            StringBuilder hexString = new StringBuilder();
-
-            for (byte responseValue : responseByte) {
-                String hex = String.format("%02X", responseValue);
-                hexString.append(hex);
-            }
-
             if (responseFuture != null) {
-                responseFuture.complete(hexString.toString());
+                responseFuture.complete(responseByte);
             }
         }
 

@@ -117,11 +117,7 @@ public class LedController {
 
         try {
             parameterValidation(param, keyList);
-            parameterInt("presetNumber", param.get("presetNumber"), true);
-
-            if (Integer.parseInt(String.valueOf(param.get("presetNumber"))) <= 0 || Integer.parseInt(String.valueOf(param.get("presetNumber"))) > 16) {
-                throw new ParamException(ResponseCode.INVALID_PARAM_VALUE, "presetNumber");
-            }
+            parameterString("presetNumber", param.get("presetNumber"), true, 0, null);
 
             responseMap = ledService.loadPreset(String.valueOf(param.get("presetNumber")));
         } catch (ParamException paramException) {
@@ -199,7 +195,7 @@ public class LedController {
     }
 
     /**
-     * * 프리셋 리스트 조회
+     * * 프리셋 명 수정
      */
     @PatchMapping("/preset/name")
     public Map<String, Object> putLedPresetName(HttpServletRequest request, @RequestBody Map<String, Object> param) {
@@ -211,14 +207,15 @@ public class LedController {
 
         responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
 
-        String[] keyList = {"presetId", "presetName"};
+        String[] keyList = {"presetNumber", "presetName"};
 
         try {
             parameterValidation(param, keyList);
-            parameterString("presetId", param.get("presetId"), true, 0, null);
+            parameterString("presetNumber", param.get("presetNumber"), true, 0, null);
             parameterString("presetName", param.get("presetName"), true, 0, null);
 
-            responseMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
+            responseMap = ledService.putLedPresetName(param);
+
         } catch (ParamException paramException) {
             log.error("[paramException] - {}", paramException.getMessage());
 
