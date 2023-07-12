@@ -151,7 +151,7 @@ public class DisplayServiceImpl implements DisplayService {
                     .retrieve()
                     .bodyToMono(String.class);
 
-            // TODO : 디스플레이 상태 업데이트
+            // TODO : [미완료][테스트패턴] 디스플레이 상태 업데이트
             responseMono.subscribe(response -> {
                 String data = response.toString();
                 Map<String, Object> responseMap = new HashMap<>();
@@ -165,7 +165,7 @@ public class DisplayServiceImpl implements DisplayService {
                 if(responseMap.get("code").equals(200)){
                     resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
 
-                    // TODO : 상태 업데이트 및 예외 처리
+                    // TODO : [미완료][테스트패턴]상태 업데이트 및 예외 처리
 //                    int patchDisplayNameResult = displayMapper.patchDisplayTestpattern(param);
 //
 //                    if(patchDisplayNameResult == 1){ // Success : 1
