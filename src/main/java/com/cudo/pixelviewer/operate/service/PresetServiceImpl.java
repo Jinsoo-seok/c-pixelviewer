@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
@@ -39,15 +40,34 @@ public class PresetServiceImpl implements PresetService {
 
     final PlaylistMapper playlistMapper;
 
-    private static final String protocol = "http://";
 
-    private static final String wasIp = "106.245.226.42";
-    private static final String wasPort = "9898";
-    private static final String wasPath = "/api-viewer/";
 
-    private static final String agentIp = "192.168.123.12";
-    private static final String agentPort = "8800";
-    private static final String agentPath = "/vieweragent/Preset/layer-placement";
+    @Value("${values.protocol}")
+    private String protocol;
+
+    @Value("${values.was.ip}")
+    private String wasIp;
+    @Value("${values.was.port}")
+    private String wasPort;
+    @Value("${values.was.path}")
+    private String wasPath;
+
+    @Value("${values.agent.ip}")
+    private String agentIp;
+    @Value("${values.agent.port}")
+    private String agentPort;
+    @Value("${values.agent.path}")
+    private String agentPath;
+
+//    private static final String protocol = "http://";
+
+//    private static final String wasIp = "106.245.226.42";
+//    private static final String wasPort = "9898";
+//    private static final String wasPath = "/api-viewer/";
+
+//    private static final String agentIp = "192.168.123.12";
+//    private static final String agentPort = "8800";
+//    private static final String agentPath = "/vieweragent/Preset/layer-placement";
 
     String presetStatusPlay = "play";
     String presetStatusStop = "stop";
@@ -289,7 +309,7 @@ public class PresetServiceImpl implements PresetService {
         ////////////////////////////////////////////////////////////////////
 
         // test 타입 >> 실제 연동이 필요 시, true
-        Boolean callYn = true;
+        Boolean callYn = false;
 
         if(callYn) {
             if (controlType.equals("apply")) {

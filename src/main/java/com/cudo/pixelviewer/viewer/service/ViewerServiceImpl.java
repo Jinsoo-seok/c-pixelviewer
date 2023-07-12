@@ -14,6 +14,7 @@ import org.apache.commons.io.FileUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -44,10 +45,18 @@ public class ViewerServiceImpl implements ViewerService {
     
     final Environment environment;
 
-    private static final String protocol = "http://";
+    @Value("${values.protocol}")
+    private String protocol;
 
-    private static final String wasIp = "106.245.226.42";
-    private static final String wasPort = "9898";
+    @Value("${values.was.ip}")
+    private String wasIp;
+    @Value("${values.was.port}")
+    private String wasPort;
+
+//    private static final String protocol = "http://";
+//
+//    private static final String wasIp = "106.245.226.42";
+//    private static final String wasPort = "9898";
 
 //    final ViewerMapper viewerMapper;
 
