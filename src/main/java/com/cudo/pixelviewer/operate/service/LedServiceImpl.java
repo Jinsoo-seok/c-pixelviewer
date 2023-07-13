@@ -3,6 +3,7 @@ package com.cudo.pixelviewer.operate.service;
 import com.cudo.pixelviewer.bo.mapper.LedconMapper;
 import com.cudo.pixelviewer.bo.mapper.PwrconMapper;
 import com.cudo.pixelviewer.component.DeviceControllerClient;
+import com.cudo.pixelviewer.component.InputSourceComponent;
 import com.cudo.pixelviewer.component.LedControllerClient;
 import com.cudo.pixelviewer.config.ParamException;
 import com.cudo.pixelviewer.operate.mapper.LedMapper;
@@ -38,6 +39,8 @@ public class LedServiceImpl implements LedService {
 
     final LedconMapper ledconMapper;
 
+    final InputSourceComponent inputSourceComponent;
+
     @Override
     public Map<String, Object> setBrightness(float brightness) {
         Map<String, Object> responseMap = new HashMap<>();
@@ -51,7 +54,7 @@ public class LedServiceImpl implements LedService {
 //            if (ledControllerChannelMap.size() > 0) {
 //                ledControllerClient.sendMessage(lightMessage);
 
-                responseMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
+            responseMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
 //            } else {
 //                responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
 //                responseMap.put("exceptionMessage", "No active LED Controller Connection");
@@ -75,13 +78,13 @@ public class LedServiceImpl implements LedService {
 //                byte[] message = {0x33, 0x00, 0x12, 0x00, 0x00, 0x00, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF,
 //                        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01};
 //
-//                int hexValue = getInputSourceCode(source);
+//                int hexValue = inputSourceComponent.getInputSourceCode(source);
 //
 //                message[17] = (byte) hexValue;
 //
 //                ledControllerClient.sendMessage(message);
 
-                responseMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
+            responseMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
 //            } else {
 //                responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
 //                responseMap.put("exceptionMessage", "No active LED Controller Connection");
@@ -111,13 +114,13 @@ public class LedServiceImpl implements LedService {
 //
 //                ledControllerClient.sendMessage(message);
 //
-                Integer updateLastLoad = ledMapper.putLedPreset(presetNumber); // 프리셋 마지막 실행시간 업데이트
+            Integer updateLastLoad = ledMapper.putLedPreset(presetNumber); // 프리셋 마지막 실행시간 업데이트
 //
-                if (updateLastLoad > 0) {
-                    responseMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
-                } else {
-                    responseMap.putAll(ParameterUtils.responseOption(ResponseCode.NO_CONTENT.getCodeName()));
-                }
+            if (updateLastLoad > 0) {
+                responseMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
+            } else {
+                responseMap.putAll(ParameterUtils.responseOption(ResponseCode.NO_CONTENT.getCodeName()));
+            }
 //            } else {
 //                responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
 //                responseMap.put("exceptionMessage", "No active LED Controller Connection");
@@ -176,8 +179,8 @@ public class LedServiceImpl implements LedService {
 
                     light = hexToFloat(lightHexReverse.toString());
 
-                    // TODO 입력소스 수정 필요
-                    inputSource = String.format("%02X", response.getResponse()[88]);
+                    // TODO default 값 HDMI1로 했는데 수정 필요
+                    inputSource = inputSourceComponent.getInputSourceValue(String.format("%02X", response.getResponse()[88]));
 
                     ledStatusMap.put("ip", response.getIp());
                     ledStatusMap.put("brightness", light);
