@@ -283,14 +283,14 @@ public class ViewerServiceImpl implements ViewerService {
                             String weatherPath = "weather";
                             String weatherImage = weatherImageBranch(weatherMap.get("rainStatus"), weatherMap.get("skyStatus"));
 
-                            weatherMap.put("imagePathWeather", protocol + wasIp + ":" + wasPort + "/" + weatherPath + "/" + adminSettingMapper.getValue(weatherImage));
+                            weatherMap.put("imagePath", protocol + wasIp + ":" + wasPort + "/" + weatherPath + "/" + adminSettingMapper.getValue(weatherImage));
                             dataMap.put("weatherInfo", weatherMap);
                         }
                         else if (externalType.equals("대기")) {
                             Map<String, Object> tempMap = (Map<String, Object>) obj;
                             String airImage = airImageBranch(tempMap.get("pm10Grade"));
                             String airPath = "air";
-                            tempMap.put("imagePathAir", protocol + wasIp + ":" + wasPort + "/" + airPath + "/" + airImage + ".jpg");
+                            tempMap.put("imagePath", protocol + wasIp + ":" + wasPort + "/" + airPath + "/" + airImage + ".jpg");
 
                             dataMap.put("airInfo", obj);
                         }
