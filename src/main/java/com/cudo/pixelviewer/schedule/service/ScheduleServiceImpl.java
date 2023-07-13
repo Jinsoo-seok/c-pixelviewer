@@ -92,7 +92,7 @@ public class ScheduleServiceImpl implements ScheduleService {
                         .endDate(String.valueOf(resultMap.get("sch_end_date")).substring(0, 10).replace("-", ""))
                         .startTime(String.valueOf(resultMap.get("time_start")).substring(0, 5).replace(":", ""))
                         .endTime(String.valueOf(resultMap.get("time_end")).substring(0, 5).replace(":", ""))
-                        .scheduleDay(resultMap.get("run_day_week") == null ?
+                        .scheduleDay((resultMap.get("run_day_week") == null || resultMap.get("run_day_week").equals("")) ?
                                 null : Arrays.stream(String.valueOf(resultMap.get("run_day_week")).split(","))
                                 .map(Integer::parseInt)
                                 .collect(Collectors.toList()))
@@ -110,7 +110,7 @@ public class ScheduleServiceImpl implements ScheduleService {
                         .endDate(String.valueOf(resultMap.get("sch_end_date")).substring(0, 10).replace("-", ""))
                         .powerOnTime(String.valueOf(resultMap.get("time_pwr_on")).substring(0, 5).replace(":", ""))
                         .powerOffTime(String.valueOf(resultMap.get("time_pwr_off")).substring(0, 5).replace(":", ""))
-                        .scheduleDay(resultMap.get("run_day_week") == null ?
+                        .scheduleDay((resultMap.get("run_day_week") == null || resultMap.get("run_day_week").equals("")) ?
                                 null : Arrays.stream(String.valueOf(resultMap.get("run_day_week")).split(","))
                                 .map(Integer::parseInt)
                                 .collect(Collectors.toList()))
@@ -135,7 +135,7 @@ public class ScheduleServiceImpl implements ScheduleService {
                         .scheduleName(String.valueOf(resultList.get(0).get("sch_nm")))
                         .startDate(String.valueOf(resultList.get(0).get("sch_start_date")).substring(0, 10).replace("-", ""))
                         .endDate(String.valueOf(resultList.get(0).get("sch_end_date")).substring(0, 10).replace("-", ""))
-                        .scheduleDay(resultList.get(0).get("run_day_week") == null ?
+                        .scheduleDay((resultList.get(0).get("run_day_week") == null || resultList.get(0).get("run_day_week").equals("")) ?
                                 null : Arrays.stream(String.valueOf(resultList.get(0).get("run_day_week")).split(","))
                                 .map(Integer::parseInt)
                                 .collect(Collectors.toList()))
@@ -516,7 +516,7 @@ public class ScheduleServiceImpl implements ScheduleService {
     }
 
     private String parseScheduleDay(Object scheduleDayList) {
-        if (scheduleDayList != null) {
+        if (scheduleDayList != null && ((ArrayList<Integer>) scheduleDayList).size() > 0) {
             String scheduleDay = "";
 
             for (Object day : (ArrayList) scheduleDayList) {
