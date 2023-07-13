@@ -146,6 +146,7 @@ public enum ResponseCode {
     FAIL_USED_DISPLAY_SETTING(4317, "FailedUsedDisplaySetting", "Failed Used Display Setting"),
     FAIL_DISPLAY_SETTING_TO_AGENT(4317, "FailedDisplaySettingToAgent", "Failed Used Display Setting to Agent"),
     FAIL_UPDATE_ADMIN_SETTING_WEATHER_IMG(4318, "FailedUpdateAdminSettingWeatherImage", "Failed Update AdminSetting Weather Image"),
+    FAIL_UPDATE_ADMIN_SETTING_AIR_IMG(4318, "FailedUpdateAdminSettingAirImage", "Failed Update AdminSetting Air Image"),
 
     FAIL_UNSUPPORTED_TYPE_SETTING(4300, "FailedUnsupportedTypeSetting", "Failed Unsupported Type Setting"),
 

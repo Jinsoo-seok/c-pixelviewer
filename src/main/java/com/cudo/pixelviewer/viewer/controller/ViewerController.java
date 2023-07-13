@@ -109,7 +109,8 @@ public class ViewerController {
             if (type.equals("10") || type.equals("20") || type.equals("30")
                 || type.equals("40") || type.equals("50") || type.equals("60")
                 || type.equals("70") || type.equals("80") || type.equals("90")
-                || type.equals("100")){
+                || type.equals("100") || type.equals("110") || type.equals("120")
+                || type.equals("130") || type.equals("140")){
                 responseMap = viewerService.postPreviewImgUpload(type, name, file);
             }
             else {

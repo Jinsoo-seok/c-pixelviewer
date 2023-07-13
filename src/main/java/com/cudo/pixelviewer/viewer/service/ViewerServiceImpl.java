@@ -329,6 +329,7 @@ public class ViewerServiceImpl implements ViewerService {
                 Boolean agentCaptureType = false;
                 Boolean contentsType = false;
                 Boolean weatherType = false;
+                Boolean airType = false;
 
                 if(os.equals("Linux")){
                     filePath = "/usr/local/tomcat/webapps/";
@@ -354,6 +355,13 @@ public class ViewerServiceImpl implements ViewerService {
                     {
                         weatherType = true;
                         filePath += "weather"  + File.separator + originalFilename;
+                        break;
+                    }
+                    // Air Img
+                    case "110": case "120": case "130": case "140":
+                    {
+                        airType = true;
+                        filePath += "air"  + File.separator + originalFilename;
                         break;
                     }
                     default: {
@@ -406,6 +414,36 @@ public class ViewerServiceImpl implements ViewerService {
                         resultMap.put("message", ResponseCode.FAIL_UPDATE_ADMIN_SETTING_WEATHER_IMG.getMessage());
                     }
                 }
+                else if(airType){
+                    Boolean airImgDB = false;
+                    String settingKey = "";
+                    if (type.equals("110")) {
+                        settingKey = "airGood";
+                    } else if (type.equals("120")) {
+                        settingKey = "airNormal";
+                    } else if (type.equals("130")) {
+                        settingKey = "airBad";
+                    } else if (type.equals("140")) {
+                        settingKey = "airVeryBad";
+                    }
+
+//                    int airImgResult = adminSettingMapper.patchWeatherImg(settingKey, originalFilename);
+                    int airImgResult = 1;
+                    if(airImgResult > 0){
+                        airImgDB = true;
+                    }
+                    if(airImgDB) {
+                        Map<String, Object> dataMap = new HashMap<>();
+                        dataMap.put("filePath", filePath);
+                        resultMap.put("data", dataMap);
+                        resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
+                    }
+                    else{
+                        resultMap.put("code", ResponseCode.FAIL_UPDATE_ADMIN_SETTING_AIR_IMG.getCode());
+                        resultMap.put("message", ResponseCode.FAIL_UPDATE_ADMIN_SETTING_AIR_IMG.getMessage());
+                    }
+                }
+
             } catch (IOException ioException) {
                 ioException.printStackTrace();
                 log.error("[paramException][postPreviewImgUpload] - {}", ioException.getMessage());
