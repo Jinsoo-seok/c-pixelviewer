@@ -357,6 +357,7 @@ public class PlaylistServiceImpl implements PlaylistService {
         return resultMap;
     }
 
+    ////////////////////////////////////////////////////////////////////////////////////Functions.
     public List<Map<String, Object>> contentMatchingAndOrderByOrder (List<Map<String, Object>> playlistContentList,  List<Map<String, Object>> realContentList){
         for(Map<String, Object> playlistContent : playlistContentList){
             for(Map<String, Object> realContent : realContentList){

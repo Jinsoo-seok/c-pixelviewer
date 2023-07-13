@@ -283,10 +283,15 @@ public class ViewerServiceImpl implements ViewerService {
                             String weatherPath = "weather";
                             String weatherImage = weatherImageBranch(weatherMap.get("rainStatus"), weatherMap.get("skyStatus"));
 
-                            weatherMap.put("imagePath", protocol + wasIp + ":" + wasPort + "/" + weatherPath + "/" + adminSettingMapper.getValue(weatherImage));
+                            weatherMap.put("imagePathWeather", protocol + wasIp + ":" + wasPort + "/" + weatherPath + "/" + adminSettingMapper.getValue(weatherImage));
                             dataMap.put("weatherInfo", weatherMap);
                         }
                         else if (externalType.equals("대기")) {
+                            Map<String, Object> tempMap = (Map<String, Object>) obj;
+                            String airImage = airImageBranch(tempMap.get("pm10Grade"));
+                            String airPath = "air";
+                            tempMap.put("imagePathAir", protocol + wasIp + ":" + wasPort + "/" + airPath + "/" + airImage + ".jpg");
+
                             dataMap.put("airInfo", obj);
                         }
                     }
@@ -479,6 +484,26 @@ public class ViewerServiceImpl implements ViewerService {
         else{
             System.out.println("[WARN] rainStatus = " + rainStatus);
             return "weatherRain";
+        }
+    }
+
+    public String airImageBranch (Object pm10Grade){
+
+        if (pm10Grade.equals(1L)){
+            return "good";
+        }
+        else if (pm10Grade.equals(2L)){
+            return "normal";
+        }
+        else if (pm10Grade.equals(3L)){
+            return "bad";
+        }
+        else if (pm10Grade.equals(4L)){
+            return "veryBad";
+        }
+        else{
+            System.out.println("[WARN] pm10Grade = " + pm10Grade);
+            return "good";
         }
     }
 }
