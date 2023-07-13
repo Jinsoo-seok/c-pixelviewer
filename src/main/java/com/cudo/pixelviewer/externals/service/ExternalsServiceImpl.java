@@ -12,6 +12,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -40,8 +41,9 @@ public class ExternalsServiceImpl implements ExternalsService {
     
     final ExternalsMapper externalsMapper;
 
+    @Scheduled(cron = "0 0 2-23/3 * * *")
     @Override
-    public Map<String, Object> getExternalWeather(String baseTime) {
+    public Map<String, Object> getExternalWeather() {
         Map<String, Object> resultMap = new HashMap<>();
 
 //        String[] baseTimes = {"0200", "0500", "0800", "1100", "1400", "1700", "2000", "2300"};
@@ -61,7 +63,7 @@ public class ExternalsServiceImpl implements ExternalsService {
         String numOfRows = "36";
         String dataType = "JSON";
         String baseDate = localDateTime.substring(0, 8);
-//        String baseTime = localDateTime.substring(8, 12);
+        String baseTime = localDateTime.substring(8, 10) + "00";
 //        String baseTime = "2000";
         String nx = coordsSplit[0];
         String ny = coordsSplit[1];
@@ -127,6 +129,7 @@ public class ExternalsServiceImpl implements ExternalsService {
         return resultMap;
     }
 
+    @Scheduled(cron = "0 0 0-24/1 * * *")
     @Override
     public Map<String, Object> getExternalAir() {
         Map<String, Object> resultMap = new HashMap<>();
@@ -146,13 +149,6 @@ public class ExternalsServiceImpl implements ExternalsService {
                 + "&stationName=" + stationName
                 + "&dataTerm=" + dataTerm
                 + "&ver=" + ver;
-//
-//        String tempUrl2 = apisDataUrl + "?"
-//                + "serviceKey=" + serviceKey2
-//                + "&returnType=" + returnType
-//                + "&stationName=" + stationName
-//                + "&dataTerm=" + dataTerm
-//                + "&ver=" + ver;
 
         URI airRequestUrl = UriComponentsBuilder.fromHttpUrl(apisDataUrl)
                 .queryParam("serviceKey", serviceKey)
