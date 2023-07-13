@@ -1,5 +1,10 @@
 package com.cudo.pixelviewer.component;
 
+import com.cudo.pixelviewer.bo.mapper.LedconMapper;
+import com.cudo.pixelviewer.bo.mapper.PwrconMapper;
+import com.cudo.pixelviewer.vo.LedconVo;
+import com.cudo.pixelviewer.vo.PwrconVo;
+import com.cudo.pixelviewer.vo.ResponseWithIpVo;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -11,6 +16,14 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.*;
 
 @Component
@@ -18,22 +31,52 @@ import java.util.concurrent.*;
 public class LedControllerClient {
 
     private EventLoopGroup group;
-    private Channel channel;
     private TcpClientHandler tcpClientHandler;
-    private CompletableFuture<byte[]> responseFuture;
+    private Map<Channel, CompletableFuture<ResponseWithIpVo>> channelFutureMap;
+    final LedconMapper ledconMapper;
+    private Map<Channel, List<byte[]>> responseFragmentMap;
+    private boolean detectSenderMessage;
+
+    private final static Integer EXPECTED_TOTAL_LENGTH = 260;
+
+    public LedControllerClient(final LedconMapper ledconMapper) {
+        this.ledconMapper = ledconMapper;
+    }
 
 
     @PostConstruct
     public void start() throws Exception {
         group = new NioEventLoopGroup();
         tcpClientHandler = new TcpClientHandler();
+        channelFutureMap = new ConcurrentHashMap<>();
+        responseFragmentMap = new ConcurrentHashMap<>();
+        detectSenderMessage = false;
 
-        connect(new Bootstrap(), group);
+        connect(); // 초기 연결
     }
 
-    private void connect(Bootstrap bootstrap, EventLoopGroup eventLoop) {
-        log.info("Led Controller Connect Start {} : {}", bootstrap, eventLoop);
-        bootstrap.group(eventLoop)
+    public Map<Channel, CompletableFuture<ResponseWithIpVo>> getChannelFutureMap() {
+        return this.channelFutureMap;
+    }
+
+    private void connect() {
+        List<LedconVo> ipPortList = ledconMapper.getLedconList();
+
+        for (LedconVo ipPort : ipPortList) {
+            String ip = ipPort.getIp();
+            Integer port = ipPort.getPort();
+
+            connectChannel(ip, port);
+        }
+    }
+
+    private void connectChannel(String ip, int port) {
+        log.info("Led Controller Connect Start ip: {} port : {}", ip, port);
+
+        Bootstrap bootstrap = new Bootstrap();
+
+        bootstrap
+                .group(new NioEventLoopGroup())
                 .channel(NioSocketChannel.class)
                 .handler(new ChannelInitializer<Channel>() {
                     @Override
@@ -41,55 +84,94 @@ public class LedControllerClient {
                         ChannelPipeline pipeline = ch.pipeline();
                         pipeline.addLast(tcpClientHandler);
                     }
+                }).connect(ip, port).addListener((ChannelFuture future) -> {
+                    if (future.isSuccess()) {
+                        Channel channel = future.channel();
+                        channelFutureMap.put(channel, new CompletableFuture<>());
+                    } else {
+                        log.error("Failed to Led Controller Connect. Retrying in 5 seconds... Because {}", String.valueOf(future.cause()));
+
+                        future.channel().eventLoop().schedule(() -> connectChannel(ip, port), 5, TimeUnit.SECONDS);
+                    }
                 });
-
-        // TODO 재연결 예외처리 추가 필요
-        bootstrap.connect("192.168.0.201", 9999).addListener((ChannelFuture future) -> {
-            if (future.isSuccess()) {
-                channel = future.channel();
-            } else {
-                log.error("Failed to Led Controller Connect. Retrying in 5 seconds... Because {}", String.valueOf(future.cause()));
-
-                future.channel().eventLoop().schedule(() -> connect(bootstrap, eventLoop), 5, TimeUnit.SECONDS);
-            }
-        });
     }
 
-    public CompletableFuture<byte[]> sendMessage(byte[] message) {
-        CompletableFuture<byte[]> future = new CompletableFuture<>();
-        responseFuture = future;
+    public CompletableFuture<ResponseWithIpVo[]> sendMessage(byte[] message) {
+        List<CompletableFuture<ResponseWithIpVo>> futures = new ArrayList<>();
 
         // send it to the server
-        if (channel != null && channel.isActive()) {
-            ByteBuf buffer = Unpooled.wrappedBuffer(message);
+        for (Map.Entry<Channel, CompletableFuture<ResponseWithIpVo>> entry : channelFutureMap.entrySet()) {
+            Channel channel = entry.getKey();
+            CompletableFuture<ResponseWithIpVo> future = new CompletableFuture<>();
+            futures.add(future);
 
-            ChannelFuture channelFuture = channel.writeAndFlush(buffer);
+            if (channel != null && channel.isActive()) {
+                // detect sender 메세지 체크 true 이면 detect sender 이므로 길이 체크 수행
+                detectSenderMessage = checkDetectSenderMessage(message);
 
-            channelFuture.addListener((ChannelFutureListener) future1 -> {
-                if (!future1.isSuccess()) {
-                    Throwable cause = future1.cause();
-                    log.error("SEND PACKET TO LED CONTROLLER FAIL", cause);
-                    future.completeExceptionally(cause);
-                } else {
-                    log.info("SEND PACKET {} TO LED CONTROLLER SUCCESS", message);
-                }
-            });
-        } else {
-            log.error("NO ACTIVE LED CONTROLLER CONNECTION");
-            future.completeExceptionally(new RuntimeException("No active LED controller connection"));
+                ByteBuf buffer = Unpooled.wrappedBuffer(message);
+
+                ChannelFuture channelFuture = channel.writeAndFlush(buffer);
+
+                channelFuture.addListener((ChannelFutureListener) future1 -> {
+                    if (!future1.isSuccess()) {
+                        Throwable cause = future1.cause();
+                        log.error("Send Packet To LED Controller Fail", cause);
+                        future.completeExceptionally(cause);
+                    } else {
+                        log.info("Send Packet {} To LED Controller Success", message);
+                    }
+                });
+            } else {
+                log.error("No Active LED Controller Connection");
+                future.completeExceptionally(new RuntimeException("No active LED Controller Connection"));
+            }
+
+            channelFutureMap.put(channel, future);
         }
 
-        return future;
+        return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
+                .thenApply(v -> {
+                    // Get the responses from channelFutureMap along with IP address
+                    ResponseWithIpVo[] responses = new ResponseWithIpVo[futures.size()];
+                    for (int i = 0; i < futures.size(); i++) {
+                        CompletableFuture<ResponseWithIpVo> future = futures.get(i);
+                        try {
+                            byte[] response = future.get().getResponse();
+                            String ip = future.get().getIp();
+                            responses[i] = new ResponseWithIpVo(response, ip);
+                        } catch (InterruptedException | ExecutionException e) {
+                            log.error("Failed to get led controller response with IP address", e);
+                        }
+                    }
+                    return responses;
+                });
     }
 
     @PreDestroy
     public void stop() throws InterruptedException {
-        if (channel != null) {
-            channel.close().sync();
+        for (Map.Entry<Channel, CompletableFuture<ResponseWithIpVo>> entry : channelFutureMap.entrySet()) {
+            Channel channel = entry.getKey();
+
+            if (channel != null) {
+                channel.close().sync();
+                CompletableFuture<ResponseWithIpVo> future = channelFutureMap.remove(channel); // 맵에서 CompletableFuture 제거함
+
+                if (future != null) {
+                    future.completeExceptionally(new RuntimeException("Led Controller Channel closed"));
+                }
+            }
         }
+
         if (group != null) {
             group.shutdownGracefully().sync();
         }
+    }
+
+    private boolean checkDetectSenderMessage(byte[] message) {
+        byte[] ledStatusMessage = {0x01, 0x00, 0x11, 0x00, 0x00, 0x00, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x16};
+
+        return Arrays.equals(message, ledStatusMessage);
     }
 
     @ChannelHandler.Sharable
@@ -114,6 +196,19 @@ public class LedControllerClient {
             log.info("Heartbeat send to Led Controller");
         }
 
+        /**
+         * * IP 가져오기
+         */
+        private String getIpAddressFromChannel(Channel channel) {
+            String ip = "";
+            SocketAddress remoteAddress = channel.remoteAddress();
+
+            if (remoteAddress instanceof InetSocketAddress) {
+                InetSocketAddress inetAddress = (InetSocketAddress) remoteAddress;
+                ip = inetAddress.getHostString();
+            }
+            return ip;
+        }
 
         /**
          * * TCP 통신 후 Response 값 처리
@@ -123,15 +218,69 @@ public class LedControllerClient {
             byte[] responseByte = new byte[msg.readableBytes()];
             msg.readBytes(responseByte);
 
-            StringBuilder hexString = new StringBuilder();
-            for (byte responseValue : responseByte) {
-                String hex = String.format("%02X", responseValue);
-                hexString.append(hex);
-            }
+            CompletableFuture<ResponseWithIpVo> future = channelFutureMap.get(ctx.channel());
 
-            if (responseFuture != null && !hexString.toString().equals("99990400")) {
-                responseFuture.complete(responseByte);
+            if (future != null && !bytesToHexString(responseByte).equals("99990400")) {
+                String ip = getIpAddressFromChannel(ctx.channel()); // IP 주소 가져오기
+
+                if (!responseFragmentMap.containsKey(ctx.channel())) {
+                    // 채널에 대한 응답 값 조각이 없는 경우, 새로운 응답 값 조각 맵을 생성
+                    responseFragmentMap.put(ctx.channel(), new ArrayList<>());
+                }
+
+                List<byte[]> fragmentList = responseFragmentMap.get(ctx.channel());
+                fragmentList.add(responseByte);
+
+                // 응답 값 길이 체크, detect Sender 메세지가 아닐 경우 길이체크 x
+                if (isResponseComplete(fragmentList) || !detectSenderMessage) {
+                    byte[] assembledData = assembleResponse(fragmentList); // 하나의 응답 값으로 생성
+                    ResponseWithIpVo responseWithIp = new ResponseWithIpVo(assembledData, ip);
+
+                    // CompletableFuture 완료
+                    future.complete(responseWithIp);
+
+                    // 응답 값 조각 맵에서 제거
+                    responseFragmentMap.remove(ctx.channel());
+                }
             }
+        }
+
+        /**
+         * * 하트비트 패킷 구별
+         */
+        private String bytesToHexString(byte[] bytes) {
+            StringBuilder hexString = new StringBuilder();
+            for (byte b : bytes) {
+                hexString.append(String.format("%02X", b));
+            }
+            return hexString.toString();
+        }
+
+        /**
+         * * 응답 값 길이 체크
+         */
+        private boolean isResponseComplete(List<byte[]> fragmentList) {
+            int totalLength = fragmentList.stream()
+                    .mapToInt(response -> response.length)
+                    .sum();
+
+            return totalLength >= EXPECTED_TOTAL_LENGTH;
+        }
+
+        /**
+         * * 응답 값을 합치기
+         */
+        private byte[] assembleResponse(List<byte[]> fragmentList) {
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
+            for (byte[] fragment : fragmentList) {
+                try {
+                    outputStream.write(fragment);
+                } catch (IOException e) {
+                    log.error("Error while assembling response", e);
+                }
+            }
+            return outputStream.toByteArray();
         }
 
         /**
@@ -139,12 +288,30 @@ public class LedControllerClient {
          */
         @Override
         public void channelInactive(ChannelHandlerContext ctx) {
-            log.error("Lost connection to Led Controller. Reconnecting...");
+            String ip = "";
+            int port = 0;
+
+            SocketAddress remoteAddress = ctx.channel().remoteAddress();
+
+            if (remoteAddress instanceof InetSocketAddress) {
+                InetSocketAddress inetAddress = (InetSocketAddress) remoteAddress;
+                ip = inetAddress.getHostString();
+                port = inetAddress.getPort();
+            }
+
+            log.error("Lost connection to Led Controller. Reconnecting to {}:{}", ip, port);
 
             // 하트비트 전송 작업 취소
             heartbeatTask.cancel(true);
 
-            connect(new Bootstrap(), ctx.channel().eventLoop().parent());
+            Channel channel = ctx.channel();
+
+            CompletableFuture<ResponseWithIpVo> future = channelFutureMap.remove(channel); // 맵에서 CompletableFuture 제거함
+            if (future != null) {
+                future.completeExceptionally(new RuntimeException("Led Channel Inactive"));
+            }
+
+            connectChannel(ip, port);
         }
 
         /**
@@ -163,6 +330,13 @@ public class LedControllerClient {
                     HEARTBEAT_INTERVAL_SECONDS, // 주기적인 간격
                     TimeUnit.SECONDS
             );
+
+            Channel channel = ctx.channel();
+
+            channelFutureMap.computeIfPresent(channel, (c, future) -> {
+                future.completeExceptionally(new RuntimeException("Led Channel reconnected"));
+                return new CompletableFuture<>(); // 재연결된 채널에 대해 새로운 CompletableFuture 생성함
+            });
         }
     }
 }
