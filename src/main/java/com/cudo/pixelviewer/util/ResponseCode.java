@@ -56,9 +56,14 @@ public enum ResponseCode {
     FAIL_UPDATE_PRESET_STATUS(3307, "FailedUpdatePresetStatus", "Failed Update Preset Status"),
     FAIL_UNSUPPORTED_PRESET_STATUS(3308, "FailedUnsupportedPresetStatus", "Failed Unsupported Preset Status"),
     FAIL_UNSUPPORTED_PRESET_CONTROL_TYPE(3309, "FailedUnsupportedPresetControlType", "Failed Unsupported Preset Control Type"),
+    FAIL_NOT_EXIST_PRESET_ALLOCATE_RUN_LAYERS(3310, "FailedNotExistPresetAllocateRunLayers", "Failed Not Exist Preset Allocate Run Layers"),
 
-    FAIL_UPDATE_NOT_EXIST_PLAYLIST(3310, "FailedUpdateNotExistPlaylist", "Failed Update Not Exist Playlist"),
-    ALREADY_PLAYING_PRESET(3311, "AlreadyPlayingPreset", "Already Playing Preset"),
+    FAIL_UPDATE_NOT_EXIST_PLAYLIST(3311, "FailedUpdateNotExistPlaylist", "Failed Update Not Exist Playlist"),
+    ALREADY_PLAYING_PRESET(3312, "AlreadyPlayingPreset", "Already Playing Preset"),
+
+    FAIL_PRESET_RUN_TO_AGENT(3314, "FailedPresetRunToAgent", "Failed Preset Run To Agent"),
+    FAIL_AGENT_TO_VIEWER(3315, "FailedAgentToViewer", "Failed Agent To Viewer"),
+
 
     // Layer : 3400
     FAIL_INSERT_LAYER(3400, "FailedInsertLayer", "Failed Insert Layer"),
