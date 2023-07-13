@@ -12,6 +12,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -28,12 +29,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-// TODO : [미완료]restTemplate으로 해보기
-//  이후 스케줄
-//  시간 올림처리
-
 @Slf4j
 @Service
+@EnableScheduling
 @RequiredArgsConstructor
 public class ExternalsServiceImpl implements ExternalsService {
 
@@ -41,7 +39,7 @@ public class ExternalsServiceImpl implements ExternalsService {
     
     final ExternalsMapper externalsMapper;
 
-    @Scheduled(cron = "0 0 2-23/3 * * *")
+    @Scheduled(cron = "0 0 2-23/3 1/1 * ?")
     @Override
     public Map<String, Object> getExternalWeather() {
         Map<String, Object> resultMap = new HashMap<>();
@@ -83,7 +81,7 @@ public class ExternalsServiceImpl implements ExternalsService {
 
 
         String type = "날씨";
-        System.out.println("weatherRequestUrl = " + weatherRequestUrl);
+        System.out.println("[@Scheduled]weatherRequestUrl = " + weatherRequestUrl);
         Map<String, Object> webClientResponseMap = webClientFunction(type, weatherRequestUrl);
 
         if(webClientResponseMap != null){
@@ -129,7 +127,7 @@ public class ExternalsServiceImpl implements ExternalsService {
         return resultMap;
     }
 
-    @Scheduled(cron = "0 0 0-24/1 * * *")
+    @Scheduled(cron = "0 0 0/1 1/1 * ?")
     @Override
     public Map<String, Object> getExternalAir() {
         Map<String, Object> resultMap = new HashMap<>();
@@ -160,8 +158,8 @@ public class ExternalsServiceImpl implements ExternalsService {
                 .toUri();
 
         String type = "대기";
-        System.out.println("tempUrl = " + tempUrl);
-        System.out.println("airRequestUrl = " + airRequestUrl);
+        System.out.println("[@Scheduled]airRequestUrl = " + tempUrl);
+//        System.out.println("[@Scheduled]airRequestUrl = " + airRequestUrl);
         Map<String, Object> webClientResponseMap = webClientFunction(type, tempUrl);
 
         if(webClientResponseMap != null){

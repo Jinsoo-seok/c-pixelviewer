@@ -277,7 +277,6 @@ public class ViewerServiceImpl implements ViewerService {
                         if (externalType.equals("날씨")) {
                             // TODO : [미완료] 시간별 분기처리
                             Map<String, Object> tempMap = (Map<String, Object>) obj;
-
                             Map<String, Object> weatherMap = (Map<String, Object>) tempMap.get("weather12");
 
                             String weatherPath = "weather";
@@ -288,17 +287,17 @@ public class ViewerServiceImpl implements ViewerService {
                         }
                         else if (externalType.equals("대기")) {
                             Map<String, Object> tempMap = (Map<String, Object>) obj;
+
                             String airImage = airImageBranch(tempMap.get("pm10Grade"));
                             String airPath = "air";
-                            tempMap.put("imagePath", protocol + wasIp + ":" + wasPort + "/" + airPath + "/" + airImage + ".jpg");
 
+                            tempMap.put("imagePath", protocol + wasIp + ":" + wasPort + "/" + airPath + "/" + airImage + ".jpg");
                             dataMap.put("airInfo", obj);
                         }
                     }
                 }
             }
             resultMap.put("data", dataMap);
-
             resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
         }
         else{
