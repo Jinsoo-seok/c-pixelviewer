@@ -287,6 +287,11 @@ public class ViewerServiceImpl implements ViewerService {
                             dataMap.put("weatherInfo", weatherMap);
                         }
                         else if (externalType.equals("대기")) {
+                            Map<String, Object> tempMap = (Map<String, Object>) obj;
+                            String airImage = airImageBranch(tempMap.get("pm10Grade"));
+                            String airPath = "air";
+                            tempMap.put("imagePath", protocol + wasIp + ":" + wasPort + "/" + airPath + "/" + airImage + ".jpg");
+
                             dataMap.put("airInfo", obj);
                         }
                     }
@@ -324,6 +329,7 @@ public class ViewerServiceImpl implements ViewerService {
                 Boolean agentCaptureType = false;
                 Boolean contentsType = false;
                 Boolean weatherType = false;
+                Boolean airType = false;
 
                 if(os.equals("Linux")){
                     filePath = "/usr/local/tomcat/webapps/";
@@ -349,6 +355,13 @@ public class ViewerServiceImpl implements ViewerService {
                     {
                         weatherType = true;
                         filePath += "weather"  + File.separator + originalFilename;
+                        break;
+                    }
+                    // Air Img
+                    case "110": case "120": case "130": case "140":
+                    {
+                        airType = true;
+                        filePath += "air"  + File.separator + originalFilename;
                         break;
                     }
                     default: {
@@ -401,6 +414,36 @@ public class ViewerServiceImpl implements ViewerService {
                         resultMap.put("message", ResponseCode.FAIL_UPDATE_ADMIN_SETTING_WEATHER_IMG.getMessage());
                     }
                 }
+                else if(airType){
+                    Boolean airImgDB = false;
+                    String settingKey = "";
+                    if (type.equals("110")) {
+                        settingKey = "airGood";
+                    } else if (type.equals("120")) {
+                        settingKey = "airNormal";
+                    } else if (type.equals("130")) {
+                        settingKey = "airBad";
+                    } else if (type.equals("140")) {
+                        settingKey = "airVeryBad";
+                    }
+
+//                    int airImgResult = adminSettingMapper.patchWeatherImg(settingKey, originalFilename);
+                    int airImgResult = 1;
+                    if(airImgResult > 0){
+                        airImgDB = true;
+                    }
+                    if(airImgDB) {
+                        Map<String, Object> dataMap = new HashMap<>();
+                        dataMap.put("filePath", filePath);
+                        resultMap.put("data", dataMap);
+                        resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
+                    }
+                    else{
+                        resultMap.put("code", ResponseCode.FAIL_UPDATE_ADMIN_SETTING_AIR_IMG.getCode());
+                        resultMap.put("message", ResponseCode.FAIL_UPDATE_ADMIN_SETTING_AIR_IMG.getMessage());
+                    }
+                }
+
             } catch (IOException ioException) {
                 ioException.printStackTrace();
                 log.error("[paramException][postPreviewImgUpload] - {}", ioException.getMessage());
@@ -479,6 +522,26 @@ public class ViewerServiceImpl implements ViewerService {
         else{
             System.out.println("[WARN] rainStatus = " + rainStatus);
             return "weatherRain";
+        }
+    }
+
+    public String airImageBranch (Object pm10Grade){
+
+        if (pm10Grade.equals(1L)){
+            return "good";
+        }
+        else if (pm10Grade.equals(2L)){
+            return "normal";
+        }
+        else if (pm10Grade.equals(3L)){
+            return "bad";
+        }
+        else if (pm10Grade.equals(4L)){
+            return "veryBad";
+        }
+        else{
+            System.out.println("[WARN] pm10Grade = " + pm10Grade);
+            return "good";
         }
     }
 }
