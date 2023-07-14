@@ -344,7 +344,8 @@ public class ViewerServiceImpl implements ViewerService {
                     // Contents Thumbnails
                     case "20": {
                         contentsType = true;
-                        filePath += "thumbnails"  + File.separator + filename + "_" + formattedDateTime + extension;
+//                        filePath += "thumbnails"  + File.separator + filename + "_" + formattedDateTime + extension;
+                        filePath = File.separator + "thumbnails"  + File.separator + filename + "_" + formattedDateTime + extension;
                         break;
                     }
                     // Weather Img
@@ -354,6 +355,7 @@ public class ViewerServiceImpl implements ViewerService {
                     {
                         weatherType = true;
                         filePath += "weather"  + File.separator + originalFilename;
+//                        filePath = File.separator + "weather"  + File.separator + originalFilename;
                         break;
                     }
                     // Air Img
@@ -361,6 +363,7 @@ public class ViewerServiceImpl implements ViewerService {
                     {
                         airType = true;
                         filePath += "air"  + File.separator + originalFilename;
+//                        filePath = File.separator + "air"  + File.separator + originalFilename;
                         break;
                     }
                     default: {
@@ -473,6 +476,7 @@ public class ViewerServiceImpl implements ViewerService {
         Map<String, Object> tempPositionMap = new HashMap<>();
 
         tempStyleMap.put("fontNm", dataMap.get("fontNm"));
+        tempStyleMap.put("fontFl", dataMap.get("fontFl"));
         tempStyleMap.put("fontSize", dataMap.get("fontSize"));
         tempStyleMap.put("forecolor", dataMap.get("forecolor"));
 
