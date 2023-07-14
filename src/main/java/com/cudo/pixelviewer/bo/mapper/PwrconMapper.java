@@ -20,4 +20,5 @@ public interface PwrconMapper {
     int putPwrconValid(Map<String, Object> param);
     int putPwrcon(Map<String, Object> param);
 
+    Map<String, Object> putPwrConValid(Integer condeviceId);
 }

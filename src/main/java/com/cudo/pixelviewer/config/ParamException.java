@@ -6,11 +6,11 @@ public class ParamException extends Throwable {
 
     private static final long serialVersionUID = 1L;
 
-    private ResponseCode responseCode;
-    private int code;
-    private String codeName;
-    private String message;
-    private String key;
+    private final ResponseCode responseCode;
+    private final int code;
+    private final String codeName;
+    private final String message;
+    private final String key;
 
     public ParamException(ResponseCode responseCode) {
         this.responseCode = responseCode;

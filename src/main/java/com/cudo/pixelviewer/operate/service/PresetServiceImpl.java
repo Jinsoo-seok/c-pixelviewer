@@ -295,7 +295,7 @@ public class PresetServiceImpl implements PresetService {
         Boolean runPresetYn = false;
         if(runPresetVo != null){
             runPresetYn = true;
-        };
+        }
 
         String controlType = (String) param.get("controlType");
         Object newPresetId = param.get("presetId");

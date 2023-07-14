@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 
 @Component
 @Slf4j
@@ -39,6 +40,7 @@ public class LedControllerClient {
     private AtomicBoolean detectSenderMessage;
 
     private final static Integer EXPECTED_TOTAL_LENGTH = 260;
+    private final static Integer SOCKET_RE_CONNECT_COUNT = 3;
 
     public LedControllerClient(final LedconMapper ledconMapper) {
         this.ledconMapper = ledconMapper;
@@ -60,6 +62,11 @@ public class LedControllerClient {
         return this.channelFutureMap;
     }
 
+    public void setChannelFutureMap(Map<Channel, CompletableFuture<ResponseWithIpVo>> channelFutureMap) {
+        this.channelFutureMap = channelFutureMap;
+
+    }
+
     private void connect() {
         List<LedconVo> ipPortList = ledconMapper.getLedconList();
 
@@ -67,16 +74,14 @@ public class LedControllerClient {
             String ip = ipPort.getIp();
             Integer port = ipPort.getPort();
 
-            connectChannel(ip, port);
+            connectChannel(ip, port, 0);
         }
     }
 
-    public void connectChannel(String ip, int port) {
+    public void connectChannel(String ip, int port, int reConnectCount) {
         log.info("Led Controller Connect Start ip: {} port : {}", ip, port);
 
         Bootstrap bootstrap = new Bootstrap();
-
-        CompletableFuture<Boolean> future = new CompletableFuture<>();
 
         bootstrap
                 .group(new NioEventLoopGroup())
@@ -91,20 +96,14 @@ public class LedControllerClient {
                     if (channelFuture.isSuccess()) {
                         Channel channel = channelFuture.channel();
                         channelFutureMap.put(channel, new CompletableFuture<>());
-                        future.complete(true);
                     } else {
                         log.error("Failed to Led Controller Connect. Retrying in 5 seconds... Because {}", String.valueOf(channelFuture.cause()));
 
-//                        channelFuture.channel().eventLoop().schedule(() -> connectChannel(ip, port), 5, TimeUnit.SECONDS);
+                        if (reConnectCount < SOCKET_RE_CONNECT_COUNT) {
+                            channelFuture.channel().eventLoop().schedule(() -> connectChannel(ip, port, reConnectCount + 1), 5, TimeUnit.SECONDS);
+                        }
                     }
                 });
-
-//        try {
-//            return future.get();
-//        } catch (InterruptedException | ExecutionException e) {
-//            log.error("Exception while connecting to Led Controller: {}", e.getMessage());
-//            return false;
-//        }
     }
 
     public CompletableFuture<ResponseWithIpVo[]> sendMessage(byte[] message) {
@@ -322,7 +321,7 @@ public class LedControllerClient {
                 future.completeExceptionally(new RuntimeException("Led Channel Inactive"));
             }
 
-            connectChannel(ip, port);
+            connectChannel(ip, port, 0);
         }
 
         /**

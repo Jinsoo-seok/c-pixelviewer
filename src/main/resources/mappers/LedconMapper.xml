@@ -135,5 +135,16 @@
             color_temp = 0
         WHERE led_controller_id = #{ledControllerId}
     </update>
+    
+    <select id="postIpLedPwrValid" parameterType="String" resultType="String">
+        SELECT lc.ip FROM LED_Controls AS lc  WHERE lc.ip = #{ip}
+        UNION ALL
+        SELECT dc.ip FROM Device_Controls AS dc WHERE dc.ip = #{ip}
+    </select>
 
+    <select id="putLedConValid" parameterType="int" resultType="Map">
+        SELECT ip, port
+        FROM LED_Controls
+        WHERE led_controller_id = #{ledControllerId}
+    </select>
 </mapper>

@@ -119,6 +119,8 @@ public enum ResponseCode {
     FAIL_DELETE_LEDCON(4203, "FailedDeleteLedcon", "Failed Delete Ledcon"),
     FAIL_NOT_EXIST_LEDCON(4204, "FailedNotExistLedcon", "Failed Not Exist Ledcon"),
 
+    FAIL_DUPLICATE_IP(4205, "FailedDuplicateIp", "Failed Duplicate Ip"),
+
     // Setting : 4300
     FAIL_UPDATE_SETTING_VALUES(4301, "FailedUpdateSettingValues", "Failed to Update Setting Values"),
 
@@ -162,9 +164,9 @@ public enum ResponseCode {
 
 
 
-    private int code;
-    private String codeName;
-    private String message;
+    private final int code;
+    private final String codeName;
+    private final String message;
 
     ResponseCode(int code, String codeName, String message){
         this.code = code;

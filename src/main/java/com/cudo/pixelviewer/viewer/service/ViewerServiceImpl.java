@@ -228,11 +228,7 @@ public class ViewerServiceImpl implements ViewerService {
         Integer diffCheckMin = 3;
         Boolean diffYn = false;
 
-        if (minutesDifference >= diffCheckMin) {
-            diffYn = false;
-        } else {
-            diffYn = true;
-        }
+        diffYn = minutesDifference < diffCheckMin;
 
         Map<String, Object> viewerParam = new HashMap<>();
         viewerParam.put("viewerStatus", viewerStatus);

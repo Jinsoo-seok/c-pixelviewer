@@ -114,4 +114,10 @@
             led_key = "NULL"
         WHERE D.condevice_id = #{condeviceId}
     </update>
+
+    <select id="putPwrConValid" parameterType="int" resultType="Map">
+        SELECT ip, port
+        FROM Device_Controls
+        WHERE condevice_id = #{condeviceId}
+    </select>
 </mapper>

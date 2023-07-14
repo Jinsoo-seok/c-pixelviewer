@@ -20,4 +20,7 @@ public interface LedconMapper {
     int putLedconValid(Map<String, Object> param);
     int putLedcon(Map<String, Object> param);
 
+    List<String> postIpLedPwrValid(String ip);
+    Map<String, Object> putLedConValid(Integer ledControllerId);
+
 }

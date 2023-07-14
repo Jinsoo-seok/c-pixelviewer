@@ -398,9 +398,7 @@ public class ScheduleServiceImpl implements ScheduleService {
                             .BrightnessVal(Integer.parseInt(String.valueOf(lightInfo.get("brightness"))))
                             .build());
 
-                    if (deleteSet.contains(Long.parseLong(String.valueOf(lightInfo.get("listId"))))) {
-                        deleteSet.remove(Long.parseLong(String.valueOf(lightInfo.get("listId"))));
-                    }
+                    deleteSet.remove(Long.parseLong(String.valueOf(lightInfo.get("listId"))));
                 }
             }
 

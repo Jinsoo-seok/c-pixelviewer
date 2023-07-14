@@ -32,12 +32,10 @@ public class DeviceControllerClient {
     private Map<Channel, CompletableFuture<ResponseWithIpVo>> channelFutureMap;
     final PwrconMapper pwrconMapper;
 
+    private final static Integer SOCKET_RE_CONNECT_COUNT = 3;
+
     public DeviceControllerClient(final PwrconMapper pwrconMapper) {
         this.pwrconMapper = pwrconMapper;
-    }
-
-    public Map<Channel, CompletableFuture<ResponseWithIpVo>> getChannelFutureMap() {
-        return this.channelFutureMap;
     }
 
     @PostConstruct
@@ -49,6 +47,15 @@ public class DeviceControllerClient {
         connect(); // 초기 연결
     }
 
+    public Map<Channel, CompletableFuture<ResponseWithIpVo>> getChannelFutureMap() {
+        return this.channelFutureMap;
+    }
+
+    public void setChannelFutureMap(Map<Channel, CompletableFuture<ResponseWithIpVo>> channelFutureMap) {
+        this.channelFutureMap = channelFutureMap;
+
+    }
+
     private void connect() {
         List<PwrconVo> ipPortList = pwrconMapper.getPwrconList();
 
@@ -56,11 +63,11 @@ public class DeviceControllerClient {
             String ip = ipPort.getIp();
             Integer port = ipPort.getPort();
 
-            connectChannel(ip, port);
+            connectChannel(ip, port, 0);
         }
     }
 
-    private void connectChannel(String ip, int port) {
+    public void connectChannel(String ip, int port, int reConnectCount) {
         log.info("Device Unit Controller Connect Start ip: {} port : {}", ip, port);
 
         Bootstrap bootstrap = new Bootstrap();
@@ -81,7 +88,9 @@ public class DeviceControllerClient {
                     } else {
                         log.error("Failed to Device Unit Controller Connect. Retrying in 5 seconds... Because {}", String.valueOf(future.cause()));
 
-//                        future.channel().eventLoop().schedule(() -> connectChannel(ip, port), 5, TimeUnit.SECONDS);
+                        if (reConnectCount < SOCKET_RE_CONNECT_COUNT) {
+                            future.channel().eventLoop().schedule(() -> connectChannel(ip, port, reConnectCount + 1), 5, TimeUnit.SECONDS);
+                        }
                     }
                 });
     }
@@ -216,7 +225,7 @@ public class DeviceControllerClient {
                 future.completeExceptionally(new RuntimeException("Device Unit Channel Inactive"));
             }
 
-            connectChannel(ip, port);
+            connectChannel(ip, port, 0);
         }
 
         /**

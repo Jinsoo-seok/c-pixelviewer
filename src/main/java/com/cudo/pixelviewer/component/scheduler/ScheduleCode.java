@@ -15,8 +15,8 @@ public enum ScheduleCode {
     LED_PLAY_LIST("key", "ledPlayList");
 
 
-    private String code;
-    private String value;
+    private final String code;
+    private final String value;
 
     ScheduleCode(String code, String value){
         this.code = code;
