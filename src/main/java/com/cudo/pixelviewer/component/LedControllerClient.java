@@ -25,6 +25,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @Component
 @Slf4j
@@ -35,7 +36,7 @@ public class LedControllerClient {
     private Map<Channel, CompletableFuture<ResponseWithIpVo>> channelFutureMap;
     final LedconMapper ledconMapper;
     private Map<Channel, List<byte[]>> responseFragmentMap;
-    private boolean detectSenderMessage;
+    private AtomicBoolean detectSenderMessage;
 
     private final static Integer EXPECTED_TOTAL_LENGTH = 260;
 
@@ -50,7 +51,7 @@ public class LedControllerClient {
         tcpClientHandler = new TcpClientHandler();
         channelFutureMap = new ConcurrentHashMap<>();
         responseFragmentMap = new ConcurrentHashMap<>();
-        detectSenderMessage = false;
+        detectSenderMessage = new AtomicBoolean(false);
 
         connect(); // 초기 연결
     }
@@ -70,10 +71,12 @@ public class LedControllerClient {
         }
     }
 
-    private void connectChannel(String ip, int port) {
+    public void connectChannel(String ip, int port) {
         log.info("Led Controller Connect Start ip: {} port : {}", ip, port);
 
         Bootstrap bootstrap = new Bootstrap();
+
+        CompletableFuture<Boolean> future = new CompletableFuture<>();
 
         bootstrap
                 .group(new NioEventLoopGroup())
@@ -84,16 +87,24 @@ public class LedControllerClient {
                         ChannelPipeline pipeline = ch.pipeline();
                         pipeline.addLast(tcpClientHandler);
                     }
-                }).connect(ip, port).addListener((ChannelFuture future) -> {
-                    if (future.isSuccess()) {
-                        Channel channel = future.channel();
+                }).connect(ip, port).addListener((ChannelFuture channelFuture) -> {
+                    if (channelFuture.isSuccess()) {
+                        Channel channel = channelFuture.channel();
                         channelFutureMap.put(channel, new CompletableFuture<>());
+                        future.complete(true);
                     } else {
-                        log.error("Failed to Led Controller Connect. Retrying in 5 seconds... Because {}", String.valueOf(future.cause()));
+                        log.error("Failed to Led Controller Connect. Retrying in 5 seconds... Because {}", String.valueOf(channelFuture.cause()));
 
-                        future.channel().eventLoop().schedule(() -> connectChannel(ip, port), 5, TimeUnit.SECONDS);
+//                        channelFuture.channel().eventLoop().schedule(() -> connectChannel(ip, port), 5, TimeUnit.SECONDS);
                     }
                 });
+
+//        try {
+//            return future.get();
+//        } catch (InterruptedException | ExecutionException e) {
+//            log.error("Exception while connecting to Led Controller: {}", e.getMessage());
+//            return false;
+//        }
     }
 
     public CompletableFuture<ResponseWithIpVo[]> sendMessage(byte[] message) {
@@ -107,7 +118,7 @@ public class LedControllerClient {
 
             if (channel != null && channel.isActive()) {
                 // detect sender 메세지 체크 true 이면 detect sender 이므로 길이 체크 수행
-                detectSenderMessage = checkDetectSenderMessage(message);
+                detectSenderMessage.set(checkDetectSenderMessage(message));
 
                 ByteBuf buffer = Unpooled.wrappedBuffer(message);
 
@@ -232,7 +243,7 @@ public class LedControllerClient {
                 fragmentList.add(responseByte);
 
                 // 응답 값 길이 체크, detect Sender 메세지가 아닐 경우 길이체크 x
-                if (isResponseComplete(fragmentList) || !detectSenderMessage) {
+                if (isResponseComplete(fragmentList) || !detectSenderMessage.get()) {
                     byte[] assembledData = assembleResponse(fragmentList); // 하나의 응답 값으로 생성
                     ResponseWithIpVo responseWithIp = new ResponseWithIpVo(assembledData, ip);
 

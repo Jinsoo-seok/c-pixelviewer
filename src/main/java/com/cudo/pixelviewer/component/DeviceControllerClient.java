@@ -81,7 +81,7 @@ public class DeviceControllerClient {
                     } else {
                         log.error("Failed to Device Unit Controller Connect. Retrying in 5 seconds... Because {}", String.valueOf(future.cause()));
 
-                        future.channel().eventLoop().schedule(() -> connectChannel(ip, port), 5, TimeUnit.SECONDS);
+//                        future.channel().eventLoop().schedule(() -> connectChannel(ip, port), 5, TimeUnit.SECONDS);
                     }
                 });
     }

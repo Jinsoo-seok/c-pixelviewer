@@ -75,7 +75,6 @@ public class InputSourceComponent implements InitializingBean {
 
     public int getInputSourceCode(String inputSource) throws ParamException {
         if (inputSourceMap.containsKey(inputSource)) {
-            System.out.println("111111111111111111111111111111");
             return Integer.decode(inputSourceMap.get(inputSource));
         } else {
             throw new ParamException(ResponseCode.INVALID_PARAM_VALUE, "inputSource");
