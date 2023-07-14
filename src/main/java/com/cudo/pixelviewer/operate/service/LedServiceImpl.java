@@ -1,13 +1,19 @@
 package com.cudo.pixelviewer.operate.service;
 
-import com.cudo.pixelviewer.bo.mapper.AdminSettingMapper;
+import com.cudo.pixelviewer.bo.mapper.LedconMapper;
+import com.cudo.pixelviewer.bo.mapper.PwrconMapper;
 import com.cudo.pixelviewer.component.DeviceControllerClient;
+import com.cudo.pixelviewer.component.InputSourceComponent;
 import com.cudo.pixelviewer.component.LedControllerClient;
 import com.cudo.pixelviewer.config.ParamException;
 import com.cudo.pixelviewer.operate.mapper.LedMapper;
 import com.cudo.pixelviewer.util.ParameterUtils;
 import com.cudo.pixelviewer.util.ResponseCode;
-import com.cudo.pixelviewer.vo.LedStatusVo;
+import com.cudo.pixelviewer.vo.LedconVo;
+import com.cudo.pixelviewer.vo.PwrconVo;
+import com.cudo.pixelviewer.vo.ResponseWithIpVo;
+import io.netty.channel.Channel;
+import io.netty.handler.timeout.TimeoutException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,6 +21,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static com.cudo.pixelviewer.util.TcpClientUtil.*;
 
@@ -27,20 +35,30 @@ public class LedServiceImpl implements LedService {
 
     final LedMapper ledMapper;
 
-    final AdminSettingMapper adminSettingMapper;
+    final PwrconMapper pwrconMapper;
+
+    final LedconMapper ledconMapper;
+
+    final InputSourceComponent inputSourceComponent;
 
     @Override
     public Map<String, Object> setBrightness(float brightness) {
         Map<String, Object> responseMap = new HashMap<>();
 
         String light = floatToHex(brightness);
-
         byte[] lightMessage = getLightByte(light);
 
         try {
-//            ledControllerClient.sendMessage(lightMessage);
+//            Map<Channel, CompletableFuture<ResponseWithIpVo>> ledControllerChannelMap = ledControllerClient.getChannelFutureMap();
+//
+//            if (ledControllerChannelMap.size() > 0) {
+//                ledControllerClient.sendMessage(lightMessage);
 
             responseMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
+//            } else {
+//                responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
+//                responseMap.put("exceptionMessage", "No active LED Controller Connection");
+//            }
         } catch (Exception e) {
             responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
             responseMap.put("exceptionMessage", e.getMessage());
@@ -54,17 +72,23 @@ public class LedServiceImpl implements LedService {
         Map<String, Object> responseMap = new HashMap<>();
 
         try {
-            // TODO 레이어 번호 어떻게 설정하는지 확인 필요
-            byte[] message = {0x33, 0x00, 0x12, 0x00, 0x00, 0x00, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF,
-                    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01};
-
-            int hexValue = getInputSourceCode(source);
-
-            message[17] = (byte) hexValue;
-
-//            ledControllerClient.sendMessage(message);
+//            Map<Channel, CompletableFuture<ResponseWithIpVo>> ledControllerChannelMap = ledControllerClient.getChannelFutureMap();
+//
+//            if (ledControllerChannelMap.size() > 0) {
+//                byte[] message = {0x33, 0x00, 0x12, 0x00, 0x00, 0x00, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF,
+//                        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01};
+//
+//                int hexValue = inputSourceComponent.getInputSourceCode(source);
+//
+//                message[17] = (byte) hexValue;
+//
+//                ledControllerClient.sendMessage(message);
 
             responseMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
+//            } else {
+//                responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
+//                responseMap.put("exceptionMessage", "No active LED Controller Connection");
+//            }
         } catch (Exception e) {
             responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
             responseMap.put("exceptionMessage", e.getMessage());
@@ -79,22 +103,28 @@ public class LedServiceImpl implements LedService {
         Map<String, Object> responseMap = new HashMap<>();
 
         try {
-            byte[] message = {0x74, 0x00, 0x11, 0x00, 0x00, 0x00, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF,
-                    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
-
-            int presetValue = Integer.decode(presetNumber);
-            message[16] = (byte) presetValue;
-
-//            ledControllerClient.sendMessage(message);
-
+//            Map<Channel, CompletableFuture<ResponseWithIpVo>> ledControllerChannelMap = ledControllerClient.getChannelFutureMap();
+//
+//            if (ledControllerChannelMap.size() > 0) {
+//                byte[] message = {0x74, 0x00, 0x11, 0x00, 0x00, 0x00, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF,
+//                        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+//
+//                int presetValue = Integer.decode(presetNumber);
+//                message[16] = (byte) presetValue;
+//
+//                ledControllerClient.sendMessage(message);
+//
             Integer updateLastLoad = ledMapper.putLedPreset(presetNumber); // 프리셋 마지막 실행시간 업데이트
-
+//
             if (updateLastLoad > 0) {
                 responseMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
             } else {
                 responseMap.putAll(ParameterUtils.responseOption(ResponseCode.NO_CONTENT.getCodeName()));
             }
-
+//            } else {
+//                responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
+//                responseMap.put("exceptionMessage", "No active LED Controller Connection");
+//            }
         } catch (Exception e) {
             responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
             responseMap.put("exceptionMessage", e.getMessage());
@@ -106,84 +136,104 @@ public class LedServiceImpl implements LedService {
     @Override
     public Map<String, Object> getLedStatus() {
         Map<String, Object> responseMap = new HashMap<>();
-
-        /* TODO
-                1. 전원 ON/OFF       -> 컨트롤 유닛
-                2. LED 컨트롤 프리셋  -> 따로 DB 저장해서 가지고 있기 (프리셋 실행 할 때 마지막거 실행한 번호 업데이트)
-                3. 영상 입력소스      -> 88
-                4. LED 밝기 상태     -> 23
-             */
+        List<Map<String, Object>> ledControllerList = new ArrayList<>();
+        List<Map<String, Object>> unitControllerList = new ArrayList<>();
 
         try {
             byte[] ledStatusMessage = {0x01, 0x00, 0x11, 0x00, 0x00, 0x00, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF,
                     0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x16}; // LED 컨트롤러 상태 조회
 
-            // 밝기 / 입력소스 조회
-//            CompletableFuture<byte[]> ledControllerFuture = ledControllerClient.sendMessage(ledStatusMessage);
-//            ledControllerFuture.get(10, TimeUnit.SECONDS); // 응답 값 타임아웃 설정
-//            byte[] ledHexResponse = ledControllerFuture.join(); // 응답 값 비동기 수신
+            // 밝기/입력소스 조회
+//            CompletableFuture<ResponseWithIpVo[]> ledControllerFuture = ledControllerClient.sendMessage(ledStatusMessage);
+//            ResponseWithIpVo[] ledHexResponse = ledControllerFuture.get(10, TimeUnit.SECONDS); // 응답 값 수신
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-            // TODO 하드 코딩 삭제
-            byte[] ledHexResponse = {(byte) 0xF1, (byte) 0x00, (byte) 0x04, (byte) 0x01, (byte) 0xAB, (byte) 0xAB, (byte) 0xAB, (byte) 0xAB, (byte) 0x16, (byte) 0x01, (byte) 0x00, (byte) 0x01, (byte) 0x1B, (byte) 0x14, (byte) 0x02, (byte) 0x01, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x3F, (byte) 0x00, (byte) 0x00, (byte) 0x80, (byte) 0x3F, (byte) 0x00, (byte) 0x00, (byte) 0x80, (byte) 0x3F, (byte) 0x00, (byte) 0x00, (byte) 0x80, (byte) 0x3F, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x70, (byte) 0x43, (byte) 0x3B, (byte) 0xDF, (byte) 0x2F, (byte) 0x3F, (byte) 0x89, (byte) 0x41, (byte) 0xA0, (byte) 0x3E, (byte) 0x00, (byte) 0xC0, (byte) 0x0E, (byte) 0x44, (byte) 0x12, (byte) 0x83, (byte) 0x40, (byte) 0x3E, (byte) 0x19, (byte) 0x04, (byte) 0x36, (byte) 0x3F, (byte) 0x00, (byte) 0x00, (byte) 0x58, (byte) 0x42, (byte) 0xBA, (byte) 0x49, (byte) 0x0C, (byte) 0x3E, (byte) 0x60, (byte) 0xE5, (byte) 0x50, (byte) 0x3D, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x01, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00};
-            float light = -1; // 밝기
-
-            String inputSource = "";
-
-            if (ledHexResponse.length >= 88) {
-                StringBuilder lightHexReverse = new StringBuilder();
-
-                for (int i = 26; i >= 23; i--) {
-                    lightHexReverse.append(String.format("%02X", ledHexResponse[i]));
-                }
-
-                light = hexToFloat(lightHexReverse.toString());
-                inputSource = String.format("%02X", ledHexResponse[88]);
-            }
-
-            byte[] powerMessage = {0x02, (byte) 0xFF, (byte) 0x24, 0x00, 0x00, (byte) 0xDB, 0x03}; // 전원 상태 확인
-
-            // 전원 상태 조회
-//            CompletableFuture<byte[]> unitControllerFuture = deviceControllerClient.sendMessage(powerMessage);
-//            unitControllerFuture.get(10, TimeUnit.SECONDS); // 응답 값 타임아웃 설정
-//            byte[] powerHexResponse = unitControllerFuture.join(); // 응답 값 비동기 수신
-            // TODO 하드코딩 삭제 / 여러개의 값 동시에 진행
-
-            byte[] powerHexResponse = {0x02, (byte) 0xFF, 0x06, 0x00, 0x02, 0x24, 0x01, (byte) 0xDF, 0x03};
-
-            int powerState = -1;
-
-            if (powerHexResponse.length >= 6) {
-                powerState = Integer.parseInt(String.format("%02X", powerHexResponse[6]));
-            }
+            // TODO LED 컨트롤러 상태 조회 하드코딩 제거
+            ResponseWithIpVo[] ledHexResponse = new ResponseWithIpVo[1];
+            byte[] responseByte = {(byte) 0xF1, (byte) 0x00, (byte) 0x04, (byte) 0x01, (byte) 0xAB, (byte) 0xAB, (byte) 0xAB, (byte) 0xAB, (byte) 0x16, (byte) 0x01, (byte) 0x00, (byte) 0x01, (byte) 0x1B, (byte) 0x14, (byte) 0x02, (byte) 0x01, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x3F, (byte) 0x00, (byte) 0x00, (byte) 0x80, (byte) 0x3F, (byte) 0x00, (byte) 0x00, (byte) 0x80, (byte) 0x3F, (byte) 0x00, (byte) 0x00, (byte) 0x80, (byte) 0x3F, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x70, (byte) 0x43, (byte) 0x3B, (byte) 0xDF, (byte) 0x2F, (byte) 0x3F, (byte) 0x89, (byte) 0x41, (byte) 0xA0, (byte) 0x3E, (byte) 0x00, (byte) 0xC0, (byte) 0x0E, (byte) 0x44, (byte) 0x12, (byte) 0x83, (byte) 0x40, (byte) 0x3E, (byte) 0x19, (byte) 0x04, (byte) 0x36, (byte) 0x3F, (byte) 0x00, (byte) 0x00, (byte) 0x58, (byte) 0x42, (byte) 0xBA, (byte) 0x49, (byte) 0x0C, (byte) 0x3E, (byte) 0x60, (byte) 0xE5, (byte) 0x50, (byte) 0x3D, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x01, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00};
+            ledHexResponse[0] = new ResponseWithIpVo(responseByte, "192.168.123.110");
+            // TODO LED 컨트롤러 상태 조회 하드코딩 제거
 
             // LED 컨트롤 프리셋 조회
             String presetNumber = ledMapper.getLastLoadPreset();
 
-            if (powerState != -1 && light != -1 && presetNumber != null) {
-                // TODO 입력소스 수정 필요
-                LedStatusVo ledStatusVo = LedStatusVo.builder()
-                        .inputSource("HDMI1")
-                        .powerState(powerState)
-                        .brightness(light)
-                        .presetNumber(presetNumber)
-                        .build();
+            // led 컨트롤러 리스트 조회
+            List<LedconVo> ledControllerInfoList = ledconMapper.getLedconList();
+            Map<String, Date> ledControllerInfoMap = IntStream.range(0, ledControllerInfoList.size())
+                    .boxed()
+                    .collect(Collectors.toMap(i -> ledControllerInfoList.get(i).getIp(), i -> ledControllerInfoList.get(i).getRegDt(), (v1, v2) -> v2, HashMap::new));
 
-                responseMap.put("data", ledStatusVo);
+            float light = -1; // 밝기
+            String inputSource = ""; // 입력 소스
+
+            // TODO 260까지 자르기
+
+            for (ResponseWithIpVo response : ledHexResponse) {
+                Map<String, Object> ledStatusMap = new HashMap<>();
+
+                if (response.getResponse().length >= 88) {
+                    StringBuilder lightHexReverse = new StringBuilder();
+
+                    for (int i = 26; i >= 23; i--) {
+                        lightHexReverse.append(String.format("%02X", response.getResponse()[i]));
+                    }
+
+                    light = hexToFloat(lightHexReverse.toString());
+
+                    // TODO default 값 HDMI1로 했는데 수정 필요
+                    inputSource = inputSourceComponent.getInputSourceValue(String.format("%02X", response.getResponse()[88]));
+
+                    ledStatusMap.put("ip", response.getIp());
+                    ledStatusMap.put("brightness", light);
+                    ledStatusMap.put("inputSource", inputSource);
+                    ledStatusMap.put("createDate", ledControllerInfoMap.getOrDefault(response.getIp(), null));
+
+                    if (presetNumber != null) {
+                        ledStatusMap.put("presetNumber", presetNumber);
+                    }
+
+                    ledControllerList.add(ledStatusMap);
+                }
+            }
+
+            byte[] powerMessage = {0x02, (byte) 0xFF, (byte) 0x24, 0x00, 0x00, (byte) 0xDB, 0x03}; // 전원 상태 확인
+
+            // 유닛 전원 상태 조회
+//            CompletableFuture<ResponseWithIpVo[]> unitControllerFuture = deviceControllerClient.sendMessage(powerMessage);
+//            ResponseWithIpVo[] powerHexResponse = unitControllerFuture.get(10, TimeUnit.SECONDS); // 응답 값 수신
+
+            // TODO 유닛 전원 상태 조회 하드코딩 제거
+            ResponseWithIpVo[] powerHexResponse = new ResponseWithIpVo[1];
+            byte[] responseByte1 = {0x02, (byte) 0xFF, 0x06, 0x00, 0x02, 0x24, 0x01, (byte) 0xDF, 0x03};
+            powerHexResponse[0] = new ResponseWithIpVo(responseByte1, "192.168.123.111");
+            // TODO 유닛 전원 상태 조회 하드코딩 제거
+
+            List<PwrconVo> unitControllerInfoList = pwrconMapper.getPwrconList();
+            Map<String, Date> unitControllerInfoMap = IntStream.range(0, unitControllerInfoList.size())
+                    .boxed()
+                    .collect(Collectors.toMap(i -> unitControllerInfoList.get(i).getIp(), i -> unitControllerInfoList.get(i).getRegDt(), (v1, v2) -> v2, HashMap::new));
+
+
+            // 유닛 전원 상태 조회
+            for (ResponseWithIpVo response : powerHexResponse) {
+                if (response.getResponse().length >= 6) {
+                    int powerState = Integer.parseInt(String.format("%02X", response.getResponse()[6]));
+                    Map<String, Object> powerMap = new HashMap<>();
+
+                    powerMap.put("ip", response.getIp());
+                    powerMap.put("state", powerState);
+                    powerMap.put("createDate", unitControllerInfoMap.getOrDefault(response.getIp(), null));
+
+                    unitControllerList.add(powerMap);
+                }
+            }
+
+            if (ledControllerList.size() > 0 || unitControllerList.size() > 0) {
+                Map<String, Object> dataMap = new HashMap<>();
+
+                dataMap.put("ledController", ledControllerList);
+                dataMap.put("unitController", unitControllerList);
+
+                responseMap.put("data", dataMap);
                 responseMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
 
             } else {

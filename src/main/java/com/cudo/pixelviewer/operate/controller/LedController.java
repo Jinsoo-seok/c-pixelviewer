@@ -1,5 +1,6 @@
 package com.cudo.pixelviewer.operate.controller;
 
+import com.cudo.pixelviewer.component.InputSourceComponent;
 import com.cudo.pixelviewer.config.ParamException;
 import com.cudo.pixelviewer.operate.service.LedService;
 import com.cudo.pixelviewer.util.ParameterUtils;
@@ -13,7 +14,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static com.cudo.pixelviewer.util.ParameterUtils.*;
-import static com.cudo.pixelviewer.util.TcpClientUtil.getInputSourceCode;
 
 @Slf4j
 @RestController
@@ -22,6 +22,8 @@ import static com.cudo.pixelviewer.util.TcpClientUtil.getInputSourceCode;
 @RequestMapping("/api-manager/led-control")
 public class LedController {
     final LedService ledService;
+
+    final InputSourceComponent inputSourceComponent;
 
     /**
      * * LED 전광판 밝기 제어
@@ -79,7 +81,7 @@ public class LedController {
         try {
             parameterValidation(param, keyList);
             parameterString("inputSource", param.get("inputSource"), true, 0, null);
-            getInputSourceCode((String) param.get("inputSource"));
+            inputSourceComponent.getInputSourceCode((String) param.get("inputSource"));
 
             responseMap = ledService.setInputSource(String.valueOf(param.get("inputSource")));
         } catch (ParamException paramException) {
