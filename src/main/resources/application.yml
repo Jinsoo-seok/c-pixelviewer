@@ -39,7 +39,7 @@ values:
   protocol: "http://"
   was:
     ip: "106.245.226.42"
-    port: "9898"
+    port: "4006"
     path: "/api-viewer/"
   agent:
     ip: "192.168.123.12"

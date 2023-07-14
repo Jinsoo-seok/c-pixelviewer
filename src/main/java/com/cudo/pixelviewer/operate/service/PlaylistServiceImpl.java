@@ -52,7 +52,7 @@ public class PlaylistServiceImpl implements PlaylistService {
 
         if(playlist != null){
             String contentIdList = (String) playlist.get("contentIdList");
-            if(!contentIdList.equals("NULL")) {
+            if(!contentIdList.equals("NULL") && !contentIdList.equals("[{}]")) {
                 String queryTemp = "(" + contentIdList + ")";
                 List<Map<String, Object>> tempContentIdList = new ArrayList<>();
                 try {
@@ -83,15 +83,18 @@ public class PlaylistServiceImpl implements PlaylistService {
                 if(playlistContentList.size() > 0){
                     List<Map<String, Object>> resultContentList = contentMatchingAndOrderByOrder(tempContentIdList, playlistContentList);
                     if(resultContentList.size() > 0){
-                        playlist.put("contentArray", resultContentList);
+                        playlist.put("contentIdList", resultContentList);
                     }
                     else{
-                        playlist.put("contentArray", tempContentIdList);
+                        playlist.put("contentIdList", tempContentIdList);
                         log.info("[FAIL][getPlaylist] resultContentList");
                     }
-                    String removeKey = "contentIdList";
-                    playlist.remove(removeKey);
+//                    String removeKey = "contentIdList";
+//                    playlist.remove(removeKey);
                 }
+            }
+            else{
+                playlist.put("contentIdList", "NULL");
             }
             resultMap.put("data", playlist);
             resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));

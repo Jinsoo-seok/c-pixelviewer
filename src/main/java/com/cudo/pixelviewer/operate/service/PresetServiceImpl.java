@@ -309,7 +309,7 @@ public class PresetServiceImpl implements PresetService {
         ////////////////////////////////////////////////////////////////////
 
         // test 타입 >> 실제 연동이 필요 시, true
-        Boolean callYn = false;
+        Boolean callYn = true;
 
         if(callYn) {
             if (controlType.equals("apply")) {
