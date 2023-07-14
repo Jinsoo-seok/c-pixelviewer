@@ -1,11 +1,13 @@
 package com.cudo.pixelviewer.operate.service;
 
 import com.cudo.pixelviewer.bo.mapper.LedconMapper;
+import com.cudo.pixelviewer.bo.mapper.PwrconMapper;
 import com.cudo.pixelviewer.component.DeviceControllerClient;
 import com.cudo.pixelviewer.component.LedControllerClient;
 import com.cudo.pixelviewer.util.ParameterUtils;
 import com.cudo.pixelviewer.util.ResponseCode;
 import com.cudo.pixelviewer.vo.LedconVo;
+import com.cudo.pixelviewer.vo.PwrconVo;
 import com.cudo.pixelviewer.vo.ResponseWithIpVo;
 import io.netty.channel.Channel;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +18,8 @@ import java.net.SocketAddress;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +29,8 @@ public class DeviceServiceImpl implements DeviceService {
     final LedControllerClient ledControllerClient;
 
     final LedconMapper ledconMapper;
+
+    final PwrconMapper pwrconMapper;
 
     @Override
     public Map<String, Object> setDevicePower(Integer power) {
@@ -41,14 +47,8 @@ public class DeviceServiceImpl implements DeviceService {
         }
 
         try {
-//            CompletableFuture<ResponseWithIpVo[]> future = deviceControllerClient.sendMessage(message); // 전원 제어
-//            ResponseWithIpVo[] hexResponseWithIp = future.get(10, TimeUnit.SECONDS); // 응답 값 수신
-
-            // TODO 유닛 전원 제어 하드코딩 제거
-            ResponseWithIpVo[] hexResponseWithIp = new ResponseWithIpVo[1];
-            byte[] responseByte = {0x02, (byte) 0xFF, 0x06, 0x00, 0x02, 0x24, 0x01, (byte) 0xDF, 0x03};
-            hexResponseWithIp[0] = new ResponseWithIpVo(responseByte, "192.168.123.111");
-            // TODO 유닛 전원 제어 하드코딩 제거
+            CompletableFuture<ResponseWithIpVo[]> future = deviceControllerClient.sendMessage(message); // 전원 제어
+            ResponseWithIpVo[] hexResponseWithIp = future.get(10, TimeUnit.SECONDS); // 응답 값 수신
 
             int successCount = 0;
 
@@ -81,14 +81,8 @@ public class DeviceServiceImpl implements DeviceService {
 
         try {
             Map<Channel, CompletableFuture<ResponseWithIpVo>> ledControllerChannelMap = ledControllerClient.getChannelFutureMap();
-//            CompletableFuture<ResponseWithIpVo[]> future = deviceControllerClient.sendMessage(message); // 유닛 컨트롤러 전원 상태 값 조회
-//            ResponseWithIpVo[] hexResponseWithIp = future.get(10, TimeUnit.SECONDS); // 응답 값 수신
-
-            // TODO 유닛 전원 상태 조회 하드코딩 제거
-            ResponseWithIpVo[] hexResponseWithIp = new ResponseWithIpVo[1];
-            byte[] responseByte = {0x02, (byte) 0xFF, 0x06, 0x00, 0x02, 0x24, 0x01, (byte) 0xDF, 0x03};
-            hexResponseWithIp[0] = new ResponseWithIpVo(responseByte, "192.168.123.111");
-            // TODO 유닛 전원 상태 조회 하드코딩 제거
+            CompletableFuture<ResponseWithIpVo[]> future = deviceControllerClient.sendMessage(message); // 유닛 컨트롤러 전원 상태 값 조회
+            ResponseWithIpVo[] hexResponseWithIp = future.get(10, TimeUnit.SECONDS); // 응답 값 수신
 
             // 유닛 전원 상태 조회
             for (ResponseWithIpVo response : hexResponseWithIp) {
@@ -160,14 +154,13 @@ public class DeviceServiceImpl implements DeviceService {
         byte[] message = {0x02, (byte) 0xFF, (byte) 0x6A, 0x00, 0x00, (byte) 0x95, 0x03};
 
         try {
-//            CompletableFuture<ResponseWithIpVo[]> future = deviceControllerClient.sendMessage(message); // 온습도 조회
-//            ResponseWithIpVo[] hexResponseWithIp = future.get(10, TimeUnit.SECONDS); // 응답 값 수신
+            CompletableFuture<ResponseWithIpVo[]> future = deviceControllerClient.sendMessage(message); // 온습도 조회
+            ResponseWithIpVo[] hexResponseWithIp = future.get(10, TimeUnit.SECONDS); // 응답 값 수신
 
-            // TODO 유닛 온습도 조회 하드코딩 제거
-            ResponseWithIpVo[] hexResponseWithIp = new ResponseWithIpVo[1];
-            byte[] responseByte = {0x02, (byte) 0xFF, 0x06, 0x00, 0x0A, 0x6A, 0x2B, 0x00, 0x03, 0x01, 0x05, 0x04, 0x05, 0x07, 0x02, (byte) 0xB2, 0x03};
-            hexResponseWithIp[0] = new ResponseWithIpVo(responseByte, "192.168.123.111");
-            // TODO 유닛 온습도 조회 하드코딩 제거
+            List<PwrconVo> unitControllerInfoList = pwrconMapper.getPwrconList();
+            Map<String, Date> unitControllerInfoMap = IntStream.range(0, unitControllerInfoList.size())
+                    .boxed()
+                    .collect(Collectors.toMap(i -> unitControllerInfoList.get(i).getIp(), i -> unitControllerInfoList.get(i).getRegDt(), (v1, v2) -> v2, HashMap::new));
 
             for (ResponseWithIpVo response : hexResponseWithIp) {
                 Map<String, Object> tempHumiMap = new HashMap<>();
@@ -200,11 +193,11 @@ public class DeviceServiceImpl implements DeviceService {
                     tempHumiMap.put("ip", response.getIp());
                     tempHumiMap.put("temperature", Double.parseDouble(temperature.toString()) * minusCheck);
                     tempHumiMap.put("humidity", Double.parseDouble(humidity.toString()));
+                    tempHumiMap.put("createDate", unitControllerInfoMap.getOrDefault(response.getIp(), null));
 
                     dataMapList.add(tempHumiMap);
                 }
             }
-
 
             if (dataMapList.size() > 0) {
                 responseMap.put("data", dataMapList);

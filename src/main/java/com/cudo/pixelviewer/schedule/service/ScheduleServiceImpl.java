@@ -162,8 +162,6 @@ public class ScheduleServiceImpl implements ScheduleService {
         int insertCount = scheduleMapper.postLedPlaylistSchedule(setPowerParam(param));
 
         if (insertCount > 0) {
-            // TODO 스케줄 등록
-
             LedPlayScheduleVo ledPlayScheduleVo = LedPlayScheduleVo.builder()
                     .scheduleId(Long.parseLong(String.valueOf(param.get("scheduleId"))))
                     .presetId(Long.parseLong(String.valueOf(param.get("presetId"))))
