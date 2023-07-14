@@ -12,7 +12,8 @@ public enum ScheduleCode {
 
     LIGHT("key", "light"),
 
-    LED_PLAY_LIST("key", "ledPlayList");
+    LED_PLAY_LIST_START("key", "ledPlayListStart"),
+    LED_PLAY_LIST_END("key", "ledPlayListEnd");
 
 
     private final String code;

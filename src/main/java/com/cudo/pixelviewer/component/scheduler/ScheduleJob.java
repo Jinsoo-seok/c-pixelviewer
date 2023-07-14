@@ -1,42 +1,78 @@
 package com.cudo.pixelviewer.component.scheduler;
 
 import com.cudo.pixelviewer.component.LedControllerClient;
+import com.cudo.pixelviewer.operate.mapper.PresetMapper;
 import lombok.RequiredArgsConstructor;
-import org.quartz.Job;
-import org.quartz.JobDataMap;
-import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
+import org.quartz.*;
+import org.springframework.scheduling.quartz.SchedulerFactoryBean;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import static com.cudo.pixelviewer.component.scheduler.ScheduleCode.*;
 import static com.cudo.pixelviewer.util.TcpClientUtil.floatToHex;
 import static com.cudo.pixelviewer.util.TcpClientUtil.getLightByte;
 
+@Slf4j
 @RequiredArgsConstructor
 public class ScheduleJob implements Job {
     final LedControllerClient ledControllerClient;
 
+    final PresetMapper presetMapper;
+
+    final SchedulerFactoryBean schedulerFactoryBean;
+
+    final static String CONTROL_TYPE = "controlType";
+
+    final static String PRESET_ID = "presetId";
+
+
+    @SneakyThrows
     @Override
     public void execute(JobExecutionContext context) throws JobExecutionException {
         JobDataMap jobDataMap = context.getMergedJobDataMap();
 
-        if (jobDataMap.get(DATA_MAP_KEY.getCode()).equals(POWER_ON.getValue())) { // 전원 ON
-            byte[] message = {0x02, (byte) 0xFF, (byte) 0xB1, 0x00, 0x01, 0x01, (byte) 0x4E, 0x03};
+        if (jobDataMap != null) {
+            Object type = jobDataMap.get(DATA_MAP_KEY.getCode());
 
-            ledControllerClient.sendMessage(message);
+            if (POWER_ON.getValue().equals(type)) { // 전원 ON
+                byte[] powerOnMessage = {0x02, (byte) 0xFF, (byte) 0xB1, 0x00, 0x01, 0x01, (byte) 0x4E, 0x03};
+                ledControllerClient.sendMessage(powerOnMessage);
 
-        } else if (jobDataMap.get(DATA_MAP_KEY.getCode()).equals(POWER_OFF.getValue())) { // 전원 OFF
-            byte[] message = {0x02, (byte) 0xFF, (byte) 0xB1, 0x00, 0x01, 0x00, (byte) 0x4F, 0x03};
+            } else if (POWER_OFF.getValue().equals(type)) { // 전원 OFF
+                byte[] powerOffMessage = {0x02, (byte) 0xFF, (byte) 0xB1, 0x00, 0x01, 0x00, (byte) 0x4F, 0x03};
+                ledControllerClient.sendMessage(powerOffMessage);
 
-            ledControllerClient.sendMessage(message);
-        } else if (jobDataMap.get(DATA_MAP_KEY.getCode()).equals(LIGHT.getValue())) { // 밝기 조절
-            String light = floatToHex((Float) jobDataMap.get(LIGHT.getValue()));
 
-            byte[] lightMessage = getLightByte(light);
+            } else if (LIGHT.getValue().equals(type)) { // 밝기 조절
+                String light = floatToHex((Float) jobDataMap.get(LIGHT.getValue()));
+                byte[] lightMessage = getLightByte(light);
+                ledControllerClient.sendMessage(lightMessage);
 
-            ledControllerClient.sendMessage(lightMessage);
 
-        } else if (jobDataMap.get(DATA_MAP_KEY.getCode()).equals(LED_PLAY_LIST.getValue())) {
-            System.out.println("밝기 조절");
+            } else if (LED_PLAY_LIST_START.getValue().equals(type) || LED_PLAY_LIST_END.getValue().equals(type)) { // LED 영상 재생 시작/종료
+                Map<String, Object> param = new HashMap<>();
+
+                param.put(PRESET_ID, jobDataMap.get(PRESET_ID));
+
+                if (jobDataMap.get(DATA_MAP_KEY.getCode()).equals(LED_PLAY_LIST_START.getValue())) {
+                    param.put(CONTROL_TYPE, "start");
+                    presetMapper.patchPresetStatusRunClear(); // 프리셋 start 상태 클리어
+                } else {
+                    param.put(CONTROL_TYPE, "stop");
+                }
+
+                presetMapper.patchPresetStatusSet(param); // 프리셋 상태 값 업데이트
+            }
+
+            Scheduler scheduler = schedulerFactoryBean.getScheduler();
+
+            if (scheduler.checkExists(context.getJobDetail().getKey())) {
+                scheduler.deleteJob(context.getJobDetail().getKey());
+                log.info("Success delete of terminated schedule. >> {}", context.getJobDetail().getKey());
+            }
         }
     }
 }

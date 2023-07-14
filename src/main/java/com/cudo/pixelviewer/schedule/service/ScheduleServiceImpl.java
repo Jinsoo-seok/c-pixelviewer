@@ -156,13 +156,29 @@ public class ScheduleServiceImpl implements ScheduleService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Map<String, Object> postLedPlaylistSchedule(Map<String, Object> param) {
+    public Map<String, Object> postLedPlaylistSchedule(Map<String, Object> param) throws SchedulerException, ParseException {
         Map<String, Object> responseMap = new HashMap<>();
 
         int insertCount = scheduleMapper.postLedPlaylistSchedule(setPowerParam(param));
 
         if (insertCount > 0) {
             // TODO 스케줄 등록
+
+            LedPlayScheduleVo ledPlayScheduleVo = LedPlayScheduleVo.builder()
+                    .scheduleId(Long.parseLong(String.valueOf(param.get("scheduleId"))))
+                    .presetId(Long.parseLong(String.valueOf(param.get("presetId"))))
+                    .schStartDate(String.valueOf(param.get("startDate")))
+                    .schEndDate(String.valueOf(param.get("endDate")))
+                    .timeStart(String.valueOf(param.get("startTime")))
+                    .timeEnd(String.valueOf(param.get("endTime")))
+                    .runDayWeek((param.get("scheduleDay") == null || param.get("scheduleDay").equals(""))
+                            ? null : String.valueOf(param.get("scheduleDay")))
+                    .build();
+
+            // 스케줄 등록
+            schedulerManager.setJob(ledPlayScheduleVo, LED_PLAY_LIST_START.getValue(), false);
+            schedulerManager.setJob(ledPlayScheduleVo, LED_PLAY_LIST_END.getValue(), false);
+
             responseMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
         } else {
             responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
@@ -172,13 +188,27 @@ public class ScheduleServiceImpl implements ScheduleService {
     }
 
     @Override
-    public Map<String, Object> puLedPlaylistSchedule(Map<String, Object> param) {
+    public Map<String, Object> puLedPlaylistSchedule(Map<String, Object> param) throws SchedulerException, ParseException{
         Map<String, Object> responseMap = new HashMap<>();
 
         int insertCount = scheduleMapper.putLedPlaylistSchedule(setPowerParam(param));
 
         if (insertCount > 0) {
-            // TODO 스케줄 수정
+            LedPlayScheduleVo ledPlayScheduleVo = LedPlayScheduleVo.builder()
+                    .scheduleId(Long.parseLong(String.valueOf(param.get("scheduleId"))))
+                    .presetId(Long.parseLong(String.valueOf(param.get("presetId"))))
+                    .schStartDate(String.valueOf(param.get("startDate")))
+                    .schEndDate(String.valueOf(param.get("endDate")))
+                    .timeStart(String.valueOf(param.get("startTime")))
+                    .timeEnd(String.valueOf(param.get("endTime")))
+                    .runDayWeek((param.get("scheduleDay") == null || param.get("scheduleDay").equals(""))
+                            ? null : String.valueOf(param.get("scheduleDay")))
+                    .build();
+
+            // 스케줄 수정
+            schedulerManager.setJob(ledPlayScheduleVo, LED_PLAY_LIST_START.getValue(), true);
+            schedulerManager.setJob(ledPlayScheduleVo, LED_PLAY_LIST_END.getValue(), true);
+
             responseMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
         } else {
             responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
@@ -188,14 +218,17 @@ public class ScheduleServiceImpl implements ScheduleService {
     }
 
     @Override
-    public Map<String, Object> deletePlaylistSchedule(Map<String, Object> param) {
+    public Map<String, Object> deletePlaylistSchedule(Map<String, Object> param) throws SchedulerException {
         Map<String, Object> responseMap = new HashMap<>();
 
         Long scheduleId = Long.parseLong(String.valueOf(param.get("scheduleId")));
         int insertCount = scheduleMapper.deletePlayListSchedule(scheduleId);
 
         if (insertCount > 0) {
-            // TODO 스케줄 삭제
+            // 스케줄 삭제
+            schedulerManager.deleteJob(LED_PLAY_LIST_START.getValue() + scheduleId);
+            schedulerManager.deleteJob(LED_PLAY_LIST_END.getValue() + scheduleId);
+
             responseMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
         } else {
             responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));

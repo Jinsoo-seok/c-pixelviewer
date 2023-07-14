@@ -1,5 +1,7 @@
 package com.cudo.pixelviewer.component.scheduler;
 
+import com.cudo.pixelviewer.operate.mapper.PresetMapper;
+import com.cudo.pixelviewer.vo.LedPlayScheduleVo;
 import com.cudo.pixelviewer.vo.LightScheduleVo;
 import com.cudo.pixelviewer.vo.PowerScheduleVo;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +24,16 @@ import static com.cudo.pixelviewer.component.scheduler.ScheduleCode.*;
 @RequiredArgsConstructor
 @Slf4j
 public class SchedulerManager {
+
+    public enum ScheduleStatus {
+        NO_SCHEDULE,
+        CALL_WITHOUT_SCHEDULE,
+        REGISTER_SCHEDULE
+    }
+
     final SchedulerFactoryBean schedulerFactoryBean;
+    final PresetMapper presetMapper;
+
     final String DEFAULT = "DEFAULT";
 
     final Scheduler scheduler;
@@ -52,31 +63,21 @@ public class SchedulerManager {
             PowerScheduleVo powerSchedule = (PowerScheduleVo) scheduleInfo;
             List<String> scheduleTime = new ArrayList<>();
 
-            if (powerSchedule.getTimePwrOn().length() == 6) {
-                scheduleTime.add(powerSchedule.getTimePwrOn().substring(0, 2));
-                scheduleTime.add(powerSchedule.getTimePwrOn().substring(2, 4));
-                scheduleTime.add(powerSchedule.getTimePwrOn().substring(4));
-            }
-
-            if (checkDayTime(powerSchedule.getSchStartDate(), powerSchedule.getSchEndDate(), scheduleTime, powerSchedule.getRunDayWeek())) {
-
-                // 전원 스케줄 수정
-                if (update) {
-                    boolean scheduleExistCheck = updateTrigger(powerSchedule.getScheduleId(), scheduleTime, type);
-
-                    if (!scheduleExistCheck) {
-                        JobDataMap jobDataMap = new JobDataMap();
-                        jobDataMap.put(DATA_MAP_KEY.getCode(), type);
-
-                        setSchedule(powerSchedule.getScheduleId(), scheduleTime, jobDataMap);
-                    }
-                } else { // 전원 스케줄 등록
-                    JobDataMap jobDataMap = new JobDataMap();
-                    jobDataMap.put(DATA_MAP_KEY.getCode(), type);
-
-                    setSchedule(powerSchedule.getScheduleId(), scheduleTime, jobDataMap);
+            if (type.equals(POWER_ON.getValue())) {
+                if (powerSchedule.getTimePwrOn().length() == 6) {
+                    scheduleTime.add(powerSchedule.getTimePwrOn().substring(0, 2));
+                    scheduleTime.add(powerSchedule.getTimePwrOn().substring(2, 4));
+                    scheduleTime.add(powerSchedule.getTimePwrOn().substring(4));
+                }
+            } else {
+                if (powerSchedule.getTimePwrOff().length() == 6) {
+                    scheduleTime.add(powerSchedule.getTimePwrOff().substring(0, 2));
+                    scheduleTime.add(powerSchedule.getTimePwrOff().substring(2, 4));
+                    scheduleTime.add(powerSchedule.getTimePwrOff().substring(4));
                 }
             }
+
+            insertAndUpdateSchedule(type, update, scheduleTime, powerSchedule.getSchStartDate(), powerSchedule.getSchEndDate(), powerSchedule.getRunDayWeek(), powerSchedule.getScheduleId(), null);
 
         } else if (type.equals(LIGHT.getValue())) { // 밝기 스케줄 등록
             List<LightScheduleVo> lightScheduleList = (List<LightScheduleVo>) scheduleInfo;
@@ -97,8 +98,87 @@ public class SchedulerManager {
                     setSchedule(lightSchedule.getListId(), scheduleTime, jobDataMap);
                 }
             }
-        } else if (type.equals(LED_PLAY_LIST.getValue())) {
-            System.out.println("LED 영상 play");
+        } else if (type.equals(LED_PLAY_LIST_START.getValue())) { // LED 플레이 영상 시작 스케줄
+            LedPlayScheduleVo ledPlayScheduleVo = (LedPlayScheduleVo) scheduleInfo;
+
+            // 시작 시간
+            List<String> scheduleStartTime = new ArrayList<>();
+
+            if (ledPlayScheduleVo.getTimeStart().length() == 6) {
+                scheduleStartTime.add(ledPlayScheduleVo.getTimeStart().substring(0, 2));
+                scheduleStartTime.add(ledPlayScheduleVo.getTimeStart().substring(2, 4));
+                scheduleStartTime.add(ledPlayScheduleVo.getTimeStart().substring(4));
+            }
+
+            // 종료 시간
+            List<String> scheduleEndTime = new ArrayList<>();
+
+            if (ledPlayScheduleVo.getTimeEnd().length() == 6) {
+                scheduleEndTime.add(ledPlayScheduleVo.getTimeEnd().substring(0, 2));
+                scheduleEndTime.add(ledPlayScheduleVo.getTimeEnd().substring(2, 4));
+                scheduleEndTime.add(ledPlayScheduleVo.getTimeEnd().substring(4));
+            }
+
+            ScheduleStatus scheduleStatus = checkLedPlayStartTime(ledPlayScheduleVo.getSchStartDate(), ledPlayScheduleVo.getSchEndDate(),
+                    scheduleStartTime, scheduleEndTime, ledPlayScheduleVo.getRunDayWeek());
+
+
+            if (scheduleStatus.equals(ScheduleStatus.REGISTER_SCHEDULE)) {
+                boolean scheduleExistCheck = update && updateTrigger(ledPlayScheduleVo.getScheduleId(), scheduleStartTime, type);
+
+                if (!scheduleExistCheck) {
+                    JobDataMap jobDataMap = new JobDataMap();
+                    jobDataMap.put(DATA_MAP_KEY.getCode(), type);
+                    jobDataMap.put("presetId", ledPlayScheduleVo.getPresetId());
+
+                    setSchedule(ledPlayScheduleVo.getScheduleId(), scheduleStartTime, jobDataMap);
+                }
+            } else if (scheduleStatus.equals(ScheduleStatus.CALL_WITHOUT_SCHEDULE)) {
+                if (update) {
+                    deleteJob(type + ledPlayScheduleVo.getScheduleId());
+                }
+
+                Map<String, Object> param = new HashMap<>();
+
+                param.put("presetId", ledPlayScheduleVo.getPresetId());
+                param.put("controlType", "start");
+
+                presetMapper.patchPresetStatusRunClear(); // 프리셋 start 상태 클리어
+                presetMapper.patchPresetStatusSet(param); // 프리셋 상태 값 업데이트
+            }
+
+
+        } else if (type.equals(LED_PLAY_LIST_END.getValue())) {  // LED 플레이 영상 종료 스케줄
+            LedPlayScheduleVo ledPlayScheduleVo = (LedPlayScheduleVo) scheduleInfo;
+
+            // 종료 시간
+            List<String> scheduleEndTime = new ArrayList<>();
+
+            if (ledPlayScheduleVo.getTimeEnd().length() == 6) {
+                scheduleEndTime.add(ledPlayScheduleVo.getTimeEnd().substring(0, 2));
+                scheduleEndTime.add(ledPlayScheduleVo.getTimeEnd().substring(2, 4));
+                scheduleEndTime.add(ledPlayScheduleVo.getTimeEnd().substring(4));
+            }
+
+            insertAndUpdateSchedule(type, update, scheduleEndTime, ledPlayScheduleVo.getSchStartDate(), ledPlayScheduleVo.getSchEndDate(), ledPlayScheduleVo.getRunDayWeek(), ledPlayScheduleVo.getScheduleId(), ledPlayScheduleVo.getPresetId());
+        }
+    }
+
+    private void insertAndUpdateSchedule(String type, boolean update, List<String> scheduleEndTime, String schStartDate, String schEndDate, String runDayWeek, Long scheduleId, Long presetId) throws SchedulerException, ParseException {
+        if (checkDayTime(schStartDate, schEndDate, scheduleEndTime, runDayWeek)) {
+
+            boolean scheduleExistCheck = update && updateTrigger(scheduleId, scheduleEndTime, type);
+
+                if (!scheduleExistCheck) {
+                    JobDataMap jobDataMap = new JobDataMap();
+                    jobDataMap.put(DATA_MAP_KEY.getCode(), type);
+
+                    if (type.equals(LED_PLAY_LIST_END.getValue())) {
+                        jobDataMap.put("presetId", presetId);
+                    }
+
+                    setSchedule(scheduleId, scheduleEndTime, jobDataMap);
+                }
         }
     }
 
@@ -108,15 +188,7 @@ public class SchedulerManager {
     private boolean checkDayTime(String scheduleStartDate, String scheduleEndDate, List<String> scheduleTime, String runDayWeek) {
         if (scheduleStartDate.length() == 8 && scheduleEndDate.length() == 8 && scheduleTime.size() == 3) {
 
-            Set<String> daysOfWeek = new HashSet<>();
-
-            if (runDayWeek == null) { // null일 경우 모든 요일 수행
-                for (int i = 0; i < 7; i++) {
-                    daysOfWeek.add(String.valueOf(i));
-                }
-            } else {
-                daysOfWeek = new HashSet<>(Arrays.asList(runDayWeek.split(",")));
-            }
+            Set<String> daysOfWeek = new HashSet<>(runDayWeek == null ? Arrays.asList("0", "1", "2", "3", "4", "5", "6") : Arrays.asList(runDayWeek.split(",")));
 
             LocalDate startDate = LocalDate.of(Integer.parseInt(scheduleStartDate.substring(0, 4)),
                     Integer.parseInt(scheduleStartDate.substring(4, 6)), Integer.parseInt(scheduleStartDate.substring(6))),
@@ -137,6 +209,52 @@ public class SchedulerManager {
         }
 
         return false;
+    }
+
+    /**
+     * * playList 영상 재생 시작 날짜 체크
+     */
+    private ScheduleStatus checkLedPlayStartTime(String scheduleStartDate, String scheduleEndDate, List<String> scheduleStartTime, List<String> scheduleEndTime, String runDayWeek) {
+        if (scheduleStartDate.length() == 8 && scheduleEndDate.length() == 8 && scheduleStartTime.size() == 3 && scheduleEndTime.size() == 3) {
+
+            Set<String> daysOfWeek = new HashSet<>(runDayWeek == null ? Arrays.asList("0", "1", "2", "3", "4", "5", "6") : Arrays.asList(runDayWeek.split(",")));
+
+            // 날짜 계산
+            LocalDate startDate = LocalDate.of(Integer.parseInt(scheduleStartDate.substring(0, 4)),
+                    Integer.parseInt(scheduleStartDate.substring(4, 6)), Integer.parseInt(scheduleStartDate.substring(6))),
+
+                    endDate = LocalDate.of(Integer.parseInt(scheduleEndDate.substring(0, 4)),
+                            Integer.parseInt(scheduleEndDate.substring(4, 6)), Integer.parseInt(scheduleEndDate.substring(6))),
+
+                    nowDate = LocalDate.now();
+
+            String dayOfWeek = nowDate.getDayOfWeek().getValue() == 7 ? "0" : String.valueOf(nowDate.getDayOfWeek().getValue());
+
+
+            // 시작날짜 ~ 종료 날짜가 포함되고 실행 요일이 맞을 경우
+            if (daysOfWeek.contains(dayOfWeek) && (startDate.equals(nowDate) || startDate.isBefore(nowDate))
+                    && (endDate.equals(nowDate) || endDate.isAfter(nowDate))) {
+
+                // 시간 계산
+                LocalTime scheduleStartLocalTime = LocalTime.of(Integer.parseInt(scheduleStartTime.get(0)),
+                        Integer.parseInt(scheduleStartTime.get(1)), Integer.parseInt(scheduleStartTime.get(2)));
+
+                LocalTime scheduleEndLocalTime = LocalTime.of(Integer.parseInt(scheduleEndTime.get(0)),
+                        Integer.parseInt(scheduleEndTime.get(1)), Integer.parseInt(scheduleEndTime.get(2)));
+
+                LocalTime nowTime = LocalTime.now();
+
+                // 시작 시간 ~ 종료 시간 사이일 경우 스케줄 없이 바로 호출
+                if ((scheduleStartLocalTime.isBefore(nowTime) || scheduleStartLocalTime.equals(nowTime)) && scheduleEndLocalTime.isAfter(nowTime)) {
+                    return ScheduleStatus.CALL_WITHOUT_SCHEDULE;
+                } else if (scheduleStartLocalTime.isAfter(nowTime)) { // 시작 시간 전일 경우 스케줄 등록
+                    return ScheduleStatus.REGISTER_SCHEDULE;
+                }
+            }
+        }
+
+        // 코드 값(0 : 아무 동작 없음 / 1 : 스케줄 없이 바로 로직 호출 / 2 : 스케줄 등록)
+        return ScheduleStatus.NO_SCHEDULE;
     }
 
     /**
@@ -165,7 +283,6 @@ public class SchedulerManager {
      * * trigger 수정
      */
     private boolean updateTrigger(Long scheduleId, List<String> scheduleTime, String type) throws SchedulerException, ParseException {
-
         CronTriggerImpl cronTrigger = (CronTriggerImpl) scheduler.getTrigger(TriggerKey.triggerKey(type + scheduleId));
 
         if (cronTrigger != null) {
@@ -202,3 +319,4 @@ public class SchedulerManager {
         return cron;
     }
 }
+
