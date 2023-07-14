@@ -53,7 +53,7 @@
         VALUES
             (
                 #{ip}, #{port}
-            , #{modelNm}, "NULL", #{serialNo}, "NULL"
+            , #{modelNm}, "NULL", #{serialNo}, #{firmwareVer}
             , 0, "NULL", "NULL", "NULL"
             , 0
             , NOW(), NOW(), NOW(), NOW()
@@ -115,7 +115,7 @@
             model_nm = #{modelNm},
             version = "NULL",
             serial_no = #{serialNo},
-            firmware_ver = "NULL",
+            firmware_ver = #{firmwareVer},
             L.state = 0,
             spec_1 = "NULL",
             spec_2 = "NULL",

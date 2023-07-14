@@ -44,6 +44,17 @@ public class LedconServiceImpl implements LedconService {
         int ledconCheck = 0;
 
         if(ledconCheck == 0){ // Not Exist : 0
+
+            // TODO : connect
+
+            // TODO : data parsing
+//            if(data.length > 0){
+//                param.put("firmware_ver", version);
+//            }
+//            else{
+//                param.put("firmware_ver", "");
+//            }
+
             int postLedconResult = ledconMapper.postLedcon(param);
 
             if(postLedconResult == 1){ // Success : 1
@@ -96,6 +107,17 @@ public class LedconServiceImpl implements LedconService {
         int ledconCheck = ledconMapper.putLedconValid(param);
 
         if(ledconCheck == 1){  // Exist : 1
+
+            // TODO : connect
+
+            // TODO : data parsing
+//            if(data.length > 0){
+//                param.put("firmware_ver", version);
+//            }
+//            else{
+//                param.put("firmware_ver", );
+//            }
+
             int putLedconResult = ledconMapper.putLedcon(param);
 
             if(putLedconResult == 1){ // Success : 1

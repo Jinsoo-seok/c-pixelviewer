@@ -81,14 +81,17 @@ public class ExternalsServiceImpl implements ExternalsService {
 
 
         String type = "날씨";
-        System.out.println("[@Scheduled]weatherRequestUrl = " + weatherRequestUrl);
+        log.info("[@Scheduled] weatherRequestUrl = {}", weatherRequestUrl);
+        log.info("[@Scheduled] Scheduled Time = {} {}", baseDate, baseTime);
+
         Map<String, Object> webClientResponseMap = webClientFunction(type, weatherRequestUrl);
 
         if(webClientResponseMap != null){
-            System.out.println("[First]");
+            log.info("[RUN][First]");
             if(webClientResponseMap.get("webClient").equals(false)){
+                log.info("[FAIL][First]");
                 webClientResponseMap = webClientFunction(type, weatherRequestUrl);
-                System.out.println("[Second]");
+                log.info("[RUN][Second]");
             }
             if(!webClientResponseMap.get("webClient").equals(false)) {
                 List<Map<String, Object>> tempWeather12 = (List<Map<String, Object>>) webClientResponseMap.get("tempFirst");
@@ -110,15 +113,15 @@ public class ExternalsServiceImpl implements ExternalsService {
 
                 int putExternalsInfosResult = externalsMapper.putExternalsInfos(type, mapperJson);
                 if (putExternalsInfosResult > 0) {
+                    log.info("[SUCCESS]webClientResponseMap = {}", webClientResponseMap);
                     resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
                 } else {
                     resultMap.put("code", ResponseCode.FAIL_INSERT_EXTERNALS_WEATHER.getCode());
                     resultMap.put("message", ResponseCode.FAIL_INSERT_EXTERNALS_WEATHER.getMessage());
                 }
-                System.out.println("[success]webClientResponseMap = " + webClientResponseMap);
             }
             else{
-                System.out.println("[fail]webClientResponseMap = " + webClientResponseMap);
+                log.info("[FAIL]webClientResponseMap = {}", webClientResponseMap);
                 resultMap.put("code", ResponseCode.FAIL_EXTERNALS_WEATHER.getCode());
                 resultMap.put("message", ResponseCode.FAIL_EXTERNALS_WEATHER.getMessage());
                 resultMap.put("data", webClientResponseMap.get("data"));
@@ -131,6 +134,13 @@ public class ExternalsServiceImpl implements ExternalsService {
     @Override
     public Map<String, Object> getExternalAir() {
         Map<String, Object> resultMap = new HashMap<>();
+
+        LocalDateTime dateTime = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
+        String localDateTime = dateTime.format(formatter);
+        String baseDate = localDateTime.substring(0, 8);
+        String baseTime = localDateTime.substring(8, 10) + "00";
+
 
         String apisDataUrl = "http://apis.data.go.kr/B552584/ArpltnInforInqireSvc/getMsrstnAcctoRltmMesureDnsty";
         String serviceKey = "NA%2B2mZ6YHlKo2jNmEfOmsmrL2HY0ulBt9v3GUhfHtIV40HGjglABV1Zq1qCcjGJar4c1RAjcTuVI%2Blnx%2FTmkSw%3D%3D";
@@ -158,19 +168,22 @@ public class ExternalsServiceImpl implements ExternalsService {
                 .toUri();
 
         String type = "대기";
-        System.out.println("[@Scheduled]airRequestUrl = " + tempUrl);
+        log.info("[@Scheduled] airRequestUrl = {}", tempUrl);
+        log.info("[@Scheduled] Scheduled Time = {} {}", baseDate, baseTime);
 //        System.out.println("[@Scheduled]airRequestUrl = " + airRequestUrl);
         Map<String, Object> webClientResponseMap = webClientFunction(type, tempUrl);
 
         if(webClientResponseMap != null){
-            System.out.println("[First]");
+            log.info("[RUN][First]");
             if(webClientResponseMap.get("webClient").equals(false)){
+                log.info("[FAIL][First]");
                 webClientResponseMap = webClientFunction(type, tempUrl);
-                System.out.println("[Second]");
+                log.info("[RUN][Second]");
             }
             if(!webClientResponseMap.get("webClient").equals(false)) {
                 int putExternalsInfosResult = externalsMapper.putExternalsInfos(type, (String) webClientResponseMap.get("airInfo"));
                 if (putExternalsInfosResult > 0) {
+                    log.info("[SUCCESS]webClientResponseMap = {}", webClientResponseMap);
                     resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
                 } else {
                     resultMap.put("code", ResponseCode.FAIL_INSERT_EXTERNALS_AIR.getCode());
@@ -178,7 +191,7 @@ public class ExternalsServiceImpl implements ExternalsService {
                 }
             }
             else{
-                System.out.println("[fail]webClientResponseMap = " + webClientResponseMap);
+                log.info("[FAIL]webClientResponseMap = {}", webClientResponseMap);
                 resultMap.put("code", ResponseCode.FAIL_EXTERNALS_AIR.getCode());
                 resultMap.put("message", ResponseCode.FAIL_EXTERNALS_AIR.getMessage());
                 resultMap.put("data", webClientResponseMap.get("data"));
