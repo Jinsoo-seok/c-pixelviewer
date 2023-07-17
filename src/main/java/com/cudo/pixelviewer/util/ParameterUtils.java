@@ -316,4 +316,12 @@ public class ParameterUtils {
 
         return true;
     }
+
+    public static boolean parameterScheduleDay(String parameterKey, Object parameterValue) throws ParamException {
+        if (parameterValue != null && ((ArrayList<Integer>)parameterValue).size() > 7) {
+            throw new ParamException(ResponseCode.INVALID_PARAM_VALUE, parameterKey);
+        }
+
+        return true;
+    }
 }

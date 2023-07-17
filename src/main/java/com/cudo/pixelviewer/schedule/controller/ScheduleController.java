@@ -123,6 +123,7 @@ public class ScheduleController {
             parameterTime("startTime", param.get("startTime"), true);
             parameterTime("endTime", param.get("endTime"), true);
             parameterCompareDate("startDate", "endDate", param.get("startDate"), param.get("endDate"));
+            parameterScheduleDay("scheduleDay", param.get("scheduleDay"));
 
             responseMap = scheduleService.postLedPlaylistSchedule(param);
         } catch (ParamException paramException) {
@@ -171,6 +172,7 @@ public class ScheduleController {
             parameterTime("startTime", param.get("startTime"), true);
             parameterTime("endTime", param.get("endTime"), true);
             parameterCompareDate("startDate", "endDate", param.get("startDate"), param.get("endDate"));
+            parameterScheduleDay("scheduleDay", param.get("scheduleDay"));
 
             responseMap = scheduleService.puLedPlaylistSchedule(param);
         } catch (ParamException paramException) {
@@ -253,6 +255,7 @@ public class ScheduleController {
             parameterTime("startTime", param.get("startTime"), true);
             parameterTime("endTime", param.get("endTime"), true);
             parameterCompareDate("startDate", "endDate", param.get("startDate"), param.get("endDate"));
+            parameterScheduleDay("scheduleDay", param.get("scheduleDay"));
 
             responseMap = scheduleService.postLedPower(param);
         } catch (ParamException paramException) {
@@ -298,6 +301,7 @@ public class ScheduleController {
             parameterTime("startTime", param.get("startTime"), true);
             parameterTime("endTime", param.get("endTime"), true);
             parameterCompareDate("startDate", "endDate", param.get("startDate"), param.get("endDate"));
+            parameterScheduleDay("scheduleDay", param.get("scheduleDay"));
 
             responseMap = scheduleService.putLedPower(param);
         } catch (ParamException paramException) {
@@ -383,6 +387,7 @@ public class ScheduleController {
             parameterDate("endDate", param.get("endDate"), true);
             parameterCompareDate("startDate", "endDate", param.get("startDate"), param.get("endDate"));
             parameterArray("brightnessList", param.get("brightnessList"), true);
+            parameterScheduleDay("scheduleDay", param.get("scheduleDay"));
 
             for (Object brightness : (ArrayList) param.get("brightnessList")) {
                 parameterMap("brightnessList", brightness, true);
@@ -433,6 +438,7 @@ public class ScheduleController {
             parameterDate("endDate", param.get("endDate"), true);
             parameterCompareDate("startDate", "endDate", param.get("startDate"), param.get("endDate"));
             parameterArray("brightnessList", param.get("brightnessList"), true);
+            parameterScheduleDay("scheduleDay", param.get("scheduleDay"));
 
             for (Object brightness : (ArrayList) param.get("brightnessList")) {
                 parameterMap("brightnessList", brightness, true);
