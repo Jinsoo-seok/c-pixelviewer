@@ -9,6 +9,7 @@ import java.util.Map;
 @Mapper
 public interface ScreenMapper {
 
+    Integer getScreenListCount();
     List<ScreenVo> getScreenList();
 
 //    ScreenVo getScreen(String screenId);
