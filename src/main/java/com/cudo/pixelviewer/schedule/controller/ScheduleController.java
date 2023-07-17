@@ -502,4 +502,43 @@ public class ScheduleController {
 
         return responseMap;
     }
+
+    /**
+     * * 스케줄 삭제
+     */
+    @DeleteMapping
+    public Map<String, Object> deleteSchedule(HttpServletRequest request, @RequestBody Map<String, Object> param) {
+        long startTime = System.currentTimeMillis();
+        String apiInfo = "[" + request.getRequestURI() + "] [" + request.getMethod() + "]";
+        log.info("{} [START] [{}]", apiInfo, startTime);
+
+        Map<String, Object> responseMap = new HashMap<>();
+
+        responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
+
+        String[] keyList = {"contentId", "type"};
+
+        try {
+            parameterValidation(param, keyList);
+            parameterInt("contentId", param.get("contentId"), true);
+            parameterInt("type", param.get("type"), true);
+
+            responseMap = scheduleService.deleteSchedule(param);
+        } catch (ParamException paramException) {
+            log.error("[paramException] - {}", paramException.getMessage());
+
+            responseMap.put("code", paramException.getCode());
+            responseMap.put("message", paramException.getMessage());
+        } catch (Exception exception) {
+            log.error("[Exception] - {}", exception.getMessage());
+
+            responseMap.put("exceptionMessage", exception.getMessage());
+        }
+
+        long endTime = System.currentTimeMillis();
+        long procTime = endTime - startTime;
+        log.info("{} [END] [{}] - {}", apiInfo, procTime, responseMap.get("code"));
+
+        return responseMap;
+    }
 }

@@ -186,7 +186,7 @@ public class ScheduleServiceImpl implements ScheduleService {
     }
 
     @Override
-    public Map<String, Object> puLedPlaylistSchedule(Map<String, Object> param) throws SchedulerException, ParseException{
+    public Map<String, Object> puLedPlaylistSchedule(Map<String, Object> param) throws SchedulerException, ParseException {
         Map<String, Object> responseMap = new HashMap<>();
 
         int insertCount = scheduleMapper.putLedPlaylistSchedule(setPowerParam(param));
@@ -530,6 +530,48 @@ public class ScheduleServiceImpl implements ScheduleService {
 
         } else {
             responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
+        }
+
+        return responseMap;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Map<String, Object> deleteSchedule(Map<String, Object> param) throws SchedulerException {
+        Map<String, Object> responseMap = new HashMap<>();
+
+        List<Map<String, Object>> deleteScheduleInfo = scheduleMapper.deleteScheduleValid(param);
+
+        if (deleteScheduleInfo.size() > 0) {
+            Map<String, Object> dataMap = new HashMap<>();
+
+            // 삭제할 스케줄 id
+            List<Long> scheduleIdList = deleteScheduleInfo.stream()
+                    .map(scheduleInfo -> Long.parseLong(String.valueOf(scheduleInfo.get("schedule_id"))))
+                    .collect(Collectors.toList());
+
+            int deleteCount = scheduleMapper.deleteSchedule(scheduleIdList);
+
+            if (deleteCount > 0) {
+                // 응답 값 내려줄 스케줄 명
+                List<String> scheduleNameList = deleteScheduleInfo.stream()
+                        .map(scheduleInfo -> String.valueOf(scheduleInfo.get("sch_nm")))
+                        .collect(Collectors.toList());
+
+                // 스케줄 삭제
+                for (Long scheduleId : scheduleIdList) {
+                    schedulerManager.deleteJob(LED_PLAY_LIST_START.getValue() + scheduleId);
+                    schedulerManager.deleteJob(LED_PLAY_LIST_END.getValue() + scheduleId);
+                }
+
+                dataMap.put("scheduleName", scheduleNameList);
+                responseMap.put("data", dataMap);
+                responseMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
+            } else {
+                responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
+            }
+        } else {
+            responseMap.putAll(ParameterUtils.responseOption(ResponseCode.NO_CONTENT.getCodeName()));
         }
 
         return responseMap;

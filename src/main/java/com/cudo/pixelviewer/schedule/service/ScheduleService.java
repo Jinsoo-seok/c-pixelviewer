@@ -20,4 +20,5 @@ public interface ScheduleService {
     Map<String, Object> postLight(Map<String, Object> param) throws SchedulerException, ParseException;
     Map<String, Object> putLight(Map<String, Object> param) throws SchedulerException, ParseException;
     Map<String, Object> deleteLight(Map<String, Object> param) throws SchedulerException;
+    Map<String, Object> deleteSchedule(Map<String, Object> param) throws SchedulerException;
 }

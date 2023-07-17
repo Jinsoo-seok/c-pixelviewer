@@ -1,6 +1,7 @@
 package com.cudo.pixelviewer.component.scheduler;
 
 import com.cudo.pixelviewer.schedule.mapper.ScheduleMapper;
+import com.cudo.pixelviewer.vo.LedPlayScheduleVo;
 import com.cudo.pixelviewer.vo.LightScheduleVo;
 import com.cudo.pixelviewer.vo.PowerScheduleVo;
 import lombok.RequiredArgsConstructor;
@@ -44,6 +45,12 @@ public class PeriodicJob implements Job {
 
         // 밝기 스케줄 등록
         lightSchedule(lightScheduleList, nowDate);
+
+        // LED 플레이리스트 스케줄 조회
+        List<LedPlayScheduleVo> ledPlaySchedule = scheduleMapper.selectLedPlayListSchedule(nowDate);
+
+        // LED 플레이리스트 스케줄 등록
+        ledPlaySchedule(ledPlaySchedule, nowDate);
 
     }
 
@@ -126,7 +133,65 @@ public class PeriodicJob implements Job {
                 }
             }
         }
+    }
 
+    /**
+     * * Led 플레이리스트 스케줄 설정
+     */
+    private void ledPlaySchedule(List<LedPlayScheduleVo> ledPlaySchedule, String nowDate) throws SchedulerException {
+        for (LedPlayScheduleVo ledPlayScheduleInfo : ledPlaySchedule) {
+
+            if (checkDay(nowDate, ledPlayScheduleInfo.getRunDayWeek())) {
+                List<String> startTime = Arrays.asList(ledPlayScheduleInfo.getTimeStart().split(":")),
+                        endTime = Arrays.asList(ledPlayScheduleInfo.getTimeEnd().split(":"));
+
+                // 영상 시작 스케줄 등록
+                if (startTime.size() > 0) {
+                    JobDataMap powerOnDataMap = new JobDataMap();
+
+                    powerOnDataMap.put(LED_PLAY_LIST_START.getCode(), LED_PLAY_LIST_START.getValue());
+                    setLedPlayListSchedule(nowDate, ledPlayScheduleInfo, startTime, powerOnDataMap);
+                }
+
+                // 영상 종료 스케줄 등록
+                if (endTime.size() > 0) {
+                    JobDataMap powerOffDataMap = new JobDataMap();
+
+                    powerOffDataMap.put(LED_PLAY_LIST_END.getCode(), LED_PLAY_LIST_END.getValue());
+
+                    setLedPlayListSchedule(nowDate, ledPlayScheduleInfo, endTime, powerOffDataMap);
+                }
+            }
+        }
+
+    }
+
+    /**
+     * * Led 플레이리스트 스케줄 job, trigger 설정
+     */
+    private void setLedPlayListSchedule(String nowDate, LedPlayScheduleVo ledPlayInfo, List<String> ledPlayTime, JobDataMap LedPlayDataMap) throws SchedulerException {
+        LocalTime powerOnOffTime = LocalTime.of(Integer.parseInt(ledPlayTime.get(0)), Integer.parseInt(ledPlayTime.get(1)), Integer.parseInt(ledPlayTime.get(2)));
+        LocalTime nowTime = LocalTime.now();
+
+        if (powerOnOffTime.isAfter(nowTime)) {
+            JobDetail powerJob = JobBuilder.newJob(ScheduleJob.class)
+                    .withIdentity(String.valueOf(LedPlayDataMap.get(DATA_MAP_KEY.getCode())) + ledPlayInfo.getScheduleId())
+                    .usingJobData(LedPlayDataMap)
+                    .requestRecovery(true)
+                    .build();
+
+            Trigger powerTrigger = TriggerBuilder.newTrigger()
+                    .withIdentity(String.valueOf(LedPlayDataMap.get(DATA_MAP_KEY.getCode())) + ledPlayInfo.getScheduleId())
+                    .withSchedule(CronScheduleBuilder
+                            .cronSchedule(cronExpression(nowDate, ledPlayTime)))
+                    .build();
+
+            scheduler.scheduleJob(powerJob, powerTrigger);
+
+            log.info("Led PlayList Schedule Register Id : {}", String.valueOf(LedPlayDataMap.get(DATA_MAP_KEY.getCode())) + ledPlayInfo.getScheduleId());
+        } else {
+            log.info("This is the time when schedule registration is not possible. Led PlayList ScheduleId : {}", ledPlayInfo.getScheduleId());
+        }
     }
 
     /**
