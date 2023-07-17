@@ -3,6 +3,10 @@
 
 <mapper namespace="com.cudo.pixelviewer.operate.mapper.ScreenMapper">
 
+    <select id="getScreenListCount" resultType="int">
+        SELECT COUNT(screen_id)
+        FROM Screens
+    </select>
     <select id="getScreenList" resultType="com.cudo.pixelviewer.vo.ScreenVo">
         SELECT *
         FROM Screens
@@ -49,7 +53,7 @@
         WHERE Screens.screen_id = #{screenId}
     </select>
     <update id="deleteScreen">
-        DELETE S.*, P.*, L.*, LO.*, EV.*, EI.*, ST.*
+        DELETE S.*, SD.*, P.*, L.*, LO.*, EV.*, EI.*, ST.*
         FROM Screens AS S
             LEFT JOIN Screen_Displays as SD ON SD.screen_id = S.screen_id
             LEFT JOIN Presets as P ON P.screen_id = S.screen_id

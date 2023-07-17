@@ -21,11 +21,16 @@ public class ScreenServiceImpl implements ScreenService {
     @Override
     public Map<String, Object> getScreenList() {
         Map<String, Object> resultMap = new HashMap<>();
+        Map<String, Object> screenVoMap = new HashMap<>();
 
+        Integer screenVoListCount = screenMapper.getScreenListCount();
         List<ScreenVo> screenVoList = screenMapper.getScreenList();
 
+
         if(screenVoList.size() > 0){
-            resultMap.put("data", screenVoList);
+            screenVoMap.put("totalCount", screenVoListCount);
+            screenVoMap.put("screenList", screenVoList);
+            resultMap.put("data", screenVoMap);
             resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
         }
         else{
@@ -93,7 +98,7 @@ public class ScreenServiceImpl implements ScreenService {
         if(screenCheck == 1){  // Exist : 1
             int deleteScreenResult = screenMapper.deleteScreen(param);
 
-            if(deleteScreenResult > 1){ // Success : 1
+            if(deleteScreenResult > 0){ // Success : 1
                 resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
             }
             else{
