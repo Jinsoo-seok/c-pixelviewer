@@ -1,5 +1,6 @@
 package com.cudo.pixelviewer.schedule.mapper;
 
+import com.cudo.pixelviewer.vo.LedPlayScheduleVo;
 import com.cudo.pixelviewer.vo.LightListScheduleVo;
 import com.cudo.pixelviewer.vo.LightScheduleVo;
 import com.cudo.pixelviewer.vo.PowerScheduleVo;
@@ -36,4 +37,8 @@ public interface ScheduleMapper {
 
     List<PowerScheduleVo> selectPowerSchedule(String nowDate);
     List<LightScheduleVo> selectLightSchedule(String nowDate);
+    List<LedPlayScheduleVo> selectLedPlayListSchedule(String nowDate);
+
+    List<Map<String, Object>> deleteScheduleValid(Map<String, Object> param);
+    int deleteSchedule(List<Long> param);
 }

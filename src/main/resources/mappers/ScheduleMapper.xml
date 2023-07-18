@@ -199,4 +199,35 @@
                  INNER JOIN brightness_control_lists AS bcl on bs.schedule_id = bcl.schedule_id
         WHERE #{nowDate} between bs.sch_start_date AND bs.sch_end_date
     </select>
+
+    <select id="selectLedPlayListSchedule" resultType="com.cudo.pixelviewer.vo.LedPlayScheduleVo">
+        SELECT schedule_id, preset_id, sch_start_date, sch_end_date, time_start, time_end, run_day_week
+        FROM playlist_schedule
+        WHERE #{nowDate} between sch_start_date AND sch_end_date
+    </select>
+
+    <select id="deleteScheduleValid" parameterType="Map" resultType="Map">
+        SELECT schedule_id, sch_nm
+        FROM playlist_schedule
+        WHERE
+        <choose>
+            <when test="type == 0">
+                preset_id = #{contentId}
+            </when>
+            <when test="type == 1">
+                layer_id = #{contentId}
+            </when>
+            <when test="type == 2">
+                playlist_id = #{contentId}
+            </when>
+        </choose>
+    </select>
+
+    <delete id="deleteSchedule" parameterType="long">
+        DELETE FROM playlist_schedule
+        WHERE schedule_id IN
+        <foreach item="contentId" collection="list" open="(" separator="," close=")">
+            #{contentId}
+        </foreach>
+    </delete>
 </mapper>
