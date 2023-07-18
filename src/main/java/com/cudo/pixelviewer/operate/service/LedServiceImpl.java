@@ -108,7 +108,9 @@ public class LedServiceImpl implements LedService {
                 byte[] message = {0x74, 0x00, 0x11, 0x00, 0x00, 0x00, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF,
                         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 
-                int presetValue = Integer.decode(presetNumber);
+                int presetValue = Integer.decode("0x" + presetNumber);
+
+                System.out.println();
                 message[16] = (byte) presetValue;
 
                 ledControllerClient.sendMessage(message);
