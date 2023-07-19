@@ -8,7 +8,6 @@ import java.util.Map;
 @Mapper
 public interface UserMapper {
 
-    Map<String, Object> postLogin2 (Map<String, Object> param);
     UserVo postLogin (Map<String, Object> param);
 
 }

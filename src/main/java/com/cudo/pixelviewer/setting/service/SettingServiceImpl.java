@@ -66,11 +66,9 @@ public class SettingServiceImpl implements SettingService {
         resultMap.putAll(ParameterUtils.responseOption("NO_CONTENT"));
 
         List<Map<String, Object>> fontList = settingMapper.getFontList();
-        List<String> fontListV2 = settingMapper.getFontListV2();
 
         if(fontList.size() > 0) {
             dataMap.put("list", fontList);
-            dataMap.put("listV2", fontListV2);
 
             resultMap.put("data", dataMap);
             resultMap.putAll(ParameterUtils.responseOption("SUCCESS"));

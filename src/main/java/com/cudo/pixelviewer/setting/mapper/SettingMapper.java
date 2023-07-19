@@ -14,6 +14,4 @@ public interface SettingMapper {
 
     List<Map<String, Object>> getFontList ();
 
-    List<String> getFontListV2 ();
-
 }

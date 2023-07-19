@@ -89,8 +89,6 @@ public class PlaylistServiceImpl implements PlaylistService {
                         playlist.put("contentIdList", tempContentIdList);
                         log.info("[FAIL][getPlaylist] resultContentList");
                     }
-//                    String removeKey = "contentIdList";
-//                    playlist.remove(removeKey);
                 }
             }
             else{

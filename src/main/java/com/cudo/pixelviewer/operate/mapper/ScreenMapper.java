@@ -30,5 +30,4 @@ public interface ScreenMapper {
     int putScreenDeleteDisplays(Map<String, Object> param);
     int saveAllocateDisplays(Map<String, Object> param);
 
-
 }

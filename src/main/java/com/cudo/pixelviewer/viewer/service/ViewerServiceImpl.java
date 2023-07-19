@@ -53,12 +53,6 @@ public class ViewerServiceImpl implements ViewerService {
     @Value("${values.was.port}")
     private String wasPort;
 
-//    private static final String protocol = "http://";
-//
-//    private static final String wasIp = "106.245.226.42";
-//    private static final String wasPort = "9898";
-
-//    final ViewerMapper viewerMapper;
 
     @Override
     public Map<String, Object> getPlayInfo(String screenId, String presetId, String layerId) {
@@ -147,7 +141,6 @@ public class ViewerServiceImpl implements ViewerService {
                     }
                 }
             }
-//            Map<String, Object> playlist = playlistMapper.getPlaylist(layerId);
             Map<String, Object> playlist = playlistMapper.getPlaylistAboutLayer(layerId);
 
             if(playlist != null) {
@@ -251,7 +244,7 @@ public class ViewerServiceImpl implements ViewerService {
             SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
             String dateString = formatter.format(presetUpdateDate);
 
-            tempPresetMap.put("presetStatus", presetVo.getPresetStatus());
+            tempPresetMap.put("playStatus", presetVo.getPresetStatus());
             tempPresetMap.put("playInfoVersion", dateString);
             dataMap.put("preset", tempPresetMap);
 
@@ -299,7 +292,6 @@ public class ViewerServiceImpl implements ViewerService {
         else{
             resultMap.putAll(ParameterUtils.responseOption(ResponseCode.NO_CONTENT.getCodeName()));
         }
-//        return resultMap;
         return dataMap;
     }
 

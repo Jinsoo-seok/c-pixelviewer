@@ -3,14 +3,6 @@
 
 <mapper namespace="com.cudo.pixelviewer.user.mapper.UserMapper">
 
-    <select id="postLogin2" resultType="Map">
-        SELECT idx AS idx, user_id AS userId, user_name AS userName
-             , password AS userPw, auth_code AS authCode, state AS state
-             , reg_dt AS regDt, update_dt AS updateDt
-             , invalid_cnt AS invalidCnt, led_key AS ledKey
-        FROM Users
-        where user_id = #{userId}
-    </select>
     <select id="postLogin" resultType="com.cudo.pixelviewer.vo.UserVo">
         SELECT *
         FROM Users

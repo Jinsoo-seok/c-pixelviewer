@@ -6,6 +6,9 @@ import com.cudo.pixelviewer.util.ResponseCode;
 import com.cudo.pixelviewer.viewer.service.ViewerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -26,7 +29,7 @@ public class ViewerController {
     final ViewerService viewerService;
 
     @GetMapping("/playInfo/{screenId}/{presetId}/{layerId}")
-    public Map<String, Object> getPlayInfo(HttpServletRequest request
+    public ResponseEntity<Map<String, Object>> getPlayInfo(HttpServletRequest request
                                         , @PathVariable String screenId
                                         , @PathVariable String presetId
                                         , @PathVariable String layerId) {
@@ -50,7 +53,10 @@ public class ViewerController {
         long procTime = endTime-startTime;
         log.info("{} [END] [{}] - {}", apiInfo, procTime, responseMap.get("code"));
 
-        return responseMap;
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Content-Type", "application/json; charset=UTF-8");
+        return new ResponseEntity(responseMap, headers, HttpStatus.OK);
     }
 
     @PutMapping("/updateAndHealthCheck")

@@ -20,10 +20,5 @@
         FROM Font_Info
     </select>
 
-    <select id="getFontListV2" resultType="String">
-        SELECT font_nm AS fontNm
-        FROM Font_Info
-    </select>
-
 </mapper>
 
