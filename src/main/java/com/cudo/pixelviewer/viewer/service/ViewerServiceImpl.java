@@ -308,7 +308,7 @@ public class ViewerServiceImpl implements ViewerService {
         Map<String, Object> resultMap = new HashMap<>();
         
         String os = environment.getProperty("os.name");
-        System.out.println("os = " + os);
+        log.info("Current OS = {}", os);
 
         if (file != null && !file.isEmpty()) {
             try {
@@ -326,22 +326,22 @@ public class ViewerServiceImpl implements ViewerService {
                 Boolean weatherType = false;
                 Boolean airType = false;
 
+                String LinuxPath = "/usr/local/tomcat/webapps";
                 if(os.equals("Linux")){
-                    filePath = "/usr/local/tomcat/webapps/";
+                    filePath = LinuxPath;
                 }
 
                 switch(type) {
                     // Agent Capture Img
                     case "10": {
                         agentCaptureType = true;
-                        filePath += "agent" + File.separator + name + extension;
+                        filePath += File.separator + "agent" + File.separator + name + extension;
                         break;
                     }
                     // Contents Thumbnails
                     case "20": {
                         contentsType = true;
-//                        filePath += "thumbnails"  + File.separator + filename + "_" + formattedDateTime + extension;
-                        filePath = File.separator + "thumbnails"  + File.separator + filename + "_" + formattedDateTime + extension;
+                        filePath += File.separator + "thumbnails"  + File.separator + filename + "_" + formattedDateTime + extension;
                         break;
                     }
                     // Weather Img
@@ -350,16 +350,14 @@ public class ViewerServiceImpl implements ViewerService {
                     case "90": case "100":
                     {
                         weatherType = true;
-                        filePath += "weather"  + File.separator + originalFilename;
-//                        filePath = File.separator + "weather"  + File.separator + originalFilename;
+                        filePath += File.separator + "weather"  + File.separator + originalFilename;
                         break;
                     }
                     // Air Img
                     case "110": case "120": case "130": case "140":
                     {
                         airType = true;
-                        filePath += "air"  + File.separator + originalFilename;
-//                        filePath = File.separator + "air"  + File.separator + originalFilename;
+                        filePath += File.separator + "air"  + File.separator + originalFilename;
                         break;
                     }
                     default: {
@@ -373,7 +371,7 @@ public class ViewerServiceImpl implements ViewerService {
 
                 if(agentCaptureType || contentsType){
                     Map<String, Object> dataMap = new HashMap<>();
-                    dataMap.put("filePath", filePath);
+                    dataMap.put("filePath", filePath.replace(LinuxPath, ""));
                     resultMap.put("data", dataMap);
                     resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
                 }
