@@ -59,15 +59,6 @@ public class PresetServiceImpl implements PresetService {
     @Value("${values.agent.path}")
     private String agentPath;
 
-//    private static final String protocol = "http://";
-
-//    private static final String wasIp = "106.245.226.42";
-//    private static final String wasPort = "9898";
-//    private static final String wasPath = "/api-viewer/";
-
-//    private static final String agentIp = "192.168.123.12";
-//    private static final String agentPort = "8800";
-//    private static final String agentPath = "/vieweragent/Preset/layer-placement";
 
     String presetStatusPlay = "play";
     String presetStatusStop = "stop";

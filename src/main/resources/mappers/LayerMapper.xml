@@ -110,8 +110,10 @@
     </update>
 
     <select id="getRunLayersStatus" resultType="com.cudo.pixelviewer.vo.LayerStatusRunVo">
-        SELECT *
+        SELECT L.*, PL.playlist_id, PL.playlist_nm
         FROM Layers AS L
+            LEFT JOIN Playlists AS PL ON PL.layer_id = L.layer_id
+                                        AND PL.select_yn = 'Y'
         WHERE L.preset_id = #{presetId}
     </select>
 

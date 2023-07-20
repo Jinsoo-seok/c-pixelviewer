@@ -137,14 +137,12 @@
         (
             type
             , cts_nm, cts_path, playtime
-            , weather_fl, air_info_fl, stretch
             , thumbnail_path
         )
         VALUES
             (
                 #{type}
                 , #{ctsNm}, #{ctsPath}, #{playtime}
-                , false, false, false
                 , #{thumbnailPath}
             )
     </insert>
