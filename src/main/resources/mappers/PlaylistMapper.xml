@@ -15,7 +15,9 @@
     </select>
 <!--    <select id="getPlaylistContentList" resultType="com.cudo.pixelviewer.vo.PlaylistContentsVo">-->
     <select id="getPlaylistContentList" resultType="Map">
-        SELECT content_id AS contentId, type AS type, cts_nm AS ctsNm, cts_path AS ctsPath, thumbnail_path AS thumbnailPath, playtime AS playtime
+        SELECT content_id AS contentId, type AS type, cts_nm AS ctsNm, cts_path AS ctsPath
+              , thumbnail_path AS thumbnailPath, playtime AS playtime
+              , weather_fl AS weatherFl, air_info_fl AS airInfoFl, stretch AS stretch
         FROM pixelviewer.playlist_contents
         WHERE content_id IN ${contentIdList}
     </select>

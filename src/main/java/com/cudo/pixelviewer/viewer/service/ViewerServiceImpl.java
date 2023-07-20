@@ -180,6 +180,11 @@ public class ViewerServiceImpl implements ViewerService {
 
                 List<Map<String, Object>> playlistContentList = playlistMapper.getPlaylistContentList(queryTemp);
                 if (playlistContentList.size() != 0) {
+                    for(Map<String, Object> content : playlistContentList){
+                        content.put("weatherFl", content.get("weatherFl").equals(1));
+                        content.put("airInfoFl", content.get("airInfoFl").equals(1));
+                        content.put("stretch", content.get("stretch").equals(1));
+                    }
                     playlistResultMap.put("playlistContents", playlistContentList);
                     dataMap.put("playlist", playlistResultMap);
                 }
@@ -464,6 +469,9 @@ public class ViewerServiceImpl implements ViewerService {
         tempStyleMap.put("fontNm", dataMap.get("fontNm"));
         tempStyleMap.put("fontFl", dataMap.get("fontFl"));
         tempStyleMap.put("fontSize", dataMap.get("fontSize"));
+        tempStyleMap.put("fontColor", dataMap.get("fontColor"));
+        tempStyleMap.put("borderSize", dataMap.get("borderSize"));
+        tempStyleMap.put("borderColor", dataMap.get("borderColor"));
         tempStyleMap.put("forecolor", dataMap.get("forecolor"));
 
         tempPositionMap.put("posX", dataMap.get("posX"));
