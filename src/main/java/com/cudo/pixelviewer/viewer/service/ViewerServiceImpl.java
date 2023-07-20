@@ -73,8 +73,10 @@ public class ViewerServiceImpl implements ViewerService {
                                 Map<String, Object> videoTemp = layerMapper.getLayerObjectExternalVideo((Integer) lo.get("object_id"));
                                 String updateDate = convertTimestampToString(videoTemp.get("updateDate"));
 
-                                String deleteData = "updateDate";
-                                videoTemp.remove(deleteData);
+                                String[] removeKey = {"updateDate", "exVideoId", "objectId", "type"};
+                                for (String key : removeKey) {
+                                    videoTemp.remove(key);
+                                }
 
                                 Map<String, Object> exVideoMap = new HashMap<>();
                                 exVideoMap.put("updateDate", updateDate);
@@ -181,9 +183,17 @@ public class ViewerServiceImpl implements ViewerService {
                 List<Map<String, Object>> playlistContentList = playlistMapper.getPlaylistContentList(queryTemp);
                 if (playlistContentList.size() != 0) {
                     for(Map<String, Object> content : playlistContentList){
-                        content.put("weatherFl", content.get("weatherFl").equals(1));
-                        content.put("airInfoFl", content.get("airInfoFl").equals(1));
-                        content.put("stretch", content.get("stretch").equals(1));
+                        List<Map<String, Object>> ynCheckList = (List<Map<String, Object>>) playlist.get("contentIdList");
+
+                        for(Map<String, Object> ynCheck : ynCheckList){
+                            Integer tempId = (Integer) content.get("contentId");
+                            Long realContentId = tempId != null ? tempId.longValue() : null;
+                            if(ynCheck.get("contentId") == realContentId ){
+                                content.put("weatherFl", ynCheck.get("weatherFl"));
+                                content.put("airInfoFl", ynCheck.get("airInfoFl"));
+                                content.put("stretch", ynCheck.get("stretch"));
+                            }
+                        }
                     }
                     playlistResultMap.put("playlistContents", playlistContentList);
                     dataMap.put("playlist", playlistResultMap);
