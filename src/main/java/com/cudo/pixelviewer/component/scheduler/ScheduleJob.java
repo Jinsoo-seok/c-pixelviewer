@@ -58,7 +58,7 @@ public class ScheduleJob implements Job {
                 param.put(PRESET_ID, jobDataMap.get(PRESET_ID));
 
                 if (jobDataMap.get(DATA_MAP_KEY.getCode()).equals(LED_PLAY_LIST_START.getValue())) {
-                    param.put(CONTROL_TYPE, "start");
+                    param.put(CONTROL_TYPE, "play");
                     presetMapper.patchPresetStatusRunClear(); // 프리셋 start 상태 클리어
                 } else {
                     param.put(CONTROL_TYPE, "stop");

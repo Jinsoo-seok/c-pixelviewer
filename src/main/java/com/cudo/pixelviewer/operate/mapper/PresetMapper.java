@@ -17,7 +17,7 @@ public interface PresetMapper {
     PresetVo getPreset(String presetId);
     List<LayerVo> getPresetLayers(String presetId);
 
-    PresetStatusRunVo getRunPreset();
+    PresetStatusRunVo getUsingPreset();
 
     int postPresetValid(Map<String, Object> param);
     int postPreset(Map<String, Object> param);
@@ -40,4 +40,7 @@ public interface PresetMapper {
     int patchPresetStatusRunClear();
 
     int refreshPresetUpdateDate(Object presetId);
+
+    // All Clear : Preset Status
+    int clearPresetAndLayerStatus();
 }

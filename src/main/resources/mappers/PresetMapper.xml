@@ -19,10 +19,10 @@
         WHERE L.preset_id = #{presetId}
     </select>
 
-    <select id="getRunPreset" resultType="com.cudo.pixelviewer.vo.PresetStatusRunVo">
+    <select id="getUsingPreset" resultType="com.cudo.pixelviewer.vo.PresetStatusRunVo">
         SELECT *
-        FROM Presets AS P
-        WHERE P.preset_status = "play"
+        FROM pixelviewer.Presets AS P
+        WHERE P.preset_status IN ('play', 'pause', 'stop');
     </select>
     <select id="getRunPreset2" resultType="Map">
         SELECT screen_id AS screenId, preset_id AS presetId, preset_nm AS presetNm
@@ -138,8 +138,8 @@
 
     <update id="patchPresetStatusRunClear">
         UPDATE Presets
-        SET preset_status = "stop", update_date = NOW()
-        WHERE Presets.preset_status = "play"
+        SET preset_status = "none", update_date = NOW()
+        WHERE P.preset_status IN ('play', 'pause', 'stop');
     </update>
 
 
@@ -147,6 +147,13 @@
         UPDATE Presets
         SET update_date = NOW()
         WHERE Presets.preset_id = #{presetId}
+    </update>
+
+    <update id="clearPresetAndLayerStatus">
+        UPDATE pixelviewer.Presets AS P
+            JOIN pixelviewer.Layers AS L ON P.preset_id = L.preset_id
+            SET P.preset_status = 'none', L.viewer_status = 'none', P.update_date = NOW()
+        WHERE P.preset_status IN ('play', 'pause', 'stop');
     </update>
 
 </mapper>

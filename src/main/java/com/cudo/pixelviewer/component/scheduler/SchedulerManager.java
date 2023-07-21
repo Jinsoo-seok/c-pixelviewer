@@ -141,7 +141,7 @@ public class SchedulerManager {
                 Map<String, Object> param = new HashMap<>();
 
                 param.put("presetId", ledPlayScheduleVo.getPresetId());
-                param.put("controlType", "start");
+                param.put("controlType", "play");
 
                 presetMapper.patchPresetStatusRunClear(); // 프리셋 start 상태 클리어
                 presetMapper.patchPresetStatusSet(param); // 프리셋 상태 값 업데이트

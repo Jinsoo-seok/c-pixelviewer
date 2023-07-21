@@ -122,15 +122,15 @@ public class PresetServiceImpl implements PresetService {
     }
 
     @Override
-    public Map<String, Object> getRunPreset() {
+    public Map<String, Object> getUsingPreset() {
         Map<String, Object> resultMap = new HashMap<>();
         Map<String, Object> dataMap = new HashMap<>();
 
-        PresetStatusRunVo runPresetVo = presetMapper.getRunPreset();
+        PresetStatusRunVo usingPresetVo = presetMapper.getUsingPreset();
 
-        if(runPresetVo != null){
-            dataMap.put("preset", runPresetVo);
-            List<LayerStatusRunVo> runLayerVoList = layerMapper.getRunLayersStatus(runPresetVo.getPresetId());
+        if(usingPresetVo != null){
+            dataMap.put("preset", usingPresetVo);
+            List<LayerStatusRunVo> runLayerVoList = layerMapper.getRunLayersStatus(usingPresetVo.getPresetId());
             if(runLayerVoList.size() > 0){
                 dataMap.put("layerInfoList", runLayerVoList);
                 resultMap.put("data", dataMap);
@@ -284,10 +284,10 @@ public class PresetServiceImpl implements PresetService {
 
 
         // Check : Running Preset
-        PresetStatusRunVo runPresetVo = presetMapper.getRunPreset();
-        Boolean runPresetYn = false;
-        if(runPresetVo != null){
-            runPresetYn = true;
+        PresetStatusRunVo usingPresetVo = presetMapper.getUsingPreset();
+        Boolean usingPresetYn = false;
+        if(usingPresetVo != null){
+            usingPresetYn = true;
         }
 
         String controlType = (String) param.get("controlType");
@@ -307,9 +307,9 @@ public class PresetServiceImpl implements PresetService {
         if(callYn) {
             if (controlType.equals("apply")) {
                 // TODO : [완료] 실행중인 프리셋이 있을 때
-                if(runPresetYn) {
+                if(usingPresetYn) {
                     // 현재 프리셋 == 신규 프리셋 >> 레이어 정보 업데이트
-                    if (param.get("presetId").equals(runPresetVo.getPresetId())) {
+                    if (param.get("presetId").equals(usingPresetVo.getPresetId())) {
                         List<Map<String, Object>> tempLayerInfoList = (List<Map<String, Object>>) param.get("layerInfoList");
                         List<Map<String, Object>> resultLayerInfoList = new ArrayList<>();
 
@@ -324,7 +324,7 @@ public class PresetServiceImpl implements PresetService {
                         if (resultLayerInfoList.size() > 0) {
                             param.put("layerInfoList", resultLayerInfoList);
                             int setPlaylistSelectYnResult = playlistMapper.setPlaylistSelectYn(param); //[UPDATE] 레이어 >> 플레이리스트
-                            int refreshPresetUpdateDateOld = presetMapper.refreshPresetUpdateDate(runPresetVo.getPresetId()); // 기존 프리셋 버전 업데이트
+                            int refreshPresetUpdateDateOld = presetMapper.refreshPresetUpdateDate(usingPresetVo.getPresetId()); // 기존 프리셋 버전 업데이트
 
                             resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
                         } else {
@@ -336,7 +336,7 @@ public class PresetServiceImpl implements PresetService {
                     // 현재 프리셋 != 신규 프리셋 >> 현재 프리셋[none], 레이어 정보 업데이트, 신규 프리셋[stop] 상태로 presetRun
                     else {
                         // 현재 프리셋[none], 버전 업데이트
-                        int nonePresetSetResult = presetMapper.patchPresetStatusSet(presetStatusMap(runPresetVo.getPresetId(), presetStatusNone));
+                        int nonePresetSetResult = presetMapper.patchPresetStatusSet(presetStatusMap(usingPresetVo.getPresetId(), presetStatusNone));
                         
                         // Viewer의 healthCheck가 2초 >> Viewer의 상태인 none을 받아서 레이어의 상태에 none을 세팅해주는 시간 필요
                         sleep(2500);
@@ -366,19 +366,19 @@ public class PresetServiceImpl implements PresetService {
             else if (controlType.equals("play")) {
 
                 // TODO : [완료] 실행중인 프리셋이 있을때
-                if(runPresetYn) {
+                if(usingPresetYn) {
                     // Check : 기존 프리셋 == 신규 프리셋
-                    if (param.get("presetId").equals(runPresetVo.getPresetId())) {
+                    if (param.get("presetId").equals(usingPresetVo.getPresetId())) {
                         // 1. 기존 상태값 == "play" >> 예외 return
-                        if (runPresetVo.getPresetStatus().equals(presetStatusPlay)) {
+                        if (usingPresetVo.getPresetStatus().equals(presetStatusPlay)) {
                             resultMap.put("code", ResponseCode.ALREADY_PLAYING_PRESET.getCode());
                             resultMap.put("message", ResponseCode.ALREADY_PLAYING_PRESET.getMessage());
                         }
                         // 2. 기존 상태값 >> "play"
                         else {
-                            int runPresetSetResult = presetMapper.patchPresetStatusSet(presetStatusMap(runPresetVo.getPresetId(), presetStatusPlay));
+                            int runPresetSetResult = presetMapper.patchPresetStatusSet(presetStatusMap(usingPresetVo.getPresetId(), presetStatusPlay));
 
-                            resultMap.put("data", runPresetVo.getPresetId());
+                            resultMap.put("data", usingPresetVo.getPresetId());
                             resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
                         }
                     }
@@ -386,7 +386,7 @@ public class PresetServiceImpl implements PresetService {
                     // Check : 기존 프리셋 != 신규 프리셋
                     else {
                         // 기존 프리셋 Status >> none
-                        int nonePresetSetResult = presetMapper.patchPresetStatusSet(presetStatusMap(runPresetVo.getPresetId(), presetStatusNone));
+                        int nonePresetSetResult = presetMapper.patchPresetStatusSet(presetStatusMap(usingPresetVo.getPresetId(), presetStatusNone));
 
                         // Viewer의 healthCheck가 2초 >> Viewer의 상태인 none을 받아서 레이어의 상태에 none을 세팅해주는 시간 필요
                         sleep(2500);
@@ -428,10 +428,10 @@ public class PresetServiceImpl implements PresetService {
 
 
         // Check : Running Preset
-        PresetStatusRunVo runPresetVo = presetMapper.getRunPreset();
-        Boolean runPresetYn = false;
-        if(runPresetVo != null){
-            runPresetYn = true;
+        PresetStatusRunVo usingPresetVo = presetMapper.getUsingPreset();
+        Boolean usingPresetYn = false;
+        if(usingPresetVo != null){
+            usingPresetYn = true;
         }
 
         String controlType = (String) param.get("controlType");
@@ -451,9 +451,9 @@ public class PresetServiceImpl implements PresetService {
         if(callYn) {
             if (controlType.equals("apply")) {
                 // TODO : [완료] 실행중인 프리셋이 있을 때
-                if(runPresetYn) {
+                if(usingPresetYn) {
                     // 현재 프리셋 == 신규 프리셋 >> 레이어 정보 업데이트
-                    if (param.get("presetId").equals(runPresetVo.getPresetId())) {
+                    if (param.get("presetId").equals(usingPresetVo.getPresetId())) {
                         List<Map<String, Object>> tempLayerInfoList = (List<Map<String, Object>>) param.get("layerInfoList");
                         List<Map<String, Object>> resultLayerInfoList = new ArrayList<>();
 
@@ -468,7 +468,7 @@ public class PresetServiceImpl implements PresetService {
                         if (resultLayerInfoList.size() > 0) {
                             param.put("layerInfoList", resultLayerInfoList);
                             int setPlaylistSelectYnResult = playlistMapper.setPlaylistSelectYn(param); //[UPDATE] 레이어 >> 플레이리스트
-                            int refreshPresetUpdateDateOld = presetMapper.refreshPresetUpdateDate(runPresetVo.getPresetId()); // 기존 프리셋 버전 업데이트
+                            int refreshPresetUpdateDateOld = presetMapper.refreshPresetUpdateDate(usingPresetVo.getPresetId()); // 기존 프리셋 버전 업데이트
 
                             resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
                         } else {
@@ -479,7 +479,7 @@ public class PresetServiceImpl implements PresetService {
                     // 현재 프리셋 != 신규 프리셋 >> 현재 프리셋 stop, 레이어 정보 업데이트, 신규 프리셋을 stop 상태로 presetRun
                     else {
                         // 현재 프리셋 상태 stop, 버전 업데이트
-                        int runPresetSetResult = presetMapper.patchPresetStatusSet(presetStatusMap(runPresetVo.getPresetId(), presetStatusStop));
+                        int runPresetSetResult = presetMapper.patchPresetStatusSet(presetStatusMap(usingPresetVo.getPresetId(), presetStatusStop));
 
                         // 전체 레이어(해당 플레이리스트) 업데이트
                         int setPlaylistSelectYnResult = playlistMapper.setPlaylistSelectYn(param);
@@ -506,19 +506,19 @@ public class PresetServiceImpl implements PresetService {
             else if (controlType.equals("play")) {
 
                 // TODO : [완료] 실행중인 프리셋이 있을때
-                if(runPresetYn) {
+                if(usingPresetYn) {
                     // Check : 기존 프리셋 == 신규 프리셋
-                    if (param.get("presetId").equals(runPresetVo.getPresetId())) {
+                    if (param.get("presetId").equals(usingPresetVo.getPresetId())) {
                         // 1. 기존 상태값 == "play" >> 예외 return
-                        if (runPresetVo.getPresetStatus().equals(presetStatusPlay)) {
+                        if (usingPresetVo.getPresetStatus().equals(presetStatusPlay)) {
                             resultMap.put("code", ResponseCode.ALREADY_PLAYING_PRESET.getCode());
                             resultMap.put("message", ResponseCode.ALREADY_PLAYING_PRESET.getMessage());
                         }
                         // 2. 기존 상태값 >> "play"
                         else {
-                            int runPresetSetResult = presetMapper.patchPresetStatusSet(presetStatusMap(runPresetVo.getPresetId(), presetStatusPlay));
+                            int runPresetSetResult = presetMapper.patchPresetStatusSet(presetStatusMap(usingPresetVo.getPresetId(), presetStatusPlay));
 
-                            resultMap.put("data", runPresetVo.getPresetId());
+                            resultMap.put("data", usingPresetVo.getPresetId());
                             resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
                         }
                     }
@@ -526,7 +526,7 @@ public class PresetServiceImpl implements PresetService {
                     // Check : 기존 프리셋 != 신규 프리셋
                     else {
                         // 기존 프리셋 Status >> stop
-                        int stopPresetSetResult = presetMapper.patchPresetStatusSet(presetStatusMap(runPresetVo.getPresetId(), presetStatusStop));
+                        int stopPresetSetResult = presetMapper.patchPresetStatusSet(presetStatusMap(usingPresetVo.getPresetId(), presetStatusStop));
 
                         // 신규 프리셋 Status >> play
                         int runPresetSetResult = presetMapper.patchPresetStatusSet(presetStatusMap(newPresetId, presetStatusPlay));
@@ -565,6 +565,8 @@ public class PresetServiceImpl implements PresetService {
         Map<String, Object> resultMap = new HashMap<>();
 
         if(param.get("controlType").equals("pause") || param.get("controlType").equals("stop")) {
+            int clearPresetStatusResult = presetMapper.clearPresetAndLayerStatus();
+
             int patchPresetStatusSetResult = presetMapper.patchPresetStatusSet(param);
 
             if (patchPresetStatusSetResult > 0) {

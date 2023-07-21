@@ -8,7 +8,7 @@ public interface PresetService {
 
     Map<String, Object> getPreset(String screenId);
 
-    Map<String, Object> getRunPreset();
+    Map<String, Object> getUsingPreset();
 
     Map<String, Object> postPreset(Map<String, Object> param);
 
