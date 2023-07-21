@@ -27,6 +27,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -192,10 +193,16 @@ public class ViewerServiceImpl implements ViewerService {
                                 content.put("weatherFl", ynCheck.get("weatherFl"));
                                 content.put("airInfoFl", ynCheck.get("airInfoFl"));
                                 content.put("stretch", ynCheck.get("stretch"));
+                                content.put("order", ynCheck.get("order"));
                             }
                         }
                     }
-                    playlistResultMap.put("playlistContents", playlistContentList);
+                    List<Map<String, Object>> sortedList = playlistContentList.stream()
+                            .sorted(Comparator.comparingInt(m -> Math.toIntExact((Long) m.get("order"))))
+                            .collect(Collectors.toList());
+
+
+                    playlistResultMap.put("playlistContents", sortedList);
                     dataMap.put("playlist", playlistResultMap);
                 }
                 else{

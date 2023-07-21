@@ -408,12 +408,13 @@ public class ExternalsServiceImpl implements ExternalsService {
                     weatherResult.put("rainStatus", Integer.parseInt(fcstValue));
                     break;
                 case "PCP":
-                    if (fcstValue.equals("강수없음")) {
-                        weatherResult.put("precipitation", 0);
-                    } else {
-//                        weatherResult.put("precipitation", Integer.parseInt(fcstValue));
-                        weatherResult.put("precipitation", fcstValue);
-                    }
+//                    if (fcstValue.equals("강수없음")) {
+//                        weatherResult.put("precipitation", 0);
+//                    } else {
+////                        weatherResult.put("precipitation", Integer.parseInt(fcstValue));
+//                        weatherResult.put("precipitation", fcstValue);
+//                    }
+                    weatherResult.put("precipitation", fcstValue);
                     break;
                 case "TMP":
                     weatherResult.put("tempStatus", Integer.parseInt(fcstValue));
