@@ -1,5 +1,6 @@
 package com.cudo.pixelviewer.vo;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -33,4 +34,7 @@ public class LayerVo implements Serializable {
     private Boolean airEn;
 
     private Map<String, Object> layerObjectList;
+
+    @JsonFormat(shape= JsonFormat.Shape.STRING, pattern="yyyyMMddHHmmss")
+    private String updateDate;
 }

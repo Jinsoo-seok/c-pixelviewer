@@ -1,6 +1,7 @@
 package com.cudo.pixelviewer.operate.mapper;
 
 import com.cudo.pixelviewer.vo.LayerStatusRunVo;
+import com.cudo.pixelviewer.vo.LayerVo;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -36,5 +37,8 @@ public interface LayerMapper {
     List<LayerStatusRunVo> getRunLayersStatus(Integer presetId);
 
     Map<String, Object> getLayerObject(Integer layerId);
+
+    // Schedule >> get Using Layers
+    List<LayerVo> getUsingLayers(Object presetId);
 
 }

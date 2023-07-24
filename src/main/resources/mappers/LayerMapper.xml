@@ -105,7 +105,7 @@
 
     <update id="updateViewerStatus">
         UPDATE Layers
-        SET viewer_status = #{viewerStatus}, viewer_yn = #{viewerYn}
+        SET viewer_status = #{viewerStatus}, viewer_yn = #{viewerYn}, update_date = NOW()
         WHERE layer_id = #{layerId}
     </update>
 
@@ -205,6 +205,13 @@
                  LEFT JOIN Subtitles ST ON L.layer_id = ST.layer_id
                                                 AND (L.sub_first_en = 1 OR L.sub_second_en = 1)
         WHERE L.layer_id = #{layerId}
+    </select>
+
+    <select id="getUsingLayers" resultType="com.cudo.pixelviewer.vo.LayerVo">
+        SELECT *
+        FROM Layers AS L
+        WHERE L.preset_id = #{presetId}
+        AND L.viewer_status IN ('play', 'pause', 'stop');
     </select>
 
 </mapper>
