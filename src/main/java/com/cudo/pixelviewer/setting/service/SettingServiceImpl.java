@@ -49,7 +49,7 @@ public class SettingServiceImpl implements SettingService {
 
         int patchSettingNameResult = settingMapper.patchSettingImageDefaultPlaytime(param);
 
-        if(patchSettingNameResult == 1){ // Success : 1
+        if(patchSettingNameResult == 1){
             resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
         }
         else{

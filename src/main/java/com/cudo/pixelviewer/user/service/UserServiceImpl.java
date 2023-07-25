@@ -22,7 +22,6 @@ public class UserServiceImpl implements UserService {
     public Map<String, Object> postLogin(Map<String, Object> param){
         Map<String, Object> resultMap = new HashMap<>();
 
-//        Map<String, Object> userInfo = userMapper.postLogin(param);
         UserVo userVo = userMapper.postLogin(param);
         Boolean loginYn = false;
 

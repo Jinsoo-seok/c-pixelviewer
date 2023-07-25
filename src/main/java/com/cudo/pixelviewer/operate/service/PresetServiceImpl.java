@@ -524,7 +524,6 @@ public class PresetServiceImpl implements PresetService {
         return agentResultMap;
     }
 
-    ////////////////////////////////////////////////////////////////////////////////////////// Function.
     @Scheduled(cron = "*/10 * * * * ?")
     public void scheduleHealthCheckAndLayerRestore(){
 

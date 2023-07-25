@@ -68,18 +68,19 @@ public class UserController {
 
         Map<String, Object> responseMap = new HashMap<>();
 
-        String[] keyList = {"", ""};
+        String[] keyList = {"userId"};
 
         try {
-//            parameterValidation(param, keyList);
-//            parameterString("", param.get(""), true, 0, null);
-//            responseMap = settingService.serviceGetValue();
+            parameterValidation(param, keyList);
+            parameterString("userId", param.get("userId"), true, 0, null);
+
+            responseMap = userService.postLogout(param);
         }
-//        catch (ParamException paramException){
-//            log.error("[paramException][postLogout] - {}", paramException.getMessage());
-//            responseMap.put("code", paramException.getCode());
-//            responseMap.put("message", paramException.getMessage());
-//        }
+        catch (ParamException paramException){
+            log.error("[paramException][postLogout] - {}", paramException.getMessage());
+            responseMap.put("code", paramException.getCode());
+            responseMap.put("message", paramException.getMessage());
+        }
         catch (Exception exception) {
             log.error("[Exception][postLogout] - {}", exception.getMessage());
             responseMap.putAll(ParameterUtils.responseOption("FAIL"));

@@ -89,10 +89,14 @@ public class ViewerController {
             log.error("[Exception][putUpdateAndHealthCheck] - {}", exception.getMessage());
             responseMap.put("exceptionMessage", exception.getMessage());
         }
+        Integer codeValue = 500;
+        if(responseMap.size() > 0){
+            codeValue = 200;
+        }
 
         long endTime = System.currentTimeMillis();
         long procTime = endTime-startTime;
-        log.info("{} [END] [{}] - {}", apiInfo, procTime, responseMap.get("code"));
+        log.info("{} [END] [{}] - {}", apiInfo, procTime, codeValue);
 
         return responseMap;
     }
