@@ -53,7 +53,7 @@
         WHERE Screens.screen_id = #{screenId}
     </select>
     <update id="deleteScreen">
-        DELETE S.*, SD.*, P.*, L.*, LO.*, EV.*, EI.*, ST.*
+        DELETE S.*, SD.*, P.*, L.*, LO.*, EV.*, EI.*, ST.*, PL.*
         FROM Screens AS S
             LEFT JOIN Screen_Displays as SD ON SD.screen_id = S.screen_id
             LEFT JOIN Presets as P ON P.screen_id = S.screen_id
@@ -62,6 +62,7 @@
             LEFT JOIN ExternalVideo as EV ON EV.screen_id = S.screen_id
             LEFT JOIN External_Info as EI ON EI.screen_id = S.screen_id
             LEFT JOIN Subtitles as ST ON ST.screen_id = S.screen_id
+            LEFT JOIN Playlists as PL ON PL.screen_id = S.screen_id
         WHERE S.screen_id = #{screenId}
     </update>
 

@@ -12,7 +12,6 @@ public interface PlaylistMapper {
 
     List<PlaylistVo> getPlaylistList();
 
-//    PlaylistVo getPlaylist(String playlistId);
     Map<String, Object> getPlaylist(String playlistId);
     List<Map<String, Object>> getPlaylistContentList(String contentIdList);
 

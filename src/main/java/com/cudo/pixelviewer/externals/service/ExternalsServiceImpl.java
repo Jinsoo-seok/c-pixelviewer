@@ -44,8 +44,6 @@ public class ExternalsServiceImpl implements ExternalsService {
     public Map<String, Object> getExternalWeather() {
         Map<String, Object> resultMap = new HashMap<>();
 
-//        String[] baseTimes = {"0200", "0500", "0800", "1100", "1400", "1700", "2000", "2300"};
-
         LocalDateTime dateTime = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
         String localDateTime = dateTime.format(formatter);
@@ -62,7 +60,6 @@ public class ExternalsServiceImpl implements ExternalsService {
         String dataType = "JSON";
         String baseDate = localDateTime.substring(0, 8);
         String baseTime = localDateTime.substring(8, 10) + "00";
-//        String baseTime = "2000";
         String nx = coordsSplit[0];
         String ny = coordsSplit[1];
 
@@ -408,12 +405,6 @@ public class ExternalsServiceImpl implements ExternalsService {
                     weatherResult.put("rainStatus", Integer.parseInt(fcstValue));
                     break;
                 case "PCP":
-//                    if (fcstValue.equals("강수없음")) {
-//                        weatherResult.put("precipitation", 0);
-//                    } else {
-////                        weatherResult.put("precipitation", Integer.parseInt(fcstValue));
-//                        weatherResult.put("precipitation", fcstValue);
-//                    }
                     weatherResult.put("precipitation", fcstValue);
                     break;
                 case "TMP":

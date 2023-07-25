@@ -22,10 +22,10 @@ public enum ResponseCode {
     // Login, SignUp : 2000
     FAIL_INVALID_USER_ID(2000, "InvalidUserId", "Invalid User ID"),
     FAIL_INVALID_USER_PASSWORD(2001, "InvalidUserPassword", "Invalid User Password"),
-//    DUPLICATE_ID(2002, "DuplicateId", "Duplicate ID"),
-//    NOT_EXIST_ID(2003, "NotExistId", "Not Exist ID"),
-//    FAIL_CHANGE_PW(2004, "FailedChangePW", "Failed Change PW"),
-//    FAIL_SIGN(2005, "FailedSignUp", "Failed Sign-Up"),
+    DUPLICATE_ID(2002, "DuplicateId", "Duplicate ID"),
+    NOT_EXIST_ID(2003, "NotExistId", "Not Exist ID"),
+    FAIL_CHANGE_PW(2004, "FailedChangePW", "Failed Change PW"),
+    FAIL_SIGN(2005, "FailedSignUp", "Failed Sign-Up"),
 
 
     // Operate : 3000

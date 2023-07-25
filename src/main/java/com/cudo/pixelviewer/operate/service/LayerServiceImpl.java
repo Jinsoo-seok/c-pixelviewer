@@ -5,6 +5,7 @@ import com.cudo.pixelviewer.operate.mapper.PresetMapper;
 import com.cudo.pixelviewer.util.ParameterUtils;
 import com.cudo.pixelviewer.util.ResponseCode;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class LayerServiceImpl implements LayerService {
@@ -67,7 +69,6 @@ public class LayerServiceImpl implements LayerService {
         Map<String, Object> resultMap = new HashMap<>();
         Map<String, Object> dataMap = new HashMap<>();
 
-//        LayerVo layerVo = layerMapper.getLayer(layerId);
         Map<String, Object> layerMap = layerMapper.getLayer(layerId);
 
         for (String key : layerMap.keySet()) {
@@ -133,8 +134,7 @@ public class LayerServiceImpl implements LayerService {
                             layerObjectList.add(subMap);
                             break;
                         default:
-                            System.out.println("type Unknown");
-                            // 알 수 없는 타입에 대한 처리 로직 추가
+                            log.error("type Unknown");
                             break;
                     }
                 }
@@ -158,10 +158,10 @@ public class LayerServiceImpl implements LayerService {
 
         int layerCheck = 0;
 
-        if(layerCheck == 0){ // Not Exist : 0
+        if(layerCheck == 0){
             int postLayerResult = layerMapper.postLayer(param);
 
-            if(postLayerResult == 1){ // Success : 1
+            if(postLayerResult == 1){
                 dataMap.put("layerId", param.get("layerId"));
                 resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
                 resultMap.put("data", dataMap);
@@ -185,10 +185,10 @@ public class LayerServiceImpl implements LayerService {
 
         int layerCheck = layerMapper.deleteLayerValid(param);
 
-        if(layerCheck == 1){  // Exist : 1
+        if(layerCheck == 1){
             int deleteLayerResult = layerMapper.deleteLayer(param);
 
-            if(deleteLayerResult > 0){ // Success
+            if(deleteLayerResult > 0){
                 resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
             }
             else{
@@ -211,10 +211,10 @@ public class LayerServiceImpl implements LayerService {
 
         int layerCheck = layerMapper.putLayerValid(param);
 
-        if(layerCheck == 1){  // Exist : 1
+        if(layerCheck == 1){
             int putLayerResult = layerMapper.putLayer(param);
 
-            if(putLayerResult == 1){ // Success : 1
+            if(putLayerResult == 1){
 
                 //Preset Version UPDATE
                 int refreshPresetUpdateDateResult = presetMapper.refreshPresetUpdateDate(param.get("presetId"));

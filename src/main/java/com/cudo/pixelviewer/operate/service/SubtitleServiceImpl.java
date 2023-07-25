@@ -44,7 +44,7 @@ public class SubtitleServiceImpl implements SubtitleService {
             if (subtitleCheck == null) {
                 int postSubtitleResult = subtitleMapper.postSubtitle(param);
 
-                if (postSubtitleResult == 1) { // Success : 1
+                if (postSubtitleResult == 1) {
                     YN = true;
                     resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
                 } else {
@@ -57,7 +57,7 @@ public class SubtitleServiceImpl implements SubtitleService {
                 param.put("objectId", subtitleCheck);
                 int putSubtitleResult = subtitleMapper.putSubtitle(param);
 
-                if (putSubtitleResult == 1) { // Success : 1
+                if (putSubtitleResult == 1) {
                     int refreshPresetUpdateDate = presetMapper.refreshPresetUpdateDate(param.get("presetId"));
                     YN = true;
                     resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
@@ -68,7 +68,7 @@ public class SubtitleServiceImpl implements SubtitleService {
             }
             if(YN){
                 int postSubtitleLayerResult = subtitleMapper.postSubtitleLayer(param);
-                if (postSubtitleLayerResult == 1) { // Success : 1
+                if (postSubtitleLayerResult == 1) {
                     int refreshPresetUpdateDateResult = presetMapper.refreshPresetUpdateDate(param.get("presetId"));
 
                     dataMap.put("subtitleId", param.get("subtitleId"));

@@ -13,7 +13,6 @@ public interface LayerMapper {
     List<Map<String, Object>> getLayerList();
     List<Integer> getLayerListPlayList(Integer layerId);
 
-//    LayerVo getLayer(String layerId);
     Map<String, Object> getLayer(String layerId);
     List<Map<String, Object>> getLayerLayerObject(String layerId);
     Map<String, Object> getLayerObjectExternalVideo(Integer objectId);

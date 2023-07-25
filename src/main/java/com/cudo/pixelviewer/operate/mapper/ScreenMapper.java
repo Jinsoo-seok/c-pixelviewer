@@ -12,7 +12,6 @@ public interface ScreenMapper {
     Integer getScreenListCount();
     List<ScreenVo> getScreenList();
 
-//    ScreenVo getScreen(String screenId);
     Map<String, Object> getScreen(String screenId);
     List<Map<String, Object>> getScreenAllocateDisplays(String screenId);
 

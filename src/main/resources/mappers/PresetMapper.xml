@@ -57,13 +57,14 @@
         WHERE Presets.preset_id = #{presetId}
     </select>
     <update id="deletePreset">
-        DELETE P.*, L.*, LO.*, EV.*, EI.*, S.*
+        DELETE P.*, L.*, LO.*, EV.*, EI.*, S.*, PL.*
         FROM Presets AS P
             LEFT JOIN Layers as L ON L.preset_id = P.preset_id
             LEFT JOIN LayerObjects as LO ON LO.preset_id = P.preset_id
             LEFT JOIN ExternalVideo as EV ON EV.preset_id = P.preset_id
             LEFT JOIN External_Info as EI ON EI.preset_id = P.preset_id
             LEFT JOIN Subtitles as S ON S.preset_id = P.preset_id
+            LEFT JOIN Playlists as PL ON PL.preset_id = P.preset_id
         WHERE P.preset_id = #{presetId}
     </update>
 
@@ -95,12 +96,13 @@
         WHERE Presets.preset_id = #{presetId}
     </update>
     <update id="putPresetDeleteLayers">
-        DELETE L.*, LO.*, EV.*, EI.*, S.*
+        DELETE L.*, LO.*, EV.*, EI.*, S.*, PL.*
         FROM Layers AS L
             LEFT JOIN LayerObjects as LO ON LO.preset_id = L.preset_id
             LEFT JOIN ExternalVideo as EV ON EV.preset_id = L.preset_id
             LEFT JOIN External_Info as EI ON EI.preset_id = L.preset_id
             LEFT JOIN Subtitles as S ON S.preset_id = L.preset_id
+            LEFT JOIN Playlists as PL ON PL.preset_id = P.preset_id
         WHERE L.preset_id = #{presetId}
     </update>
     <insert id="saveLayer" parameterType="Map">

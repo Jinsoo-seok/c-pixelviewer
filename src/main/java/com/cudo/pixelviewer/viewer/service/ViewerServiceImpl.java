@@ -346,19 +346,16 @@ public class ViewerServiceImpl implements ViewerService {
                 }
 
                 switch(type) {
-                    // Agent Capture Img
                     case "10": {
                         agentCaptureType = true;
                         filePath += File.separator + "agent" + File.separator + name + extension;
                         break;
                     }
-                    // Contents Thumbnails
                     case "20": {
                         contentsType = true;
                         filePath += File.separator + "thumbnails"  + File.separator + filename + "_" + formattedDateTime + extension;
                         break;
                     }
-                    // Weather Img
                     case "30": case "40": case "50":
                     case "60": case "70": case "80":
                     case "90": case "100":
@@ -367,7 +364,6 @@ public class ViewerServiceImpl implements ViewerService {
                         filePath += File.separator + "weather"  + File.separator + originalFilename;
                         break;
                     }
-                    // Air Img
                     case "110": case "120": case "130": case "140":
                     {
                         airType = true;

@@ -46,9 +46,9 @@
         WHERE Playlists.playlist_id = #{playlistId}
     </select>
     <update id="deletePlaylist">
-        DELETE S
-        FROM Playlists AS S
-        WHERE S.playlist_id = #{playlistId}
+        DELETE PL
+        FROM Playlists AS PL
+        WHERE PL.playlist_id = #{playlistId}
     </update>
 
     <select id="putPlaylistValid" resultType="int">
@@ -155,7 +155,7 @@
     <update id="deletePlaylistContents">
         DELETE PC
         FROM playlist_contents AS PC
-        WHERE content_id = #{contentId}
+        WHERE PC.content_id = #{contentId}
     </update>
 
     <select id="patchContentsNameValid" resultType="int">

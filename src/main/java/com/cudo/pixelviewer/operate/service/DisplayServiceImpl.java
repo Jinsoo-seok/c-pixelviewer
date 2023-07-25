@@ -133,17 +133,15 @@ public class DisplayServiceImpl implements DisplayService {
             String port = "8800";
 
             String agentUrl = "http://" + ip + ":" + port + "/vieweragent/test-pattern";
-            // WebClient 생성
+
             WebClient webClient = WebClient.builder()
                     .clientConnector(new ReactorClientHttpConnector())
                     .baseUrl(agentUrl)
                     .build();
 
-            // 요청 헤더 설정
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
 
-            // POST 요청 보내기
             Mono<String> responseMono = webClient.method(HttpMethod.POST)
                     .uri(agentUrl)
                     .headers(httpHeaders -> httpHeaders.addAll(headers))
@@ -151,7 +149,6 @@ public class DisplayServiceImpl implements DisplayService {
                     .retrieve()
                     .bodyToMono(String.class);
 
-            // TODO : [미완료][테스트패턴] 디스플레이 상태 업데이트
             responseMono.subscribe(response -> {
                 String data = response;
                 Map<String, Object> responseMap = new HashMap<>();
@@ -164,17 +161,6 @@ public class DisplayServiceImpl implements DisplayService {
                 }
                 if(responseMap.get("code").equals(200)){
                     resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
-
-                    // TODO : [미완료][테스트패턴]상태 업데이트 및 예외 처리
-//                    int patchDisplayNameResult = displayMapper.patchDisplayTestpattern(param);
-//
-//                    if(patchDisplayNameResult == 1){ // Success : 1
-//                        resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
-//                    }
-//                    else{
-//                        resultMap.put("code", ResponseCode.FAIL_UPDATE_DISPLAY.getCode());
-//                        resultMap.put("message", ResponseCode.FAIL_UPDATE_DISPLAY.getMessage());
-//                    }
                 }
                 else{
                     resultMap.put("code", ResponseCode.FAIL_DISPLAY_SETTING_TO_AGENT.getCode());

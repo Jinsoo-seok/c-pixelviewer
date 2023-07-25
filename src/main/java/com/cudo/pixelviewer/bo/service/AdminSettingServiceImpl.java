@@ -119,7 +119,7 @@ public class AdminSettingServiceImpl implements AdminSettingService {
 
         int putAdminSettingResult = adminSettingMapper.putAdminSetting(tempArray);
 
-        if (putAdminSettingResult == 1) { // Success : 1
+        if (putAdminSettingResult == 1) {
             resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
         }
         else {
@@ -170,7 +170,7 @@ public class AdminSettingServiceImpl implements AdminSettingService {
 
         int patchLayerTopMostResult = adminSettingMapper.postDisplayInfo(param);
 
-        if (patchLayerTopMostResult == 1) { // Success : 1
+        if (patchLayerTopMostResult == 1) {
             resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
 
         } else {
@@ -192,7 +192,7 @@ public class AdminSettingServiceImpl implements AdminSettingService {
         if(putDisplayInfoValid == 1) {
             int patchLayerTopMostResult = adminSettingMapper.putDisplayInfo(param);
 
-            if (patchLayerTopMostResult == 1) { // Success : 1
+            if (patchLayerTopMostResult == 1) {
                 resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
 
             } else {
@@ -222,7 +222,7 @@ public class AdminSettingServiceImpl implements AdminSettingService {
             if(displayUsedCheck == null){
                 int patchLayerTopMostResult = adminSettingMapper.deleteDisplayInfo(param);
 
-                if (patchLayerTopMostResult == 1) { // Success : 1
+                if (patchLayerTopMostResult == 1) {
                     resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
 
                 } else {

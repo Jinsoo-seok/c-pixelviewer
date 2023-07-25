@@ -16,8 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.cudo.pixelviewer.util.ParameterUtils.parameterInt;
-import static com.cudo.pixelviewer.util.ParameterUtils.parameterValidation;
+import static com.cudo.pixelviewer.util.ParameterUtils.*;
 
 @Slf4j
 @RestController
@@ -69,14 +68,14 @@ public class ViewerController {
         Map<String, Object> responseMap = new HashMap<>();
         responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
 
-        String[] keyList = {"screenId", "presetId", "layerId"};
+        String[] keyList = {"screenId", "presetId", "layerId", "viewerStatus"};
 
         try {
             parameterValidation(param, keyList);
             parameterInt("screenId", param.get("screenId"), true);
             parameterInt("presetId", param.get("presetId"), true);
             parameterInt("layerId", param.get("layerId"), true);
-            // paramaterMap Check (viewerStatus)
+            parameterMap("viewerStatus", param.get("viewerStatus"), true);
 
             responseMap = viewerService.putUpdateAndHealthCheck(param);
 

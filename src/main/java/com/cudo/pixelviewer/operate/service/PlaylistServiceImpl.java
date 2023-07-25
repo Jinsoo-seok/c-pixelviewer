@@ -47,7 +47,6 @@ public class PlaylistServiceImpl implements PlaylistService {
     public Map<String, Object> getPlaylist(String layerId) {
         Map<String, Object> resultMap = new HashMap<>();
 
-//        PlaylistVo playlistVo = playlistMapper.getPlaylist(layerId);
         Map<String, Object> playlist = playlistMapper.getPlaylist(layerId);
 
         if(playlist != null){
@@ -112,10 +111,10 @@ public class PlaylistServiceImpl implements PlaylistService {
 //        int playlistCheck = playlistMapper.postPlaylistValid(param);
         int playlistCheck = 0;
 
-        if(playlistCheck == 0){ // Not Exist : 0
+        if(playlistCheck == 0){
             int postPlaylistResult = playlistMapper.postPlaylist(param);
 
-            if(postPlaylistResult == 1){ // Success : 1
+            if(postPlaylistResult == 1){
                 dataMap.put("playlistId", param.get("playlistId"));
                 resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
                 resultMap.put("data", dataMap);
@@ -140,7 +139,7 @@ public class PlaylistServiceImpl implements PlaylistService {
 
         int playlistCheck = playlistMapper.putPlaylistValid(param);
 
-        if(playlistCheck == 1){ // Success : 1
+        if(playlistCheck == 1){
             try {
                 ObjectMapper mapper = new ObjectMapper();
                 String mapperJson = mapper.writeValueAsString(param.get("contentIdList"));
@@ -151,7 +150,7 @@ public class PlaylistServiceImpl implements PlaylistService {
 
             int putPlaylistResult = playlistMapper.putPlaylist(param);
 
-            if(putPlaylistResult == 1){ // Success : 1
+            if(putPlaylistResult == 1){
                 int refreshPresetUpdateDate = presetMapper.refreshPresetUpdateDate(param.get("presetId"));
                 dataMap.put("playlistId", param.get("playlistId"));
                 resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
@@ -176,10 +175,10 @@ public class PlaylistServiceImpl implements PlaylistService {
 
         int playlistCheck = playlistMapper.deletePlaylistValid(param);
 
-        if(playlistCheck == 1){  // Exist : 1
+        if(playlistCheck == 1){
             int deletePlaylistResult = playlistMapper.deletePlaylist(param);
 
-            if(deletePlaylistResult == 1){ // Success : 1
+            if(deletePlaylistResult == 1){
                 resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
             }
             else{
@@ -263,10 +262,10 @@ public class PlaylistServiceImpl implements PlaylistService {
 //        int playlistCheck = playlistMapper.postPlaylistContentsValid(param);
         int playlistCheck = 0;
 
-        if(playlistCheck == 0){ // Not Exist : 0
+        if(playlistCheck == 0){
             int postPlaylistContentsResult = playlistMapper.postPlaylistContents(param);
 
-            if(postPlaylistContentsResult == 1){ // Success : 1
+            if(postPlaylistContentsResult == 1){
                 dataMap.put("contentId", param.get("contentId"));
                 resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
                 resultMap.put("data", dataMap);
@@ -290,10 +289,10 @@ public class PlaylistServiceImpl implements PlaylistService {
 
         int playlistCheck = playlistMapper.deletePlaylistContentsValid(param);
 
-        if(playlistCheck == 1){  // Exist : 1
+        if(playlistCheck == 1){
             int deletePlaylistContentsResult = playlistMapper.deletePlaylistContents(param);
 
-            if(deletePlaylistContentsResult == 1){ // Success : 1
+            if(deletePlaylistContentsResult == 1){
                 resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
             }
             else{
@@ -315,10 +314,10 @@ public class PlaylistServiceImpl implements PlaylistService {
 
         int playlistCheck = playlistMapper.patchContentsNameValid(param);
 
-        if(playlistCheck == 1){  // Exist : 1
+        if(playlistCheck == 1){
             int patchPlaylistContentsNameResult = playlistMapper.patchContentsName(param);
 
-            if(patchPlaylistContentsNameResult == 1){ // Success : 1
+            if(patchPlaylistContentsNameResult == 1){
                 resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
             }
             else{
@@ -340,10 +339,10 @@ public class PlaylistServiceImpl implements PlaylistService {
 
         int playlistCheck = playlistMapper.patchContentsPlaytimeValid(param);
 
-        if(playlistCheck == 1){  // Exist : 1
+        if(playlistCheck == 1){
             int patchPlaylistContentsNameResult = playlistMapper.patchContentsPlaytime(param);
 
-            if(patchPlaylistContentsNameResult == 1){ // Success : 1
+            if(patchPlaylistContentsNameResult == 1){
                 resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
             }
             else{

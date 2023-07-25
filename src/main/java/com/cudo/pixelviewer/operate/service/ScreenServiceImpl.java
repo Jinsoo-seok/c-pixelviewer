@@ -43,7 +43,6 @@ public class ScreenServiceImpl implements ScreenService {
     public Map<String, Object> getScreen(String screenId) {
         Map<String, Object> resultMap = new HashMap<>();
 
-//        ScreenVo screenVo = screenMapper.getScreen(screenId);
         Map<String, Object>  screenVo = screenMapper.getScreen(screenId);
 
 
@@ -68,10 +67,10 @@ public class ScreenServiceImpl implements ScreenService {
 
         int screenCheck = screenMapper.postScreenValid(param);
 
-        if(screenCheck == 0){ // Not Exist : 0
+        if(screenCheck == 0){
             int postScreenResult = screenMapper.postScreen(param);
 
-            if(postScreenResult == 1){ // Success : 1
+            if(postScreenResult == 1){
                 dataMap.put("screenId", param.get("screenId"));
                 resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
                 resultMap.put("data", dataMap);
@@ -95,10 +94,10 @@ public class ScreenServiceImpl implements ScreenService {
 
         int screenCheck = screenMapper.deleteScreenValid(param);
 
-        if(screenCheck == 1){  // Exist : 1
+        if(screenCheck == 1){
             int deleteScreenResult = screenMapper.deleteScreen(param);
 
-            if(deleteScreenResult > 0){ // Success : 1
+            if(deleteScreenResult > 0){
                 resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
             }
             else{
@@ -120,10 +119,10 @@ public class ScreenServiceImpl implements ScreenService {
 
         int screenCheck = screenMapper.patchScreenNameValid(param);
 
-        if(screenCheck == 1){  // Exist : 1
+        if(screenCheck == 1){
             int patchScreenNameResult = screenMapper.patchScreenName(param);
 
-            if(patchScreenNameResult == 1){ // Success : 1
+            if(patchScreenNameResult == 1){
                 resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
             }
             else{
@@ -145,10 +144,10 @@ public class ScreenServiceImpl implements ScreenService {
 
         int screenCheck = screenMapper.putScreenValid(param);
 
-        if(screenCheck == 1){  // Exist : 1
+        if(screenCheck == 1){
             int putScreenResult = screenMapper.putScreen(param);
 
-            if(putScreenResult == 1){ // Success : 1
+            if(putScreenResult == 1){
 
                 Boolean displayClearYn = false;
                 if(param.get("deleteType").equals(true)){

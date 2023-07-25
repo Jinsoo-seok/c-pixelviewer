@@ -50,7 +50,7 @@ public class ExternalServiceImpl implements ExternalService {
             if (externalCheck == null) {
                 int postExternalResult = externalMapper.postExternalVideo(param);
 
-                if (postExternalResult == 1) { // Success : 1
+                if (postExternalResult == 1) {
                     dataMap.put("externalId", param.get("externalId"));
                     resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
                     resultMap.put("data", dataMap);
@@ -64,7 +64,7 @@ public class ExternalServiceImpl implements ExternalService {
                 param.put("objectId", externalCheck);
                 int putExternalResult = externalMapper.putExternalVideo(param);
 
-                if (putExternalResult == 1) { // Success : 1
+                if (putExternalResult == 1) {
                     int refreshPresetUpdateDate = presetMapper.refreshPresetUpdateDate(param.get("presetId"));
                     dataMap.put("externalId", param.get("externalId"));
                     resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
@@ -96,7 +96,7 @@ public class ExternalServiceImpl implements ExternalService {
             if (externalCheck == null) {
                 int postExternalResult = externalMapper.postExternalInfo(param);
 
-                if (postExternalResult == 1) { // Success : 1
+                if (postExternalResult == 1) {
                     dataMap.put("externalId", param.get("externalId"));
                     resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
                     resultMap.put("data", dataMap);
@@ -110,7 +110,7 @@ public class ExternalServiceImpl implements ExternalService {
                 param.put("objectId", externalCheck);
                 int putExternalResult = externalMapper.putExternalInfo(param);
 
-                if (putExternalResult == 1) { // Success : 1
+                if (putExternalResult == 1) {
                     dataMap.put("externalId", param.get("externalId"));
                     resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
                     resultMap.put("data", dataMap);
