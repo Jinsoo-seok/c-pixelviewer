@@ -36,7 +36,6 @@ public class FileController {
         if(fileType.equals("agent") || fileType.equals("thumbnails") || fileType.equals("weather")){
 
             String os = environment.getProperty("os.name");
-            log.info("Current OS = {}", os);
 
             if(os.equals("Linux")){
                 // Linux

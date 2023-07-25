@@ -322,7 +322,6 @@ public class ViewerServiceImpl implements ViewerService {
         Map<String, Object> resultMap = new HashMap<>();
         
         String os = environment.getProperty("os.name");
-        log.info("Current OS = {}", os);
 
         if (file != null && !file.isEmpty()) {
             try {
