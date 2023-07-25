@@ -65,14 +65,18 @@ public class PresetServiceImpl implements PresetService {
     @Value("${values.agent.path}")
     private String agentPath;
 
+    @Value("${values.agent.restore}")
+    private String agentRestorePath;
+
+
 
     String presetStatusPlay = "play";
     String presetStatusStop = "stop";
     String presetStatusPause = "pause";
     String presetStatusNone = "none";
 
-//    Boolean CALL_YN = true;
-    Boolean CALL_YN = false;
+    Boolean CALL_YN = true;
+//    Boolean CALL_YN = false;
 
     Integer CHECK_TIME = 10;
 
@@ -591,7 +595,7 @@ public class PresetServiceImpl implements PresetService {
 
                     JsonMapToPrint(requestBodyMap);
 
-                    String agentUrl = protocol + agentIp + ":" + agentPort + agentPath;
+                    String agentUrl = protocol + agentIp + ":" + agentPort + agentRestorePath;
 
                     if(CALL_YN){
                         Map<String, Object> webClientResponse = webClientFunction("restore", agentUrl, requestBodyMap);

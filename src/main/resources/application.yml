@@ -45,3 +45,4 @@ values:
     ip: "192.168.123.12"
     port: "8800"
     path: "/vieweragent/Preset/layer-placement"
+    restore: "/vieweragent/Preset/layer-placement-restore"
