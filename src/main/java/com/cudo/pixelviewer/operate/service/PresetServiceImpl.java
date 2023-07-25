@@ -364,7 +364,7 @@ public class PresetServiceImpl implements PresetService {
 
                 // TODO : [완료] 실행중인 프리셋이 없을 때 >> 신규 프리셋 stop 상태로 PresetRun
                 else{
-                    // 신규 프리셋 PresetRun
+                    int setPlaylistSelectYnResult = playlistMapper.setPlaylistSelectYn(param);
                     int stopPresetSetResult = presetMapper.patchPresetStatusSet(presetStatusMap(newPresetId, presetStatusStop));
 
                     webClientResponse = webClientFunction("apply", agentUrl, requestMap);
@@ -436,7 +436,7 @@ public class PresetServiceImpl implements PresetService {
     public Map<String, Object> patchPresetControl(Map<String, Object> param) {
         Map<String, Object> resultMap = new HashMap<>();
 
-        if(param.get("controlType").equals("pause") || param.get("controlType").equals("stop")) {
+        if(param.get("controlType").equals("pause") || param.get("controlType").equals("stop") || param.get("controlType").equals("none")) {
             int clearPresetStatusResult = presetMapper.clearPresetAndLayerStatus();
 
             int patchPresetStatusSetResult = presetMapper.patchPresetStatusSet(param);
