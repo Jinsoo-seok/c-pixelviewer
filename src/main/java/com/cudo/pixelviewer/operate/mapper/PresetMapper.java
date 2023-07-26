@@ -43,4 +43,5 @@ public interface PresetMapper {
 
     // All Clear : Preset Status
     int clearPresetAndLayerStatus();
+    int clearPresetAndLayerStatusForce(Object presetId);
 }

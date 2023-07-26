@@ -158,4 +158,11 @@
         WHERE P.preset_status IN ('play', 'pause', 'stop');
     </update>
 
+    <update id="clearPresetAndLayerStatusForce">
+        UPDATE pixelviewer.Presets AS P
+            JOIN pixelviewer.Layers AS L ON P.preset_id = L.preset_id
+            SET P.preset_status = 'none', L.viewer_status = 'none', P.update_date = NOW(), L.update_date = NOW()
+        WHERE P.preset_id = #{presetId}
+    </update>
+
 </mapper>

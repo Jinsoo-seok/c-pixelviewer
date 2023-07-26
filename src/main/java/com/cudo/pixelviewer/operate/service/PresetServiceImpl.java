@@ -340,15 +340,19 @@ public class PresetServiceImpl implements PresetService {
                     // 현재 프리셋 != 신규 프리셋
                     // 현재 프리셋 : presetStatus[none]
                     // 신규 프리셋 : 레이어[UPDATE], presetStatus[stop], presetRun
+                    // 현재 프리셋 : presetStatus[none], 하위 레이어 Status[none]
                     else {
                         int nonePresetSetResult = presetMapper.patchPresetStatusSet(presetStatusMap(usingPresetVo.getPresetId(), presetStatusNone));
-                        sleep(2500);
+
 
                         int setPlaylistSelectYnResult = playlistMapper.setPlaylistSelectYn(param);
                         int stopPresetSetResult = presetMapper.patchPresetStatusSet(presetStatusMap(newPresetId, presetStatusStop));
 
                         webClientResponse = webClientFunction("apply", agentUrl, requestMap);
                         resultMap = agentCallResult(webClientResponse);
+
+
+                        int clearPresetAndLayerStatusForceResult = presetMapper.clearPresetAndLayerStatusForce(usingPresetVo.getPresetId());
                     }
                 }
 
@@ -381,17 +385,20 @@ public class PresetServiceImpl implements PresetService {
                     }
 
                     // Check : 기존 프리셋 != 신규 프리셋
+                    // 기존 프리셋 : presetStatus[none]
+                    // 신규 프리셋 : 플레이리스트 업데이트 / presetStatus[play] / presetRun
+                    // 기존 프리셋 : presetStatus[none], 하위 레이어 Status[none]
                     else {
-                        // 기존 프리셋 : presetStatus[none]
                         int nonePresetSetResult = presetMapper.patchPresetStatusSet(presetStatusMap(usingPresetVo.getPresetId(), presetStatusNone));
-                        sleep(2500);
 
 
-                        // 신규 프리셋 : 플레이리스트 업데이트 / presetStatus[play] / presetRun
                         int setPlaylistSelectYnResult = playlistMapper.setPlaylistSelectYn(param);
                         int runPresetSetResult = presetMapper.patchPresetStatusSet(presetStatusMap(newPresetId, presetStatusPlay));
                         webClientResponse = webClientFunction("playAndNew", agentUrl, requestMap);
                         resultMap = agentCallResult(webClientResponse);
+
+
+                        int clearPresetAndLayerStatusForceResult = presetMapper.clearPresetAndLayerStatusForce(usingPresetVo.getPresetId());
                     }
                 }
 
@@ -590,11 +597,6 @@ public class PresetServiceImpl implements PresetService {
                 }
             }
             else{
-                Map<String, Object> resetParam = new HashMap<>();
-                resetParam.put("presetId", usingPresetVo.getPresetId());
-                resetParam.put("controlType", presetStatusNone);
-                presetMapper.patchPresetStatusSet(resetParam);
-
                 log.error("{} - No Layers Running", logMessage);
             }
         } else {
