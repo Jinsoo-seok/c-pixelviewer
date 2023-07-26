@@ -117,6 +117,7 @@
             LEFT JOIN Playlists AS PL ON PL.layer_id = L.layer_id
                                         AND PL.select_yn = 'Y'
         WHERE L.preset_id = #{presetId}
+        ORDER BY L.layer_id ASC
     </select>
 
 

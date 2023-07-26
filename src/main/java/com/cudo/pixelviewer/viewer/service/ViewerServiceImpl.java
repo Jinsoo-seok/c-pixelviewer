@@ -8,6 +8,8 @@ import com.cudo.pixelviewer.operate.mapper.PresetMapper;
 import com.cudo.pixelviewer.util.ParameterUtils;
 import com.cudo.pixelviewer.util.ResponseCode;
 import com.cudo.pixelviewer.vo.PresetVo;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
@@ -217,6 +219,16 @@ public class ViewerServiceImpl implements ViewerService {
         else{
             resultMap.putAll(ParameterUtils.responseOption(ResponseCode.NO_CONTENT.getCodeName()));
         }
+
+        try {
+            String mapperJson = "";
+            ObjectMapper mapper = new ObjectMapper();
+            mapperJson = mapper.writeValueAsString(resultMap);
+            log.info("[playInfo][data] - {}", mapperJson);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+
         return resultMap;
     }
 
