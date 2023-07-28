@@ -34,6 +34,10 @@ spring:
 #      minimum-idle: 10
 #      testWhileIdle: true
 #      max-lifetime: 1200000
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
 
 values:
   protocol: "http://"
