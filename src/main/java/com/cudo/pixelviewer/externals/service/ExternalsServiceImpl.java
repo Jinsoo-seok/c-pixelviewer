@@ -201,7 +201,7 @@ public class ExternalsServiceImpl implements ExternalsService {
     public Map<String, Object> webClientFunction(String type, URI url){
         Map<String, Object> returnMap = new HashMap<>();
 
-        WebClient webClient2 = WebClient.builder()
+        WebClient webClient = WebClient.builder()
                 .clientConnector(new ReactorClientHttpConnector())
                 .baseUrl(url.toString())
                 .build();
@@ -209,7 +209,7 @@ public class ExternalsServiceImpl implements ExternalsService {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        String responseMono = webClient2.method(HttpMethod.GET)
+        String responseMono = webClient.method(HttpMethod.GET)
                 .headers(httpHeaders -> httpHeaders.addAll(headers))
                 .retrieve()
                 .bodyToMono(String.class)
@@ -297,7 +297,7 @@ public class ExternalsServiceImpl implements ExternalsService {
     public Map<String, Object> webClientFunction(String type, String url){
         Map<String, Object> returnMap = new HashMap<>();
 
-        WebClient webClient2 = WebClient.builder()
+        WebClient webClient = WebClient.builder()
                 .clientConnector(new ReactorClientHttpConnector())
                 .baseUrl(url)
                 .build();
@@ -305,7 +305,7 @@ public class ExternalsServiceImpl implements ExternalsService {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        String responseMono = webClient2.method(HttpMethod.GET)
+        String responseMono = webClient.method(HttpMethod.GET)
                 .headers(httpHeaders -> httpHeaders.addAll(headers))
                 .retrieve()
                 .bodyToMono(String.class)
