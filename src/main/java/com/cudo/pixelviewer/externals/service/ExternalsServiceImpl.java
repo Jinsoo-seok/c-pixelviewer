@@ -143,7 +143,7 @@ public class ExternalsServiceImpl implements ExternalsService {
         String serviceKey = "NA%2B2mZ6YHlKo2jNmEfOmsmrL2HY0ulBt9v3GUhfHtIV40HGjglABV1Zq1qCcjGJar4c1RAjcTuVI%2Blnx%2FTmkSw%3D%3D";
         String serviceKey2 = "NA+2mZ6YHlKo2jNmEfOmsmrL2HY0ulBt9v3GUhfHtIV40HGjglABV1Zq1qCcjGJar4c1RAjcTuVI+lnx/TmkSw==";
         String returnType = "json";
-        String stationName = "서초구";
+        String stationName = adminSettingMapper.getValue("stationName");
         String encodedStationName = URLEncoder.encode(stationName, StandardCharsets.UTF_8);
         String dataTerm = "DAILY";
         String ver = "1.3";
