@@ -53,9 +53,9 @@ public class ExternalsServiceImpl implements ExternalsService {
                 List<Map<String, Object>> tempWeather36 = (List<Map<String, Object>>) restTemplateResponseMap.get("tempThird");
 
                 Map<String, Object> weatherResultMap = new HashMap<>();
-                weatherResultMap.put("weather12", processWeatherData(tempWeather12));
-                weatherResultMap.put("weather24", processWeatherData(tempWeather24));
-                weatherResultMap.put("weather36", processWeatherData(tempWeather36));
+                weatherResultMap.put("weather0", processWeatherData(tempWeather12));
+                weatherResultMap.put("weather1", processWeatherData(tempWeather24));
+                weatherResultMap.put("weather2", processWeatherData(tempWeather36));
 
                 String mapperJson = "";
                 try {

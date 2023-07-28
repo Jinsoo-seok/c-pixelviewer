@@ -27,6 +27,7 @@ import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -298,9 +299,23 @@ public class ViewerServiceImpl implements ViewerService {
                     }
                     if(obj != null) {
                         if (externalType.equals("날씨")) {
-                            // TODO : [미완료] 시간별 분기처리
+                            String[] times = {"02", "05", "08", "11", "14", "17", "20", "23"};
+                            LocalTime currentTime = LocalTime.now();
+                            String selectedTime = null;
+                            int selectedTimeIndex = 0;
+
+                            for (int i = 0; i < times.length; i++) {
+                                if (currentTime.compareTo(LocalTime.parse(times[i] + ":00")) >= 0) {
+                                    selectedTime = times[i];
+                                    selectedTimeIndex = i % 3;
+                                } else {
+                                    break;
+                                }
+                            }
+                            String key = "weather" + selectedTimeIndex;
+
                             Map<String, Object> tempMap = (Map<String, Object>) obj;
-                            Map<String, Object> weatherMap = (Map<String, Object>) tempMap.get("weather12");
+                            Map<String, Object> weatherMap = (Map<String, Object>) tempMap.get(key);
 
                             String weatherPath = "weather";
                             String weatherImage = weatherImageBranch(weatherMap.get("rainStatus"), weatherMap.get("skyStatus"));
