@@ -11,6 +11,7 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
@@ -379,20 +380,14 @@ public class AdminSettingServiceImpl implements AdminSettingService {
             e.printStackTrace();
         }
 
-        StringBuilder urlBuilder = new StringBuilder(apisDataUrl);
-        urlBuilder.append("?")
-                .append("ServiceKey=").append(serviceKey)
-                .append("&returnType=").append(returnType)
-                .append("&numOfRows=").append(numOfRows)
-                .append("&pageNo=").append(pageNo)
-                .append("&umdName=").append(encodedUmdName);
-
-        try {
-            return new URI(urlBuilder.toString());
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
+        return UriComponentsBuilder.fromHttpUrl(apisDataUrl)
+                .queryParam("ServiceKey", serviceKey)
+                .queryParam("returnType", returnType)
+                .queryParam("numOfRows", numOfRows)
+                .queryParam("pageNo", pageNo)
+                .queryParam("umdName", encodedUmdName)
+                .build(true)
+                .toUri();
     }
 
     public URI urlXYToStationName(String tmX, String tmY){
@@ -401,18 +396,13 @@ public class AdminSettingServiceImpl implements AdminSettingService {
         String returnType = "json";
         String ver = "1.1";
 
-        StringBuilder urlBuilder = new StringBuilder(apisDataUrl);
-        urlBuilder.append("?")
-                .append("serviceKey=").append(serviceKey)
-                .append("&returnType=").append(returnType)
-                .append("&tmX=").append(tmX)
-                .append("&tmY=").append(tmY)
-                .append("&ver=").append(ver);
-        try {
-            return new URI(urlBuilder.toString());
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
+        return UriComponentsBuilder.fromHttpUrl(apisDataUrl)
+                .queryParam("serviceKey", serviceKey)
+                .queryParam("returnType", returnType)
+                .queryParam("tmX", tmX)
+                .queryParam("tmY", tmY)
+                .queryParam("ver", ver)
+                .build(true)
+                .toUri();
     }
 }
