@@ -36,7 +36,7 @@ public class AdminSettingServiceImpl implements AdminSettingService {
             String settingKey = (String) element.get("settingKey");
             Object settingValue = element.get("settingValue");
 
-            if (settingKey.equals("imgDefaultPlaytime") || settingKey.equals("ledPresetCount")) {
+            if (settingKey.equals("imgDefaultPlaytime") || settingKey.equals("ledPresetCount")|| settingKey.equals("testPatternTime")) {
                 returnMap.put(settingKey, Integer.valueOf((String) settingValue));
             }
             else if (settingKey.equals("coords")) {

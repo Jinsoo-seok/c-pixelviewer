@@ -30,7 +30,7 @@ public interface AdminSettingMapper {
 
     int patchWeatherImg(String settingKey, String originalFilename);
 
-    String getTestPattern();
+    List<Map<String, Object>> getTestPattern();
 
     String getValue(String key);
 

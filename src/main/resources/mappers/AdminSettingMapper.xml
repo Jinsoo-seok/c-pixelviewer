@@ -90,10 +90,10 @@
         WHERE setting_key = #{settingKey}
     </update>
 
-    <select id="getTestPattern" resultType="String">
-        SELECT setting_value
+    <select id="getTestPattern" resultType="Map">
+        SELECT setting_key AS settingKey, setting_value AS settingValue
         FROM Settings
-        WHERE setting_key = "testPattern"
+        WHERE setting_key IN ('testPattern', 'testPatternTime');
     </select>
 
     <select id="getValue" resultType="String">
