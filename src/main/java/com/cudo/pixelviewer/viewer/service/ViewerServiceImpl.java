@@ -264,12 +264,8 @@ public class ViewerServiceImpl implements ViewerService {
         viewerParam.put("layerId", param.get("layerId"));
 
         int updateViewerStatusResult = layerMapper.updateViewerStatus(viewerParam);
-        if(updateViewerStatusResult > 0){
-            log.info("[SUCCESS] [UPDATE] - Viewer Status");
-        }
-        else{
-            log.info("[FAIL] [UPDATE] - Viewer Status");
-        }
+        if (updateViewerStatusResult > 0){}
+        else {log.info("[FAIL] [UPDATE] - Viewer Status");}
 
         String presetId = String.valueOf(param.get("presetId"));
         PresetVo presetVo = presetMapper.getPreset(presetId);
