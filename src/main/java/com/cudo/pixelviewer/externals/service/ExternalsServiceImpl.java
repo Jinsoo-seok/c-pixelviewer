@@ -36,12 +36,12 @@ public class ExternalsServiceImpl implements ExternalsService {
     final ExternalsMapper externalsMapper;
 
     @Scheduled(cron = "0 0 2-23/3 1/1 * ?")
-    @Override
-    public Map<String, Object> getExternalWeather() {
+    public void scheduleGetExternalWeather() {
         Map<String, Object> resultMap = new HashMap<>();
 
         String type = "날씨";
-        URI weatherURI = urlWeather();
+        String coords = "schedule";
+        URI weatherURI = urlWeather(coords);
         log.info("[@Scheduled] weatherRequestUrl = {}", weatherURI);
 
         Map<String, Object> restTemplateResponseMap = restTemplateFunction(type, weatherURI);
@@ -81,17 +81,16 @@ public class ExternalsServiceImpl implements ExternalsService {
                 resultMap.put("data", restTemplateResponseMap.get("data"));
             }
         }
-
-        return resultMap;
+        log.info("[ScheduledGetExternalWeather] returnMap = {}", resultMap);
     }
 
     @Scheduled(cron = "0 0 0/1 1/1 * ?")
-    @Override
-    public Map<String, Object> getExternalAir() {
+    public void scheduleGetExternalAir() {
         Map<String, Object> resultMap = new HashMap<>();
 
         String type = "대기";
-        URI airURI = urlAir();
+        String scheduleType = "schedule";
+        URI airURI = urlAir(scheduleType);
         log.info("[@Scheduled] airRequestUrl = {}", airURI);
 
         Map<String, Object> restTemplateResponseMap = restTemplateFunction(type, airURI);
@@ -115,7 +114,88 @@ public class ExternalsServiceImpl implements ExternalsService {
             }
         }
 
-        return resultMap;
+        log.info("[scheduleGetExternalAir] returnMap = {}", resultMap);
+    }
+
+    @Override
+    public void getExternalWeather(String coords) {
+        Map<String, Object> resultMap = new HashMap<>();
+
+        String type = "날씨";
+        String scheduleType = coords;
+        URI weatherURI = urlWeather(scheduleType);
+        log.info("[@Called] weatherRequestUrl = {}", weatherURI);
+
+        Map<String, Object> restTemplateResponseMap = restTemplateFunction(type, weatherURI);
+
+        if(restTemplateResponseMap != null){
+            if(!restTemplateResponseMap.get("webClient").equals(false)) {
+                List<Map<String, Object>> tempWeather12 = (List<Map<String, Object>>) restTemplateResponseMap.get("tempFirst");
+                List<Map<String, Object>> tempWeather24 = (List<Map<String, Object>>) restTemplateResponseMap.get("tempSecond");
+                List<Map<String, Object>> tempWeather36 = (List<Map<String, Object>>) restTemplateResponseMap.get("tempThird");
+
+                Map<String, Object> weatherResultMap = new HashMap<>();
+                weatherResultMap.put("weather0", processWeatherData(tempWeather12));
+                weatherResultMap.put("weather1", processWeatherData(tempWeather24));
+                weatherResultMap.put("weather2", processWeatherData(tempWeather36));
+
+                String mapperJson = "";
+                try {
+                    ObjectMapper mapper = new ObjectMapper();
+                    mapperJson = mapper.writeValueAsString(weatherResultMap);
+                } catch (JsonProcessingException e) {
+                    e.printStackTrace();
+                }
+
+                int putExternalsInfosResult = externalsMapper.putExternalsInfos(type, mapperJson);
+                if (putExternalsInfosResult > 0) {
+                    log.info("[SUCCESS] restTemplateResponseMap = {}", restTemplateResponseMap);
+                    resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
+                } else {
+                    resultMap.put("code", ResponseCode.FAIL_INSERT_EXTERNALS_WEATHER.getCode());
+                    resultMap.put("message", ResponseCode.FAIL_INSERT_EXTERNALS_WEATHER.getMessage());
+                }
+            }
+            else{
+                log.info("[FAIL] restTemplateResponseMap = {}", restTemplateResponseMap);
+                resultMap.put("code", ResponseCode.FAIL_EXTERNALS_WEATHER.getCode());
+                resultMap.put("message", ResponseCode.FAIL_EXTERNALS_WEATHER.getMessage());
+                resultMap.put("data", restTemplateResponseMap.get("data"));
+            }
+        }
+        log.info("[CalledGetExternalWeather] returnMap = {}", resultMap);
+    }
+
+    @Override
+    public void getExternalAir(String stationName) {
+        Map<String, Object> resultMap = new HashMap<>();
+
+        String type = "대기";
+        String scheduleType = stationName;
+        URI airURI = urlAir(scheduleType);
+        log.info("[@Called] airRequestUrl = {}", airURI);
+
+        Map<String, Object> restTemplateResponseMap = restTemplateFunction(type, airURI);
+
+        if(restTemplateResponseMap != null){
+            if(!restTemplateResponseMap.get("webClient").equals(false)) {
+                int putExternalsInfosResult = externalsMapper.putExternalsInfos(type, (String) restTemplateResponseMap.get("airInfo"));
+                if (putExternalsInfosResult > 0) {
+                    log.info("[SUCCESS] restTemplateResponseMap = {}", restTemplateResponseMap);
+                    resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
+                } else {
+                    resultMap.put("code", ResponseCode.FAIL_INSERT_EXTERNALS_AIR.getCode());
+                    resultMap.put("message", ResponseCode.FAIL_INSERT_EXTERNALS_AIR.getMessage());
+                }
+            }
+            else{
+                log.info("[FAIL] restTemplateResponseMap = {}", restTemplateResponseMap);
+                resultMap.put("code", ResponseCode.FAIL_EXTERNALS_AIR.getCode());
+                resultMap.put("message", ResponseCode.FAIL_EXTERNALS_AIR.getMessage());
+                resultMap.put("data", restTemplateResponseMap.get("data"));
+            }
+        }
+        log.info("[CalledGetExternalAir] returnMap = {}", resultMap);
     }
 
     public Map<String, Object> processWeatherData(List<Map<String, Object>> tempWeatherList) {
@@ -234,24 +314,49 @@ public class ExternalsServiceImpl implements ExternalsService {
         return returnMap;
     }
 
-    public URI urlWeather(){
+    public URI urlWeather(String scheduleType){
+        String nx = null;
+        String ny = null;
+        if(scheduleType.equals("schedule")){
+            String coordsKey = "coords";
+            String coords = adminSettingMapper.getValue(coordsKey);
+            String[] coordsSplit = coords.split(",");
+
+            nx = coordsSplit[0];
+            ny = coordsSplit[1];
+        }
+        else{
+            String coords = scheduleType;
+            String[] coordsSplit = coords.split(",");
+            nx = coordsSplit[0];
+            ny = coordsSplit[1];
+        }
+
+        String[] times = {"02", "05", "08", "11", "14", "17", "20", "23"};
         LocalDateTime dateTime = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
         String localDateTime = dateTime.format(formatter);
 
-        String coordsKey = "coords";
-        String coords = adminSettingMapper.getValue(coordsKey);
-        String[] coordsSplit = coords.split(",");
+        String currentTime = localDateTime.substring(8, 10);
+        String selectedTime = null;
+        for (String time : times) {
+            if (currentTime.compareTo(time) >= 0) {
+                selectedTime = time;
+            } else {
+                break;
+            }
+        }
+        if (selectedTime == null) {
+            selectedTime = times[0];
+        }
 
+        String baseDate = localDateTime.substring(0, 8);
+        String baseTime = selectedTime + "00";
         String apisDataUrl = "http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst";
         String serviceKey = "NA%2B2mZ6YHlKo2jNmEfOmsmrL2HY0ulBt9v3GUhfHtIV40HGjglABV1Zq1qCcjGJar4c1RAjcTuVI%2Blnx%2FTmkSw%3D%3D";
         String pageNo = "1";
         String numOfRows = "36";
         String dataType = "JSON";
-        String baseDate = localDateTime.substring(0, 8);
-        String baseTime = localDateTime.substring(8, 10) + "00";
-        String nx = coordsSplit[0];
-        String ny = coordsSplit[1];
 
         URI urlBuilder = UriComponentsBuilder.fromHttpUrl(apisDataUrl)
                 .queryParam("ServiceKey", serviceKey)
@@ -274,11 +379,18 @@ public class ExternalsServiceImpl implements ExternalsService {
         }
     }
 
-    public URI urlAir(){
+    public URI urlAir(String scheduleType){
+        String stationName = null;
+        if(scheduleType.equals("schedule")){
+            stationName = adminSettingMapper.getValue("stationName");
+        }
+        else{
+            stationName = scheduleType;
+        }
+
         String apisDataUrl = "http://apis.data.go.kr/B552584/ArpltnInforInqireSvc/getMsrstnAcctoRltmMesureDnsty";
         String serviceKey = "NA%2B2mZ6YHlKo2jNmEfOmsmrL2HY0ulBt9v3GUhfHtIV40HGjglABV1Zq1qCcjGJar4c1RAjcTuVI%2Blnx%2FTmkSw%3D%3D";
         String returnType = "json";
-        String stationName = adminSettingMapper.getValue("stationName");
         String encodedStationName = URLEncoder.encode(stationName, StandardCharsets.UTF_8);
         String dataTerm = "DAILY";
         String ver = "1.3";

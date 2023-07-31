@@ -1,6 +1,7 @@
 package com.cudo.pixelviewer.bo.service;
 
 import com.cudo.pixelviewer.bo.mapper.AdminSettingMapper;
+import com.cudo.pixelviewer.externals.service.ExternalsService;
 import com.cudo.pixelviewer.operate.mapper.LedMapper;
 import com.cudo.pixelviewer.util.ParameterUtils;
 import com.cudo.pixelviewer.util.ResponseCode;
@@ -20,6 +21,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -27,6 +29,8 @@ import java.util.regex.Pattern;
 @Service
 @RequiredArgsConstructor
 public class AdminSettingServiceImpl implements AdminSettingService {
+
+    final ExternalsService externalsService;
 
     final AdminSettingMapper adminSettingMapper;
 
@@ -111,10 +115,14 @@ public class AdminSettingServiceImpl implements AdminSettingService {
         }
         if(param.containsKey("externalinfoArea")){
             Map<String, Object> queryMap = new HashMap<>();
+            String stationName = getAirStationName(extractDistrict((String) param.get("externalinfoArea")));
             queryMap.put("settingKey", "stationName");
-            queryMap.put("settingValue", getAirStationName(extractDistrict((String) param.get("externalinfoArea"))));
+            queryMap.put("settingValue", stationName);
 
             tempArray.add(queryMap);
+
+            CompletableFuture<Void> externalAirFuture = CompletableFuture.runAsync(() -> externalsService.getExternalAir(stationName));
+            CompletableFuture<Void> externalWeatherFuture = CompletableFuture.runAsync(() -> externalsService.getExternalWeather((String) param.get("coords")));
         }
 
         if(param.containsKey("ledPresetCount")) {
@@ -266,9 +274,11 @@ public class AdminSettingServiceImpl implements AdminSettingService {
     public String getAirStationName(String externalinfoArea){
 
         URI urlAddrToXY = urlAddrToXY(externalinfoArea);
+        log.info("urlAddrToXY = {}", urlAddrToXY);
         Map<String, Object> webClientResponseFirst = restTemplateFunction("addrToXY", urlAddrToXY);
 
         URI urlXYToStationName = urlXYToStationName((String) webClientResponseFirst.get("tmX"), (String) webClientResponseFirst.get("tmY"));
+        log.info("urlXYToStationName = {}", urlXYToStationName);
         Map<String, Object> webClientResponseSecond = restTemplateFunction("XYToStationName", urlXYToStationName);
 
         return (String) webClientResponseSecond.get("stationName");
