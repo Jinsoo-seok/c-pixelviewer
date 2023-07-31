@@ -91,6 +91,23 @@ public class AdminSettingServiceImpl implements AdminSettingService {
 
         List<Map<String, Object>> tempArray = new ArrayList<>();
 
+        Boolean addrUpdateYn = false;
+        List<Map<String, Object>> adminSettingVoList = adminSettingMapper.getAdminSettingList();
+
+        String externalinfoAreaParam = (String) param.get("externalinfoArea");
+        for (Map<String, Object> element : adminSettingVoList) {
+            String settingKey = (String) element.get("settingKey");
+
+            if (settingKey.equals("externalinfoArea")) {
+                Object settingValue = element.get("settingValue");
+
+                if (!externalinfoAreaParam.equals(settingValue)) {
+                    addrUpdateYn = true;
+                    break;
+                }
+            }
+        }
+
         param.put("coords", param.get("nx") + "," + param.get("ny"));
         String[] removeKey = {"nx", "ny"};
         for (String key : removeKey) {
@@ -118,7 +135,7 @@ public class AdminSettingServiceImpl implements AdminSettingService {
             }
             tempArray.add(queryMap);
         }
-        if(param.containsKey("externalinfoArea")){
+        if(addrUpdateYn){
             Map<String, Object> queryMap = new HashMap<>();
             String stationName = getAirStationName(extractDistrict((String) param.get("externalinfoArea")));
             queryMap.put("settingKey", "stationName");
@@ -294,7 +311,7 @@ public class AdminSettingServiceImpl implements AdminSettingService {
         Map<String, Object> returnMap = new HashMap<>();
 
         // 타임아웃 값 설정 (단위: 밀리초)
-        int maxRetryAttempts = 3;
+        int maxRetryAttempts = 5;
         int connectTimeout = 300; // 연결 시도 타임아웃
         int readTimeout = 1000;   // 데이터 읽기 타임아웃
 
@@ -330,6 +347,13 @@ public class AdminSettingServiceImpl implements AdminSettingService {
             } catch (HttpServerErrorException | ResourceAccessException e) {
                 // Retry if the server returns 5xx status codes or there's a timeout
                 retryAttempts++;
+            }
+            if(retryAttempts == maxRetryAttempts){
+                try {
+                    throw new Exception("[FAIL] GET Externals Data");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }
 

@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static com.cudo.pixelviewer.util.ParameterUtils.*;
+import static com.cudo.pixelviewer.util.ResponseCode.FAIL_GET_EXTERNALS_DATA;
 
 @Slf4j
 @RestController
@@ -93,6 +94,10 @@ public class AdminSettingController {
             responseMap.put("message", paramException.getMessage());
         }
         catch (Exception exception) {
+            if(exception.getMessage().equals("[FAIL] GET Externals Data")){
+                responseMap.put("code", FAIL_GET_EXTERNALS_DATA.getCode());
+                responseMap.put("message", FAIL_GET_EXTERNALS_DATA.getMessage());
+            }
             log.error("[Exception][putAdminSetting] - {}", exception.getMessage());
             responseMap.put("exceptionMessage", exception.getMessage());
         }
