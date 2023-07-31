@@ -3,6 +3,7 @@ package com.cudo.pixelviewer.user.controller;
 import com.cudo.pixelviewer.config.ParamException;
 import com.cudo.pixelviewer.user.service.UserService;
 import com.cudo.pixelviewer.util.ParameterUtils;
+import com.cudo.pixelviewer.util.ResponseCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -24,13 +25,12 @@ public class UserController {
     final UserService userService;
 
     @PostMapping("/login")
-    public Map<String, Object> postLogin(HttpServletRequest request
-                                        , @RequestBody Map<String, Object> param) {
+    public Map<String, Object> postLogin(HttpServletRequest request, @RequestBody Map<String, Object> param) {
         long startTime = System.currentTimeMillis();
         String apiInfo = "["+ request.getRequestURI() + "] [" + request.getMethod() + "]";
         log.info("{} [START] [{}] - {}", apiInfo, startTime, param);
+        Map<String, Object> responseMap = ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName());
 
-        Map<String, Object> responseMap = new HashMap<>();
 
         String[] keyList = {"userId", "userPw"};
 
@@ -52,21 +52,17 @@ public class UserController {
             responseMap.put("exceptionMessage", exception.getMessage());
         }
 
-        long endTime = System.currentTimeMillis();
-        long procTime = endTime-startTime;
-        log.info("{} [END] [{}] - {}", apiInfo, procTime, responseMap.get("code"));
-
+        log.info("{} [END] [{}] - {}", apiInfo, (System.currentTimeMillis()-startTime), responseMap.get("code"));    
         return responseMap;
     }
 
     @PostMapping("/logout")
-    public Map<String, Object> postLogout(HttpServletRequest request
-                                       , @RequestBody Map<String, Object> param) {
+    public Map<String, Object> postLogout(HttpServletRequest request, @RequestBody Map<String, Object> param) {
         long startTime = System.currentTimeMillis();
         String apiInfo = "["+ request.getRequestURI() + "] [" + request.getMethod() + "]";
         log.info("{} [START] [{}] - {}", apiInfo, startTime, param);
+        Map<String, Object> responseMap = ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName());
 
-        Map<String, Object> responseMap = new HashMap<>();
 
         String[] keyList = {"userId"};
 
@@ -87,10 +83,7 @@ public class UserController {
             responseMap.put("exceptionMessage", exception.getMessage());
         }
 
-        long endTime = System.currentTimeMillis();
-        long procTime = endTime-startTime;
-        log.info("{} [END] [{}] - {}", apiInfo, procTime, responseMap.get("code"));
-
+        log.info("{} [END] [{}] - {}", apiInfo, (System.currentTimeMillis()-startTime), responseMap.get("code"));    
         return responseMap;
     }
 }
