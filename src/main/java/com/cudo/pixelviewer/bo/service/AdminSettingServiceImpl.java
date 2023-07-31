@@ -99,7 +99,7 @@ public class AdminSettingServiceImpl implements AdminSettingService {
             String settingKey = (String) element.get("settingKey");
 
             if (settingKey.equals("externalinfoArea")) {
-                Object settingValue = element.get("settingValue");
+                String settingValue = (String) element.get("settingValue");
 
                 if (!externalinfoAreaParam.equals(settingValue)) {
                     addrUpdateYn = true;
