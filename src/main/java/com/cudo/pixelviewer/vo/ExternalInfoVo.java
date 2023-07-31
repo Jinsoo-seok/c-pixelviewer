@@ -34,7 +34,7 @@ public class ExternalInfoVo implements Serializable {
     private String imagePath;
 
     @JsonIgnore
-    private String forecolor;
+    private String foreColor;
     @JsonIgnore
     private String fontFl;
 

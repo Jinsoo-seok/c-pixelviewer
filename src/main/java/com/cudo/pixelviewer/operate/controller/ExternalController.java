@@ -118,7 +118,7 @@ public class ExternalController {
 
         String[] keyList = {"screenId", "presetId", "layerId", "objectNm", "type"
                 , "posX", "posY", "width", "height", "ord"
-                ,"forecolor", "fontNm", "fontFl", "fontSize", "fontColor"
+                ,"foreColor", "fontNm", "fontFl", "fontSize", "fontColor"
                 ,"borderSize", "borderColor", "backColor"};
 
         try {
@@ -134,7 +134,7 @@ public class ExternalController {
             parameterInt("height", param.get("height"), true);
             parameterInt("ord", param.get("ord"), true);
 
-            parameterString("forecolor", param.get("forecolor"), true, 0, null);
+            parameterString("foreColor", param.get("foreColor"), true, 0, null);
             parameterString("fontNm", param.get("fontNm"), true, 0, null);
             parameterString("fontFl", param.get("fontFl"), true, 0, null);
             parameterInt("fontSize", param.get("fontSize"), true);

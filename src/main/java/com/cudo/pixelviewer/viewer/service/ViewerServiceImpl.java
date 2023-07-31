@@ -507,7 +507,7 @@ public class ViewerServiceImpl implements ViewerService {
         tempStyleMap.put("fontColor", dataMap.get("fontColor"));
         tempStyleMap.put("borderSize", dataMap.get("borderSize"));
         tempStyleMap.put("borderColor", dataMap.get("borderColor"));
-        tempStyleMap.put("forecolor", dataMap.get("forecolor"));
+        tempStyleMap.put("foreColor", dataMap.get("foreColor"));
 
         tempPositionMap.put("posX", dataMap.get("posX"));
         tempPositionMap.put("posY", dataMap.get("posY"));
