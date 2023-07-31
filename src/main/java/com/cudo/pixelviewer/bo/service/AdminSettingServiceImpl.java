@@ -8,9 +8,14 @@ import com.cudo.pixelviewer.util.ResponseCode;
 import com.cudo.pixelviewer.vo.DisplaySettingVo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.springframework.http.*;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -287,17 +292,48 @@ public class AdminSettingServiceImpl implements AdminSettingService {
     public Map<String, Object> restTemplateFunction(String type, URI uri){
         Map<String, Object> responseMap = new HashMap<>();
         Map<String, Object> returnMap = new HashMap<>();
+
+        // 타임아웃 값 설정 (단위: 밀리초)
+        int maxRetryAttempts = 3;
+        int connectTimeout = 300; // 연결 시도 타임아웃
+        int readTimeout = 1000;   // 데이터 읽기 타임아웃
+
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set("Accept", "*/*;q=0.9"); // HTTP_ERROR 방지
         HttpEntity<String> httpRequest = new HttpEntity<>(null, headers);
 
-        RestTemplate restTemplate = new RestTemplate();
+        HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
+        RequestConfig config = RequestConfig.custom()
+                .setConnectTimeout(connectTimeout)
+                .setSocketTimeout(readTimeout)
+                .build();
+        factory.setHttpClient(HttpClientBuilder.create().setDefaultRequestConfig(config).build());
+
+
+        RestTemplate restTemplate = new RestTemplate(factory);
 
         HttpStatus httpStatus = null;
         ResponseEntity<Map> httpResponse = null;
 
-        httpResponse = restTemplate.exchange(uri, HttpMethod.GET, httpRequest, Map.class);
+        int retryAttempts = 0;
+
+        while (retryAttempts < maxRetryAttempts) {
+            try {
+                log.info("retryAttempts = {}", retryAttempts);
+                httpResponse = restTemplate.exchange(uri, HttpMethod.GET, httpRequest, Map.class);
+                if (httpResponse.getStatusCode().is2xxSuccessful()) {
+                    break;
+                } else {
+                    break;
+                }
+            } catch (HttpServerErrorException | ResourceAccessException e) {
+                // Retry if the server returns 5xx status codes or there's a timeout
+                retryAttempts++;
+            }
+        }
+
+//        httpResponse = restTemplate.exchange(uri, HttpMethod.GET, httpRequest, Map.class);
         responseMap = (Map<String, Object>) httpResponse.getBody().get("response");
         Map<String, Object> tempMap = (Map<String, Object>) responseMap.get("body");
         List<Map<String, Object>> itemsList = (List<Map<String, Object>>) tempMap.get("items");

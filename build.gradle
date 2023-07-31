@@ -52,6 +52,7 @@ dependencies {
 
     // WebClient
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
+    implementation 'org.apache.httpcomponents:httpclient:4.5.13'
 
     // quartz
     implementation 'org.springframework.boot:spring-boot-starter-quartz:2.7.11'
