@@ -50,3 +50,14 @@ values:
     port: "8800"
     path: "/vieweragent/Preset/layer-placement"
     restore: "/vieweragent/Preset/layer-placement-restore"
+  apis:
+    service:
+      key: "NA%2B2mZ6YHlKo2jNmEfOmsmrL2HY0ulBt9v3GUhfHtIV40HGjglABV1Zq1qCcjGJar4c1RAjcTuVI%2Blnx%2FTmkSw%3D%3D"
+      type:
+        lower: "json"
+        upper: "JSON"
+    url:
+      addr-xy: "http://apis.data.go.kr/B552584/MsrstnInfoInqireSvc/getTMStdrCrdnt"
+      xy-name: "http://apis.data.go.kr/B552584/MsrstnInfoInqireSvc/getNearbyMsrstnList"
+      air: "http://apis.data.go.kr/B552584/ArpltnInforInqireSvc/getMsrstnAcctoRltmMesureDnsty"
+      weather: "http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst"

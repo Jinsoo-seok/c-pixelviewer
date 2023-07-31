@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
@@ -42,6 +43,19 @@ public class AdminSettingServiceImpl implements AdminSettingService {
     final LedMapper ledMapper;
 
     final static String PRESET_NAME_PREFIX = "프리셋";
+
+    @Value("${values.apis.service.key}")
+    private String SERVICE_KEY;
+
+    @Value("${values.apis.service.type.lower}")
+    private String LOWER_TYPE;
+
+    @Value("${values.apis.url.addr-xy}")
+    private String ADDR_XY_URL;
+
+    @Value("${values.apis.url.xy-name}")
+    private String XY_NAME_URL;
+
 
     @Override
     public Map<String, Object> getAdminSettingList() {
@@ -131,7 +145,7 @@ public class AdminSettingServiceImpl implements AdminSettingService {
                 queryMap.put("settingValue", value);
             }
             else {
-                System.out.println(key + " is of an unknown type: " + value);
+                log.info(key + " is of an unknown type: " + value);
             }
             tempArray.add(queryMap);
         }
@@ -159,8 +173,8 @@ public class AdminSettingServiceImpl implements AdminSettingService {
                     presetInfo.put("presetName", PRESET_NAME_PREFIX + (i + 1));
                     presetList.add(presetInfo);
                 }
-                Integer deletePresetCount = ledMapper.deleteLedPreset();
-                Integer insertPresetCount = ledMapper.postLedPreset(presetList);
+                ledMapper.deleteLedPreset();
+                ledMapper.postLedPreset(presetList);
             }
         }
 
@@ -219,13 +233,12 @@ public class AdminSettingServiceImpl implements AdminSettingService {
 
         if (patchLayerTopMostResult == 1) {
             resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
-
-        } else {
+        }
+        else {
             ResponseCode failCode = ResponseCode.FAIL_INSERT_DISPLAY_SETTING;
             resultMap.put("code", failCode.getCode());
             resultMap.put("message", failCode.getMessage());
         }
-
         return resultMap;
     }
 
@@ -241,8 +254,8 @@ public class AdminSettingServiceImpl implements AdminSettingService {
 
             if (patchLayerTopMostResult == 1) {
                 resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
-
-            } else {
+            }
+            else {
                 ResponseCode failCode = ResponseCode.FAIL_UPDATE_DISPLAY_SETTING;
                 resultMap.put("code", failCode.getCode());
                 resultMap.put("message", failCode.getMessage());
@@ -271,8 +284,8 @@ public class AdminSettingServiceImpl implements AdminSettingService {
 
                 if (patchLayerTopMostResult == 1) {
                     resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
-
-                } else {
+                }
+                else {
                     ResponseCode failCode = ResponseCode.FAIL_DELETE_DISPLAY_SETTING;
                     resultMap.put("code", failCode.getCode());
                     resultMap.put("message", failCode.getMessage());
@@ -312,8 +325,8 @@ public class AdminSettingServiceImpl implements AdminSettingService {
 
         // 타임아웃 값 설정 (단위: 밀리초)
         int maxRetryAttempts = 5;
-        int connectTimeout = 300; // 연결 시도 타임아웃
-        int readTimeout = 1000;   // 데이터 읽기 타임아웃
+        int connectTimeout = 300;
+        int readTimeout = 1000;
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -345,7 +358,6 @@ public class AdminSettingServiceImpl implements AdminSettingService {
                     break;
                 }
             } catch (HttpServerErrorException | ResourceAccessException e) {
-                // Retry if the server returns 5xx status codes or there's a timeout
                 retryAttempts++;
             }
             if(retryAttempts == maxRetryAttempts){
@@ -356,8 +368,6 @@ public class AdminSettingServiceImpl implements AdminSettingService {
                 }
             }
         }
-
-//        httpResponse = restTemplate.exchange(uri, HttpMethod.GET, httpRequest, Map.class);
         responseMap = (Map<String, Object>) httpResponse.getBody().get("response");
         Map<String, Object> tempMap = (Map<String, Object>) responseMap.get("body");
         List<Map<String, Object>> itemsList = (List<Map<String, Object>>) tempMap.get("items");
@@ -437,9 +447,6 @@ public class AdminSettingServiceImpl implements AdminSettingService {
     }
 
     public URI urlAddrToXY(String umdName){
-        String apisDataUrl = "http://apis.data.go.kr/B552584/MsrstnInfoInqireSvc/getTMStdrCrdnt";
-        String serviceKey = "NA%2B2mZ6YHlKo2jNmEfOmsmrL2HY0ulBt9v3GUhfHtIV40HGjglABV1Zq1qCcjGJar4c1RAjcTuVI%2Blnx%2FTmkSw%3D%3D";
-        String returnType = "json";
         String numOfRows = "1";
         String pageNo = "1";
 
@@ -450,9 +457,9 @@ public class AdminSettingServiceImpl implements AdminSettingService {
             e.printStackTrace();
         }
 
-        return UriComponentsBuilder.fromHttpUrl(apisDataUrl)
-                .queryParam("ServiceKey", serviceKey)
-                .queryParam("returnType", returnType)
+        return UriComponentsBuilder.fromHttpUrl(ADDR_XY_URL)
+                .queryParam("ServiceKey", SERVICE_KEY)
+                .queryParam("returnType", LOWER_TYPE)
                 .queryParam("numOfRows", numOfRows)
                 .queryParam("pageNo", pageNo)
                 .queryParam("umdName", encodedUmdName)
@@ -461,14 +468,11 @@ public class AdminSettingServiceImpl implements AdminSettingService {
     }
 
     public URI urlXYToStationName(String tmX, String tmY){
-        String apisDataUrl = "http://apis.data.go.kr/B552584/MsrstnInfoInqireSvc/getNearbyMsrstnList";
-        String serviceKey = "NA%2B2mZ6YHlKo2jNmEfOmsmrL2HY0ulBt9v3GUhfHtIV40HGjglABV1Zq1qCcjGJar4c1RAjcTuVI%2Blnx%2FTmkSw%3D%3D";
-        String returnType = "json";
         String ver = "1.1";
 
-        return UriComponentsBuilder.fromHttpUrl(apisDataUrl)
-                .queryParam("serviceKey", serviceKey)
-                .queryParam("returnType", returnType)
+        return UriComponentsBuilder.fromHttpUrl(XY_NAME_URL)
+                .queryParam("serviceKey", SERVICE_KEY)
+                .queryParam("returnType", LOWER_TYPE)
                 .queryParam("tmX", tmX)
                 .queryParam("tmY", tmY)
                 .queryParam("ver", ver)

@@ -8,6 +8,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -34,6 +35,21 @@ public class ExternalsServiceImpl implements ExternalsService {
     final AdminSettingMapper adminSettingMapper;
     
     final ExternalsMapper externalsMapper;
+
+    @Value("${values.apis.service.key}")
+    private String SERVICE_KEY;
+
+    @Value("${values.apis.service.type.lower}")
+    private String LOWER_TYPE;
+
+    @Value("${values.apis.service.type.upper}")
+    private String UPPER_TYPE;
+
+    @Value("${values.apis.url.weather}")
+    private String WEATHER_URL;
+
+    @Value("${values.apis.url.air}")
+    private String AIR_URL;
 
     @Scheduled(cron = "0 0 2-23/3 1/1 * ?")
     public void scheduleGetExternalWeather() {
@@ -352,17 +368,14 @@ public class ExternalsServiceImpl implements ExternalsService {
 
         String baseDate = localDateTime.substring(0, 8);
         String baseTime = selectedTime + "00";
-        String apisDataUrl = "http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst";
-        String serviceKey = "NA%2B2mZ6YHlKo2jNmEfOmsmrL2HY0ulBt9v3GUhfHtIV40HGjglABV1Zq1qCcjGJar4c1RAjcTuVI%2Blnx%2FTmkSw%3D%3D";
         String pageNo = "1";
         String numOfRows = "36";
-        String dataType = "JSON";
 
-        URI urlBuilder = UriComponentsBuilder.fromHttpUrl(apisDataUrl)
-                .queryParam("ServiceKey", serviceKey)
+        URI urlBuilder = UriComponentsBuilder.fromHttpUrl(WEATHER_URL)
+                .queryParam("ServiceKey", SERVICE_KEY)
                 .queryParam("pageNo", pageNo)
                 .queryParam("numOfRows", numOfRows)
-                .queryParam("dataType", dataType)
+                .queryParam("dataType", UPPER_TYPE)
                 .queryParam("base_date", baseDate)
                 .queryParam("base_time", baseTime)
                 .queryParam("nx", nx)
@@ -388,16 +401,13 @@ public class ExternalsServiceImpl implements ExternalsService {
             stationName = scheduleType;
         }
 
-        String apisDataUrl = "http://apis.data.go.kr/B552584/ArpltnInforInqireSvc/getMsrstnAcctoRltmMesureDnsty";
-        String serviceKey = "NA%2B2mZ6YHlKo2jNmEfOmsmrL2HY0ulBt9v3GUhfHtIV40HGjglABV1Zq1qCcjGJar4c1RAjcTuVI%2Blnx%2FTmkSw%3D%3D";
-        String returnType = "json";
         String encodedStationName = URLEncoder.encode(stationName, StandardCharsets.UTF_8);
         String dataTerm = "DAILY";
         String ver = "1.3";
 
-        return UriComponentsBuilder.fromHttpUrl(apisDataUrl)
-                .queryParam("serviceKey", serviceKey)
-                .queryParam("returnType", returnType)
+        return UriComponentsBuilder.fromHttpUrl(AIR_URL)
+                .queryParam("serviceKey", SERVICE_KEY)
+                .queryParam("returnType", LOWER_TYPE)
                 .queryParam("stationName", encodedStationName)
                 .queryParam("dataTerm", dataTerm)
                 .queryParam("ver", ver)

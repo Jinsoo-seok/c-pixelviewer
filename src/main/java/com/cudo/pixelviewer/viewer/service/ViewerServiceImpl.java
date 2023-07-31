@@ -535,7 +535,7 @@ public class ViewerServiceImpl implements ViewerService {
                 return "weatherSunny";
             }
             else {
-                System.out.println("[WARN] skyStatus = " + skyStatus);
+                log.info("[WARN] skyStatus = " + skyStatus);
                 return "weatherSunny";
             }
         }
@@ -552,7 +552,7 @@ public class ViewerServiceImpl implements ViewerService {
             return "weatherShower";
         }
         else{
-            System.out.println("[WARN] rainStatus = " + rainStatus);
+            log.info("[WARN] rainStatus = " + rainStatus);
             return "weatherRain";
         }
     }
@@ -572,7 +572,7 @@ public class ViewerServiceImpl implements ViewerService {
             return "veryBad";
         }
         else{
-            System.out.println("[WARN] pm10Grade = " + pm10Grade);
+            log.info("[WARN] pm10Grade = " + pm10Grade);
             return "good";
         }
     }
