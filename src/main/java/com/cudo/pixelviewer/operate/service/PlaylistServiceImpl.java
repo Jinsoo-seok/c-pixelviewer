@@ -12,9 +12,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.File;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -26,6 +28,8 @@ public class PlaylistServiceImpl implements PlaylistService {
     final PlaylistMapper playlistMapper;
 
     final PresetMapper presetMapper;
+
+    final Environment environment;
 
     @Override
     public Map<String, Object> getPlaylistList() {
@@ -287,13 +291,38 @@ public class PlaylistServiceImpl implements PlaylistService {
     public Map<String, Object> deletePlaylistContents(Map<String, Object> param) {
         Map<String, Object> resultMap = new HashMap<>();
 
-        int playlistCheck = playlistMapper.deletePlaylistContentsValid(param);
+        PlaylistContentsVo playlistCheck = playlistMapper.deletePlaylistContentsValid(param);
 
-        if(playlistCheck == 1){
+        if(playlistCheck != null){
             int deletePlaylistContentsResult = playlistMapper.deletePlaylistContents(param);
 
             if(deletePlaylistContentsResult == 1){
                 resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
+
+                String os = environment.getProperty("os.name");
+
+                String filePath = null;
+                if(os.equals("Linux")){
+                    String LinuxPath = "/usr/local/tomcat/webapps";
+                    filePath = LinuxPath;
+                }
+                else{
+                    String desktopPath = System.getProperty("user.home") + File.separator + "Desktop";
+                    filePath = desktopPath + File.separator;
+                }
+
+                String thumbnailPath = filePath + playlistCheck.getThumbnailPath();
+                File fileToDelete = new File(thumbnailPath);
+
+                if (fileToDelete.exists()) {
+                    if (fileToDelete.delete()) {
+                        log.info("File deleted successfully - {}", thumbnailPath);
+                    } else {
+                        log.info("Failed to delete the file - {}", thumbnailPath);
+                    }
+                } else {
+                    log.info("File not found - {}", thumbnailPath);
+                }
             }
             else{
                 resultMap.put("code", ResponseCode.FAIL_DELETE_PLAYLIST_CONTENTS.getCode());

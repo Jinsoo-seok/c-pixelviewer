@@ -147,8 +147,8 @@
             )
     </insert>
 
-    <select id="deletePlaylistContentsValid" resultType="int">
-        SELECT count(content_id)
+    <select id="deletePlaylistContentsValid" resultType="com.cudo.pixelviewer.vo.PlaylistContentsVo">
+        SELECT *
         FROM playlist_contents
         WHERE content_id = #{contentId}
     </select>
