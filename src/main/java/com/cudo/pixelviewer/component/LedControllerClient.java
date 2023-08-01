@@ -109,6 +109,7 @@ public class LedControllerClient {
     public CompletableFuture<ResponseWithIpVo[]> sendMessage(byte[] message) {
         List<CompletableFuture<ResponseWithIpVo>> futures = new ArrayList<>();
 
+        log.info("Start Sending Packet to LED Controller >> {}", channelFutureMap);
         // send it to the server
         for (Map.Entry<Channel, CompletableFuture<ResponseWithIpVo>> entry : channelFutureMap.entrySet()) {
             Channel channel = entry.getKey();
@@ -116,6 +117,7 @@ public class LedControllerClient {
             futures.add(future);
 
             if (channel != null && channel.isActive()) {
+                log.error("Active LED Controller");
                 // detect sender 메세지 체크 true 이면 detect sender 이므로 길이 체크 수행
                 detectSenderMessage.set(checkDetectSenderMessage(message));
 

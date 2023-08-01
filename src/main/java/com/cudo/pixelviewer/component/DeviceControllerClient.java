@@ -98,6 +98,7 @@ public class DeviceControllerClient {
     public CompletableFuture<ResponseWithIpVo[]> sendMessage(byte[] message) {
         List<CompletableFuture<ResponseWithIpVo>> futures = new ArrayList<>();
 
+        log.info("Start Sending Packet to Unit Controller >> {}", channelFutureMap);
         // send it to the server
         for (Map.Entry<Channel, CompletableFuture<ResponseWithIpVo>> entry : channelFutureMap.entrySet()) {
             Channel channel = entry.getKey();
@@ -105,6 +106,8 @@ public class DeviceControllerClient {
             futures.add(future);
 
             if (channel != null && channel.isActive()) {
+                log.error("Active Device Unit Controller");
+
                 ByteBuf buffer = Unpooled.wrappedBuffer(message);
 
                 ChannelFuture channelFuture = channel.writeAndFlush(buffer);
