@@ -28,9 +28,7 @@ public class LayerController {
         long startTime = System.currentTimeMillis();
         String apiInfo = "["+ request.getRequestURI() + "] [" + request.getMethod() + "]";
         log.info("{} [START] [{}]", apiInfo, startTime);
-
-        Map<String, Object> responseMap = new HashMap<>();
-        responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
+        Map<String, Object> responseMap = ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName());
 
 
         try {
@@ -41,22 +39,16 @@ public class LayerController {
             responseMap.put("exceptionMessage", exception.getMessage());
         }
 
-        long endTime = System.currentTimeMillis();
-        long procTime = endTime-startTime;
-        log.info("{} [END] [{}] - {}", apiInfo, procTime, responseMap.get("code"));
-
+        log.info("{} [END] [{}] - {}", apiInfo, (System.currentTimeMillis()-startTime), responseMap.get("code"));
         return responseMap;
     }
 
     @GetMapping("/{layerId}")
-    public Map<String, Object> getLayer(HttpServletRequest request
-                                        , @PathVariable String layerId) {
+    public Map<String, Object> getLayer(HttpServletRequest request, @PathVariable String layerId) {
         long startTime = System.currentTimeMillis();
         String apiInfo = "["+ request.getRequestURI() + "] [" + request.getMethod() + "]";
         log.info("{} [START] [{}] - {}", apiInfo, startTime, layerId);
-
-        Map<String, Object> responseMap = new HashMap<>();
-        responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
+        Map<String, Object> responseMap = ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName());
 
 
         try {
@@ -67,23 +59,18 @@ public class LayerController {
             responseMap.put("exceptionMessage", exception.getMessage());
         }
 
-        long endTime = System.currentTimeMillis();
-        long procTime = endTime-startTime;
-        log.info("{} [END] [{}] - {}", apiInfo, procTime, responseMap.get("code"));
-
+        log.info("{} [END] [{}] - {}", apiInfo, (System.currentTimeMillis()-startTime), responseMap.get("code"));
         return responseMap;
     }
 
 
     @PostMapping
-    public Map<String, Object> postLayer(HttpServletRequest request
-                                        , @RequestBody Map<String, Object> param) {
+    public Map<String, Object> postLayer(HttpServletRequest request, @RequestBody Map<String, Object> param) {
         long startTime = System.currentTimeMillis();
         String apiInfo = "["+ request.getRequestURI() + "] [" + request.getMethod() + "]";
         log.info("{} [START] [{}] - {}", apiInfo, startTime, param);
+        Map<String, Object> responseMap = ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName());
 
-        Map<String, Object> responseMap = new HashMap<>();
-        responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
 
         String[] keyList = {"screenId", "presetId", "layerNm"};
 
@@ -105,22 +92,17 @@ public class LayerController {
             responseMap.put("exceptionMessage", exception.getMessage());
         }
 
-        long endTime = System.currentTimeMillis();
-        long procTime = endTime-startTime;
-        log.info("{} [END] [{}] - {}", apiInfo, procTime, responseMap.get("code"));
-
+        log.info("{} [END] [{}] - {}", apiInfo, (System.currentTimeMillis()-startTime), responseMap.get("code"));
         return responseMap;
     }
 
     @DeleteMapping
-    public Map<String, Object> deleteLayer(HttpServletRequest request
-                                        , @RequestBody Map<String, Object> param) {
+    public Map<String, Object> deleteLayer(HttpServletRequest request, @RequestBody Map<String, Object> param) {
         long startTime = System.currentTimeMillis();
         String apiInfo = "["+ request.getRequestURI() + "] [" + request.getMethod() + "]";
         log.info("{} [START] [{}] - {}", apiInfo, startTime, param);
+        Map<String, Object> responseMap = ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName());
 
-        Map<String, Object> responseMap = new HashMap<>();
-        responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
 
         String[] keyList = {"layerId"};
 
@@ -140,22 +122,17 @@ public class LayerController {
             responseMap.put("exceptionMessage", exception.getMessage());
         }
 
-        long endTime = System.currentTimeMillis();
-        long procTime = endTime-startTime;
-        log.info("{} [END] [{}] - {}", apiInfo, procTime, responseMap.get("code"));
-
+        log.info("{} [END] [{}] - {}", apiInfo, (System.currentTimeMillis()-startTime), responseMap.get("code"));
         return responseMap;
     }
 
     @PutMapping
-    public Map<String, Object> putLayer(HttpServletRequest request
-                                        , @RequestBody Map<String, Object> param) {
+    public Map<String, Object> putLayer(HttpServletRequest request, @RequestBody Map<String, Object> param) {
         long startTime = System.currentTimeMillis();
         String apiInfo = "["+ request.getRequestURI() + "] [" + request.getMethod() + "]";
         log.info("{} [START] [{}] - {}", apiInfo, startTime, param);
+        Map<String, Object> responseMap = ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName());
 
-        Map<String, Object> responseMap = new HashMap<>();
-        responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
 
         String[] keyList = {"presetId", "screenId", "layerNm"
                 , "posX", "posY", "width", "height", "ord"
@@ -191,10 +168,7 @@ public class LayerController {
             responseMap.put("exceptionMessage", exception.getMessage());
         }
 
-        long endTime = System.currentTimeMillis();
-        long procTime = endTime-startTime;
-        log.info("{} [END] [{}] - {}", apiInfo, procTime, responseMap.get("code"));
-
+        log.info("{} [END] [{}] - {}", apiInfo, (System.currentTimeMillis()-startTime), responseMap.get("code"));
         return responseMap;
     }
 }

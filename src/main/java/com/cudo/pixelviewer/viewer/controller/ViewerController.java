@@ -36,8 +36,8 @@ public class ViewerController {
         String apiInfo = "["+ request.getRequestURI() + "] [" + request.getMethod() + "]";
         log.info("{} [START] [{}] - {}", apiInfo, startTime, layerId);
 
-        Map<String, Object> responseMap = new HashMap<>();
-        responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
+        Map<String, Object> responseMap = ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName());
+
 
 
         try {
@@ -48,10 +48,7 @@ public class ViewerController {
             responseMap.put("exceptionMessage", exception.getMessage());
         }
 
-        long endTime = System.currentTimeMillis();
-        long procTime = endTime-startTime;
-        log.info("{} [END] [{}] - {}", apiInfo, procTime, responseMap.get("code"));
-
+        log.info("{} [END] [{}] - {}", apiInfo, (System.currentTimeMillis()-startTime), responseMap.get("code"));    
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("Content-Type", "application/json; charset=UTF-8");
@@ -65,8 +62,8 @@ public class ViewerController {
         String apiInfo = "["+ request.getRequestURI() + "] [" + request.getMethod() + "]";
         log.info("{} [START] [{}] - {}", apiInfo, startTime, param);
 
-        Map<String, Object> responseMap = new HashMap<>();
-        responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
+        Map<String, Object> responseMap = ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName());
+
 
         String[] keyList = {"screenId", "presetId", "layerId", "viewerStatus"};
 
@@ -110,8 +107,8 @@ public class ViewerController {
         String apiInfo = "["+ request.getRequestURI() + "] [" + request.getMethod() + "]";
         log.info("{} [START] [{}] - type : {}, name : {}", apiInfo, startTime, type, name);
 
-        Map<String, Object> responseMap = new HashMap<>();
-        responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
+        Map<String, Object> responseMap = ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName());
+
 
 
         try {
@@ -131,10 +128,7 @@ public class ViewerController {
             responseMap.put("exceptionMessage", exception.getMessage());
         }
 
-        long endTime = System.currentTimeMillis();
-        long procTime = endTime-startTime;
-        log.info("{} [END] [{}] - {}", apiInfo, procTime, responseMap.get("code"));
-
+        log.info("{} [END] [{}] - {}", apiInfo, (System.currentTimeMillis()-startTime), responseMap.get("code"));    
         return responseMap;
     }
 }

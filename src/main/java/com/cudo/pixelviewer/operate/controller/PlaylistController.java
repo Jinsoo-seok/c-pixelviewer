@@ -28,9 +28,7 @@ public class PlaylistController {
         long startTime = System.currentTimeMillis();
         String apiInfo = "["+ request.getRequestURI() + "] [" + request.getMethod() + "]";
         log.info("{} [START] [{}]", apiInfo, startTime);
-
-        Map<String, Object> responseMap = new HashMap<>();
-        responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
+        Map<String, Object> responseMap = ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName());
 
 
         try {
@@ -41,22 +39,16 @@ public class PlaylistController {
             responseMap.put("exceptionMessage", exception.getMessage());
         }
 
-        long endTime = System.currentTimeMillis();
-        long procTime = endTime-startTime;
-        log.info("{} [END] [{}] - {}", apiInfo, procTime, responseMap.get("code"));
-
+        log.info("{} [END] [{}] - {}", apiInfo, (System.currentTimeMillis()-startTime), responseMap.get("code"));
         return responseMap;
     }
 
     @GetMapping("/{layerId}")
-    public Map<String, Object> getPlaylist(HttpServletRequest request
-                                        , @PathVariable String layerId) {
+    public Map<String, Object> getPlaylist(HttpServletRequest request, @PathVariable String layerId) {
         long startTime = System.currentTimeMillis();
         String apiInfo = "["+ request.getRequestURI() + "] [" + request.getMethod() + "]";
         log.info("{} [START] [{}] - {}", apiInfo, startTime, layerId);
-
-        Map<String, Object> responseMap = new HashMap<>();
-        responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
+        Map<String, Object> responseMap = ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName());
 
 
         try {
@@ -67,23 +59,18 @@ public class PlaylistController {
             responseMap.put("exceptionMessage", exception.getMessage());
         }
 
-        long endTime = System.currentTimeMillis();
-        long procTime = endTime-startTime;
-        log.info("{} [END] [{}] - {}", apiInfo, procTime, responseMap.get("code"));
-
+        log.info("{} [END] [{}] - {}", apiInfo, (System.currentTimeMillis()-startTime), responseMap.get("code"));
         return responseMap;
     }
 
 
     @PostMapping
-    public Map<String, Object> postPlaylist(HttpServletRequest request
-                                        , @RequestBody Map<String, Object> param) {
+    public Map<String, Object> postPlaylist(HttpServletRequest request, @RequestBody Map<String, Object> param) {
         long startTime = System.currentTimeMillis();
         String apiInfo = "["+ request.getRequestURI() + "] [" + request.getMethod() + "]";
         log.info("{} [START] [{}] - {}", apiInfo, startTime, param);
+        Map<String, Object> responseMap = ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName());
 
-        Map<String, Object> responseMap = new HashMap<>();
-        responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
 
         String[] keyList = {"playlistNm", "layerId", "presetId", "screenId"};
 
@@ -106,22 +93,17 @@ public class PlaylistController {
             responseMap.put("exceptionMessage", exception.getMessage());
         }
 
-        long endTime = System.currentTimeMillis();
-        long procTime = endTime-startTime;
-        log.info("{} [END] [{}] - {}", apiInfo, procTime, responseMap.get("code"));
-
+        log.info("{} [END] [{}] - {}", apiInfo, (System.currentTimeMillis()-startTime), responseMap.get("code"));
         return responseMap;
     }
 
     @PutMapping
-    public Map<String, Object> putPlaylist(HttpServletRequest request
-            , @RequestBody Map<String, Object> param) {
+    public Map<String, Object> putPlaylist(HttpServletRequest request, @RequestBody Map<String, Object> param) {
         long startTime = System.currentTimeMillis();
         String apiInfo = "["+ request.getRequestURI() + "] [" + request.getMethod() + "]";
         log.info("{} [START] [{}] - {}", apiInfo, startTime, param);
+        Map<String, Object> responseMap = ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName());
 
-        Map<String, Object> responseMap = new HashMap<>();
-        responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
 
         String[] keyList = {"playlistId", "playlistNm", "contentIdList"};
 
@@ -143,22 +125,17 @@ public class PlaylistController {
             responseMap.put("exceptionMessage", exception.getMessage());
         }
 
-        long endTime = System.currentTimeMillis();
-        long procTime = endTime-startTime;
-        log.info("{} [END] [{}] - {}", apiInfo, procTime, responseMap.get("code"));
-
+        log.info("{} [END] [{}] - {}", apiInfo, (System.currentTimeMillis()-startTime), responseMap.get("code"));
         return responseMap;
     }
 
     @DeleteMapping
-    public Map<String, Object> deletePlaylist(HttpServletRequest request
-                                        , @RequestBody Map<String, Object> param) {
+    public Map<String, Object> deletePlaylist(HttpServletRequest request, @RequestBody Map<String, Object> param) {
         long startTime = System.currentTimeMillis();
         String apiInfo = "["+ request.getRequestURI() + "] [" + request.getMethod() + "]";
         log.info("{} [START] [{}] - {}", apiInfo, startTime, param);
+        Map<String, Object> responseMap = ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName());
 
-        Map<String, Object> responseMap = new HashMap<>();
-        responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
 
         String[] keyList = {"playlistId"};
 
@@ -178,10 +155,7 @@ public class PlaylistController {
             responseMap.put("exceptionMessage", exception.getMessage());
         }
 
-        long endTime = System.currentTimeMillis();
-        long procTime = endTime-startTime;
-        log.info("{} [END] [{}] - {}", apiInfo, procTime, responseMap.get("code"));
-
+        log.info("{} [END] [{}] - {}", apiInfo, (System.currentTimeMillis()-startTime), responseMap.get("code"));
         return responseMap;
     }
 
@@ -191,9 +165,7 @@ public class PlaylistController {
         long startTime = System.currentTimeMillis();
         String apiInfo = "["+ request.getRequestURI() + "] [" + request.getMethod() + "]";
         log.info("{} [START] [{}]", apiInfo, startTime);
-
-        Map<String, Object> responseMap = new HashMap<>();
-        responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
+        Map<String, Object> responseMap = ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName());
 
 
         try {
@@ -204,22 +176,16 @@ public class PlaylistController {
             responseMap.put("exceptionMessage", exception.getMessage());
         }
 
-        long endTime = System.currentTimeMillis();
-        long procTime = endTime-startTime;
-        log.info("{} [END] [{}] - {}", apiInfo, procTime, responseMap.get("code"));
-
+        log.info("{} [END] [{}] - {}", apiInfo, (System.currentTimeMillis()-startTime), responseMap.get("code"));
         return responseMap;
     }
 
     @GetMapping("/contents/{Id}")
-    public Map<String, Object> getPlaylistContents(HttpServletRequest request
-            , @PathVariable String Id) {
+    public Map<String, Object> getPlaylistContents(HttpServletRequest request, @PathVariable String Id) {
         long startTime = System.currentTimeMillis();
         String apiInfo = "["+ request.getRequestURI() + "] [" + request.getMethod() + "]";
         log.info("{} [START] [{}] - {}", apiInfo, startTime, Id);
-
-        Map<String, Object> responseMap = new HashMap<>();
-        responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
+        Map<String, Object> responseMap = ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName());
 
 
         try {
@@ -230,23 +196,18 @@ public class PlaylistController {
             responseMap.put("exceptionMessage", exception.getMessage());
         }
 
-        long endTime = System.currentTimeMillis();
-        long procTime = endTime-startTime;
-        log.info("{} [END] [{}] - {}", apiInfo, procTime, responseMap.get("code"));
-
+        log.info("{} [END] [{}] - {}", apiInfo, (System.currentTimeMillis()-startTime), responseMap.get("code"));
         return responseMap;
     }
 
 
     @PostMapping("/contents")
-    public Map<String, Object> postPlaylistContents(HttpServletRequest request
-            , @RequestBody Map<String, Object> param) {
+    public Map<String, Object> postPlaylistContents(HttpServletRequest request, @RequestBody Map<String, Object> param) {
         long startTime = System.currentTimeMillis();
         String apiInfo = "["+ request.getRequestURI() + "] [" + request.getMethod() + "]";
         log.info("{} [START] [{}] - {}", apiInfo, startTime, param);
+        Map<String, Object> responseMap = ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName());
 
-        Map<String, Object> responseMap = new HashMap<>();
-        responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
 
         String[] keyList = {"type", "ctsNm", "ctsPath", "playtime", "thumbnailPath"};
 
@@ -270,22 +231,17 @@ public class PlaylistController {
             responseMap.put("exceptionMessage", exception.getMessage());
         }
 
-        long endTime = System.currentTimeMillis();
-        long procTime = endTime-startTime;
-        log.info("{} [END] [{}] - {}", apiInfo, procTime, responseMap.get("code"));
-
+        log.info("{} [END] [{}] - {}", apiInfo, (System.currentTimeMillis()-startTime), responseMap.get("code"));
         return responseMap;
     }
 
     @DeleteMapping("/contents")
-    public Map<String, Object> deletePlaylistContents(HttpServletRequest request
-                                        , @RequestBody Map<String, Object> param) {
+    public Map<String, Object> deletePlaylistContents(HttpServletRequest request, @RequestBody Map<String, Object> param) {
         long startTime = System.currentTimeMillis();
         String apiInfo = "["+ request.getRequestURI() + "] [" + request.getMethod() + "]";
         log.info("{} [START] [{}] - {}", apiInfo, startTime, param);
+        Map<String, Object> responseMap = ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName());
 
-        Map<String, Object> responseMap = new HashMap<>();
-        responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
 
         String[] keyList = {"contentId"};
 
@@ -305,22 +261,17 @@ public class PlaylistController {
             responseMap.put("exceptionMessage", exception.getMessage());
         }
 
-        long endTime = System.currentTimeMillis();
-        long procTime = endTime-startTime;
-        log.info("{} [END] [{}] - {}", apiInfo, procTime, responseMap.get("code"));
-
+        log.info("{} [END] [{}] - {}", apiInfo, (System.currentTimeMillis()-startTime), responseMap.get("code"));
         return responseMap;
     }
 
     @PatchMapping("/contents/name")
-    public Map<String, Object> patchContentsName(HttpServletRequest request
-                                        , @RequestBody Map<String, Object> param) {
+    public Map<String, Object> patchContentsName(HttpServletRequest request, @RequestBody Map<String, Object> param) {
         long startTime = System.currentTimeMillis();
         String apiInfo = "["+ request.getRequestURI() + "] [" + request.getMethod() + "]";
         log.info("{} [START] [{}] - {}", apiInfo, startTime, param);
+        Map<String, Object> responseMap = ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName());
 
-        Map<String, Object> responseMap = new HashMap<>();
-        responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
 
         String[] keyList = {"contentId", "ctsNm"};
 
@@ -341,22 +292,17 @@ public class PlaylistController {
             responseMap.put("exceptionMessage", exception.getMessage());
         }
 
-        long endTime = System.currentTimeMillis();
-        long procTime = endTime-startTime;
-        log.info("{} [END] [{}] - {}", apiInfo, procTime, responseMap.get("code"));
-
+        log.info("{} [END] [{}] - {}", apiInfo, (System.currentTimeMillis()-startTime), responseMap.get("code"));
         return responseMap;
     }
 
     @PatchMapping("/contents/playtime")
-    public Map<String, Object> patchContentsPlaytime(HttpServletRequest request
-            , @RequestBody Map<String, Object> param) {
+    public Map<String, Object> patchContentsPlaytime(HttpServletRequest request, @RequestBody Map<String, Object> param) {
         long startTime = System.currentTimeMillis();
         String apiInfo = "["+ request.getRequestURI() + "] [" + request.getMethod() + "]";
         log.info("{} [START] [{}] - {}", apiInfo, startTime, param);
+        Map<String, Object> responseMap = ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName());
 
-        Map<String, Object> responseMap = new HashMap<>();
-        responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
 
         String[] keyList = {"contentId", "playtime"};
 
@@ -377,11 +323,7 @@ public class PlaylistController {
             responseMap.put("exceptionMessage", exception.getMessage());
         }
 
-        long endTime = System.currentTimeMillis();
-        long procTime = endTime-startTime;
-        log.info("{} [END] [{}] - {}", apiInfo, procTime, responseMap.get("code"));
-
+        log.info("{} [END] [{}] - {}", apiInfo, (System.currentTimeMillis()-startTime), responseMap.get("code"));
         return responseMap;
     }
-
 }

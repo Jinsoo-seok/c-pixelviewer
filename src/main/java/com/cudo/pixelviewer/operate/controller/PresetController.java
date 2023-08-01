@@ -28,9 +28,7 @@ public class PresetController {
         long startTime = System.currentTimeMillis();
         String apiInfo = "["+ request.getRequestURI() + "] [" + request.getMethod() + "]";
         log.info("{} [START] [{}]", apiInfo, startTime);
-
-        Map<String, Object> responseMap = new HashMap<>();
-        responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
+        Map<String, Object> responseMap = ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName());
 
 
         try {
@@ -41,22 +39,16 @@ public class PresetController {
             responseMap.put("exceptionMessage", exception.getMessage());
         }
 
-        long endTime = System.currentTimeMillis();
-        long procTime = endTime-startTime;
-        log.info("{} [END] [{}] - {}", apiInfo, procTime, responseMap.get("code"));
-
+        log.info("{} [END] [{}] - {}", apiInfo, (System.currentTimeMillis()-startTime), responseMap.get("code"));
         return responseMap;
     }
 
     @GetMapping("/{presetId}")
-    public Map<String, Object> getPreset(HttpServletRequest request
-                                        , @PathVariable String presetId) {
+    public Map<String, Object> getPreset(HttpServletRequest request, @PathVariable String presetId) {
         long startTime = System.currentTimeMillis();
         String apiInfo = "["+ request.getRequestURI() + "] [" + request.getMethod() + "]";
         log.info("{} [START] [{}] - {}", apiInfo, startTime, presetId);
-
-        Map<String, Object> responseMap = new HashMap<>();
-        responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
+        Map<String, Object> responseMap = ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName());
 
 
         try {
@@ -67,10 +59,7 @@ public class PresetController {
             responseMap.put("exceptionMessage", exception.getMessage());
         }
 
-        long endTime = System.currentTimeMillis();
-        long procTime = endTime-startTime;
-        log.info("{} [END] [{}] - {}", apiInfo, procTime, responseMap.get("code"));
-
+        log.info("{} [END] [{}] - {}", apiInfo, (System.currentTimeMillis()-startTime), responseMap.get("code"));
         return responseMap;
     }
     @GetMapping("/using")
@@ -78,9 +67,7 @@ public class PresetController {
         long startTime = System.currentTimeMillis();
         String apiInfo = "["+ request.getRequestURI() + "] [" + request.getMethod() + "]";
         log.info("{} [START] [{}]", apiInfo, startTime);
-
-        Map<String, Object> responseMap = new HashMap<>();
-        responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
+        Map<String, Object> responseMap = ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName());
 
 
         try {
@@ -91,23 +78,18 @@ public class PresetController {
             responseMap.put("exceptionMessage", exception.getMessage());
         }
 
-        long endTime = System.currentTimeMillis();
-        long procTime = endTime-startTime;
-        log.info("{} [END] [{}] - {}", apiInfo, procTime, responseMap.get("code"));
-
+        log.info("{} [END] [{}] - {}", apiInfo, (System.currentTimeMillis()-startTime), responseMap.get("code"));
         return responseMap;
     }
 
 
     @PostMapping
-    public Map<String, Object> postPreset(HttpServletRequest request
-                                        , @RequestBody Map<String, Object> param) {
+    public Map<String, Object> postPreset(HttpServletRequest request, @RequestBody Map<String, Object> param) {
         long startTime = System.currentTimeMillis();
         String apiInfo = "["+ request.getRequestURI() + "] [" + request.getMethod() + "]";
         log.info("{} [START] [{}] - {}", apiInfo, startTime, param);
+        Map<String, Object> responseMap = ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName());
 
-        Map<String, Object> responseMap = new HashMap<>();
-        responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
 
         String[] keyList = {"screenId", "presetNm"};
 
@@ -128,22 +110,17 @@ public class PresetController {
             responseMap.put("exceptionMessage", exception.getMessage());
         }
 
-        long endTime = System.currentTimeMillis();
-        long procTime = endTime-startTime;
-        log.info("{} [END] [{}] - {}", apiInfo, procTime, responseMap.get("code"));
-
+        log.info("{} [END] [{}] - {}", apiInfo, (System.currentTimeMillis()-startTime), responseMap.get("code"));
         return responseMap;
     }
 
     @DeleteMapping
-    public Map<String, Object> deletePreset(HttpServletRequest request
-                                        , @RequestBody Map<String, Object> param) {
+    public Map<String, Object> deletePreset(HttpServletRequest request, @RequestBody Map<String, Object> param) {
         long startTime = System.currentTimeMillis();
         String apiInfo = "["+ request.getRequestURI() + "] [" + request.getMethod() + "]";
         log.info("{} [START] [{}] - {}", apiInfo, startTime, param);
+        Map<String, Object> responseMap = ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName());
 
-        Map<String, Object> responseMap = new HashMap<>();
-        responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
 
         String[] keyList = {"presetId"};
 
@@ -163,22 +140,17 @@ public class PresetController {
             responseMap.put("exceptionMessage", exception.getMessage());
         }
 
-        long endTime = System.currentTimeMillis();
-        long procTime = endTime-startTime;
-        log.info("{} [END] [{}] - {}", apiInfo, procTime, responseMap.get("code"));
-
+        log.info("{} [END] [{}] - {}", apiInfo, (System.currentTimeMillis()-startTime), responseMap.get("code"));
         return responseMap;
     }
 
     @PatchMapping("/name")
-    public Map<String, Object> patchPresetName(HttpServletRequest request
-                                        , @RequestBody Map<String, Object> param) {
+    public Map<String, Object> patchPresetName(HttpServletRequest request, @RequestBody Map<String, Object> param) {
         long startTime = System.currentTimeMillis();
         String apiInfo = "["+ request.getRequestURI() + "] [" + request.getMethod() + "]";
         log.info("{} [START] [{}] - {}", apiInfo, startTime, param);
+        Map<String, Object> responseMap = ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName());
 
-        Map<String, Object> responseMap = new HashMap<>();
-        responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
 
         String[] keyList = {"presetId", "presetNm"};
 
@@ -199,22 +171,17 @@ public class PresetController {
             responseMap.put("exceptionMessage", exception.getMessage());
         }
 
-        long endTime = System.currentTimeMillis();
-        long procTime = endTime-startTime;
-        log.info("{} [END] [{}] - {}", apiInfo, procTime, responseMap.get("code"));
-
+        log.info("{} [END] [{}] - {}", apiInfo, (System.currentTimeMillis()-startTime), responseMap.get("code"));
         return responseMap;
     }
 
     @PutMapping
-    public Map<String, Object> putPreset(HttpServletRequest request
-            , @RequestBody Map<String, Object> param) {
+    public Map<String, Object> putPreset(HttpServletRequest request, @RequestBody Map<String, Object> param) {
         long startTime = System.currentTimeMillis();
         String apiInfo = "["+ request.getRequestURI() + "] [" + request.getMethod() + "]";
         log.info("{} [START] [{}] - {}", apiInfo, startTime, param);
+        Map<String, Object> responseMap = ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName());
 
-        Map<String, Object> responseMap = new HashMap<>();
-        responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
 
         String[] keyList = {"presetId", "presetNm", "rowsize", "columnsize", "layerList", "deleteType"};
 
@@ -239,22 +206,17 @@ public class PresetController {
             responseMap.put("exceptionMessage", exception.getMessage());
         }
 
-        long endTime = System.currentTimeMillis();
-        long procTime = endTime-startTime;
-        log.info("{} [END] [{}] - {}", apiInfo, procTime, responseMap.get("code"));
-
+        log.info("{} [END] [{}] - {}", apiInfo, (System.currentTimeMillis()-startTime), responseMap.get("code"));
         return responseMap;
     }
 
     @PatchMapping("/run")
-    public Map<String, Object> patchPresetRun(HttpServletRequest request
-            , @RequestBody Map<String, Object> param) {
+    public Map<String, Object> patchPresetRun(HttpServletRequest request, @RequestBody Map<String, Object> param) {
         long startTime = System.currentTimeMillis();
         String apiInfo = "["+ request.getRequestURI() + "] [" + request.getMethod() + "]";
         log.info("{} [START] [{}] - {}", apiInfo, startTime, param);
+        Map<String, Object> responseMap = ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName());
 
-        Map<String, Object> responseMap = new HashMap<>();
-        responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
 
         String[] keyList = {"screenId", "presetId", "layerInfoList"};
 
@@ -276,22 +238,17 @@ public class PresetController {
             responseMap.put("exceptionMessage", exception.getMessage());
         }
 
-        long endTime = System.currentTimeMillis();
-        long procTime = endTime-startTime;
-        log.info("{} [END] [{}] - {}", apiInfo, procTime, responseMap.get("code"));
-
+        log.info("{} [END] [{}] - {}", apiInfo, (System.currentTimeMillis()-startTime), responseMap.get("code"));
         return responseMap;
     }
 
     @PatchMapping("/control")
-    public Map<String, Object> patchPresetControl(HttpServletRequest request
-            , @RequestBody Map<String, Object> param) {
+    public Map<String, Object> patchPresetControl(HttpServletRequest request, @RequestBody Map<String, Object> param) {
         long startTime = System.currentTimeMillis();
         String apiInfo = "["+ request.getRequestURI() + "] [" + request.getMethod() + "]";
         log.info("{} [START] [{}] - {}", apiInfo, startTime, param);
+        Map<String, Object> responseMap = ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName());
 
-        Map<String, Object> responseMap = new HashMap<>();
-        responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
 
         String[] keyList = {"screenId", "presetId", "controlType"};
 
@@ -313,10 +270,7 @@ public class PresetController {
             responseMap.put("exceptionMessage", exception.getMessage());
         }
 
-        long endTime = System.currentTimeMillis();
-        long procTime = endTime-startTime;
-        log.info("{} [END] [{}] - {}", apiInfo, procTime, responseMap.get("code"));
-
+        log.info("{} [END] [{}] - {}", apiInfo, (System.currentTimeMillis()-startTime), responseMap.get("code"));
         return responseMap;
     }
 }

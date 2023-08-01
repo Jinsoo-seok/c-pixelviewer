@@ -9,10 +9,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.HashMap;
 import java.util.Map;
 
 import static com.cudo.pixelviewer.util.ParameterUtils.*;
+import static com.cudo.pixelviewer.util.ResponseCode.FAIL_GET_EXTERNALS_DATA;
 
 @Slf4j
 @RestController
@@ -28,9 +28,7 @@ public class AdminSettingController {
         long startTime = System.currentTimeMillis();
         String apiInfo = "["+ request.getRequestURI() + "] [" + request.getMethod() + "]";
         log.info("{} [START] [{}]", apiInfo, startTime);
-
-        Map<String, Object> responseMap = new HashMap<>();
-        responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
+        Map<String, Object> responseMap = ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName());
 
 
         try {
@@ -41,22 +39,17 @@ public class AdminSettingController {
             responseMap.put("exceptionMessage", exception.getMessage());
         }
 
-        long endTime = System.currentTimeMillis();
-        long procTime = endTime-startTime;
-        log.info("{} [END] [{}] - {}", apiInfo, procTime, responseMap.get("code"));
-
+        log.info("{} [END] [{}] - {}", apiInfo, (System.currentTimeMillis()-startTime), responseMap.get("code"));
         return responseMap;
     }
 
     @PutMapping()
-    public Map<String, Object> putAdminSetting(HttpServletRequest request
-            , @RequestBody Map<String, Object> param) {
+    public Map<String, Object> putAdminSetting(HttpServletRequest request, @RequestBody Map<String, Object> param) {
         long startTime = System.currentTimeMillis();
         String apiInfo = "["+ request.getRequestURI() + "] [" + request.getMethod() + "]";
         log.info("{} [START] [{}] - {}", apiInfo, startTime, param);
+        Map<String, Object> responseMap = ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName());
 
-        Map<String, Object> responseMap = new HashMap<>();
-        responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
 
         String[] keyList = {
                 "viewTopmostEn",
@@ -93,14 +86,15 @@ public class AdminSettingController {
             responseMap.put("message", paramException.getMessage());
         }
         catch (Exception exception) {
+            if(exception.getMessage().equals("[FAIL] GET Externals Data")){
+                responseMap.put("code", FAIL_GET_EXTERNALS_DATA.getCode());
+                responseMap.put("message", FAIL_GET_EXTERNALS_DATA.getMessage());
+            }
             log.error("[Exception][putAdminSetting] - {}", exception.getMessage());
             responseMap.put("exceptionMessage", exception.getMessage());
         }
 
-        long endTime = System.currentTimeMillis();
-        long procTime = endTime-startTime;
-        log.info("{} [END] [{}] - {}", apiInfo, procTime, responseMap.get("code"));
-
+        log.info("{} [END] [{}] - {}", apiInfo, (System.currentTimeMillis()-startTime), responseMap.get("code"));
         return responseMap;
     }
 
@@ -110,9 +104,8 @@ public class AdminSettingController {
         long startTime = System.currentTimeMillis();
         String apiInfo = "["+ request.getRequestURI() + "] [" + request.getMethod() + "]";
         log.info("{} [START] [{}]", apiInfo, startTime);
+        Map<String, Object> responseMap = ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName());
 
-        Map<String, Object> responseMap = new HashMap<>();
-        responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
 
         try {
             responseMap = adminSettingService.getDisplayInfoList();
@@ -122,22 +115,17 @@ public class AdminSettingController {
             responseMap.put("exceptionMessage", exception.getMessage());
         }
 
-        long endTime = System.currentTimeMillis();
-        long procTime = endTime-startTime;
-        log.info("{} [END] [{}] - {}", apiInfo, procTime, responseMap.get("code"));
-
+        log.info("{} [END] [{}] - {}", apiInfo, (System.currentTimeMillis()-startTime), responseMap.get("code"));
         return responseMap;
     }
 
     @GetMapping("/displayinfo/{displayId}")
-    public Map<String, Object> getDisplayInfo(HttpServletRequest request
-                                                  , @PathVariable String displayId) {
+    public Map<String, Object> getDisplayInfo(HttpServletRequest request, @PathVariable String displayId) {
         long startTime = System.currentTimeMillis();
         String apiInfo = "["+ request.getRequestURI() + "] [" + request.getMethod() + "]";
         log.info("{} [START] [{}] - {}", apiInfo, startTime, displayId);
+        Map<String, Object> responseMap = ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName());
 
-        Map<String, Object> responseMap = new HashMap<>();
-        responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
 
         try {
             responseMap = adminSettingService.getDisplayInfo(displayId);
@@ -147,22 +135,17 @@ public class AdminSettingController {
             responseMap.put("exceptionMessage", exception.getMessage());
         }
 
-        long endTime = System.currentTimeMillis();
-        long procTime = endTime-startTime;
-        log.info("{} [END] [{}] - {}", apiInfo, procTime, responseMap.get("code"));
-
+        log.info("{} [END] [{}] - {}", apiInfo, (System.currentTimeMillis()-startTime), responseMap.get("code"));
         return responseMap;
     }
 
     @PostMapping("/displayinfo")
-    public Map<String, Object> postDisplayInfo(HttpServletRequest request
-            , @RequestBody Map<String, Object> param) {
+    public Map<String, Object> postDisplayInfo(HttpServletRequest request, @RequestBody Map<String, Object> param) {
         long startTime = System.currentTimeMillis();
         String apiInfo = "["+ request.getRequestURI() + "] [" + request.getMethod() + "]";
         log.info("{} [START] [{}] - {}", apiInfo, startTime, param);
+        Map<String, Object> responseMap = ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName());
 
-        Map<String, Object> responseMap = new HashMap<>();
-        responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
 
         String[] keyList = {"displayNm", "gpuNm"
                 , "posX", "posY"
@@ -192,22 +175,17 @@ public class AdminSettingController {
             responseMap.put("exceptionMessage", exception.getMessage());
         }
 
-        long endTime = System.currentTimeMillis();
-        long procTime = endTime-startTime;
-        log.info("{} [END] [{}] - {}", apiInfo, procTime, responseMap.get("code"));
-
+        log.info("{} [END] [{}] - {}", apiInfo, (System.currentTimeMillis()-startTime), responseMap.get("code"));
         return responseMap;
     }
 
     @PutMapping("/displayinfo")
-    public Map<String, Object> putDisplayInfo(HttpServletRequest request
-            , @RequestBody Map<String, Object> param) {
+    public Map<String, Object> putDisplayInfo(HttpServletRequest request, @RequestBody Map<String, Object> param) {
         long startTime = System.currentTimeMillis();
         String apiInfo = "["+ request.getRequestURI() + "] [" + request.getMethod() + "]";
         log.info("{} [START] [{}] - {}", apiInfo, startTime, param);
+        Map<String, Object> responseMap = ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName());
 
-        Map<String, Object> responseMap = new HashMap<>();
-        responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
 
         String[] keyList = {
                 "displayId"
@@ -240,22 +218,17 @@ public class AdminSettingController {
             responseMap.put("exceptionMessage", exception.getMessage());
         }
 
-        long endTime = System.currentTimeMillis();
-        long procTime = endTime-startTime;
-        log.info("{} [END] [{}] - {}", apiInfo, procTime, responseMap.get("code"));
-
+        log.info("{} [END] [{}] - {}", apiInfo, (System.currentTimeMillis()-startTime), responseMap.get("code"));
         return responseMap;
     }
 
     @DeleteMapping("/displayinfo")
-    public Map<String, Object> deleteDisplayInfo(HttpServletRequest request
-            , @RequestBody Map<String, Object> param) {
+    public Map<String, Object> deleteDisplayInfo(HttpServletRequest request, @RequestBody Map<String, Object> param) {
         long startTime = System.currentTimeMillis();
         String apiInfo = "["+ request.getRequestURI() + "] [" + request.getMethod() + "]";
         log.info("{} [START] [{}] - {}", apiInfo, startTime, param);
+        Map<String, Object> responseMap = ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName());
 
-        Map<String, Object> responseMap = new HashMap<>();
-        responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
 
         String[] keyList = {"displayId"};
 
@@ -275,11 +248,7 @@ public class AdminSettingController {
             responseMap.put("exceptionMessage", exception.getMessage());
         }
 
-        long endTime = System.currentTimeMillis();
-        long procTime = endTime-startTime;
-        log.info("{} [END] [{}] - {}", apiInfo, procTime, responseMap.get("code"));
-
+        log.info("{} [END] [{}] - {}", apiInfo, (System.currentTimeMillis()-startTime), responseMap.get("code"));
         return responseMap;
     }
-
 }

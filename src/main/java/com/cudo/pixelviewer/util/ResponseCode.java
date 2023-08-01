@@ -122,7 +122,7 @@ public enum ResponseCode {
     FAIL_DUPLICATE_IP(4205, "FailedDuplicateIp", "Failed Duplicate Ip"),
 
     // Setting : 4300
-    FAIL_UPDATE_SETTING_VALUES(4301, "FailedUpdateSettingValues", "Failed to Update Setting Values"),
+    FAIL_UPDATE_SETTING_VALUES(4300, "FailedUpdateSettingValues", "Failed to Update Setting Values"),
 
     FAIL_UPDATE_SETTING_VIEW_TOP_MOST_EN(4301, "FailedUpdateSettingViewTopMostEn", "Failed to Update Setting View Top Most En"),
     FAIL_UPDATE_SETTING_VIEW_TEMP_HUMI_EN(4302, "FailedUpdateSettingViewTempHumiEn", "Failed to Update Setting View Temp Humi En"),
@@ -146,11 +146,12 @@ public enum ResponseCode {
     FAIL_DELETE_DISPLAY_SETTING(4315, "FailedDeleteDisplaySetting", "Failed Delete Display Setting"),
     FAIL_NOT_EXIST_DISPLAY_SETTING(4316, "FailedNotExistDisplaySetting", "Failed Not Exist Display Setting"),
     FAIL_USED_DISPLAY_SETTING(4317, "FailedUsedDisplaySetting", "Failed Used Display Setting"),
-    FAIL_DISPLAY_SETTING_TO_AGENT(4317, "FailedDisplaySettingToAgent", "Failed Used Display Setting to Agent"),
-    FAIL_UPDATE_ADMIN_SETTING_WEATHER_IMG(4318, "FailedUpdateAdminSettingWeatherImage", "Failed Update AdminSetting Weather Image"),
-    FAIL_UPDATE_ADMIN_SETTING_AIR_IMG(4318, "FailedUpdateAdminSettingAirImage", "Failed Update AdminSetting Air Image"),
+    FAIL_DISPLAY_SETTING_TO_AGENT(4318, "FailedDisplaySettingToAgent", "Failed Used Display Setting to Agent"),
+    FAIL_UPDATE_ADMIN_SETTING_WEATHER_IMG(4319, "FailedUpdateAdminSettingWeatherImage", "Failed Update AdminSetting Weather Image"),
+    FAIL_UPDATE_ADMIN_SETTING_AIR_IMG(4320, "FailedUpdateAdminSettingAirImage", "Failed Update AdminSetting Air Image"),
 
-    FAIL_UNSUPPORTED_TYPE_SETTING(4300, "FailedUnsupportedTypeSetting", "Failed Unsupported Type Setting"),
+    FAIL_GET_EXTERNALS_DATA(4321, "FailedGetExternalsData", "Failed Get Externals Data"),
+    FAIL_UNSUPPORTED_TYPE_SETTING(4322, "FailedUnsupportedTypeSetting", "Failed Unsupported Type Setting"),
 
     // Externals : 4400
     FAIL_INSERT_EXTERNALS_AIR(4401, "FailedInsertExternalsAir", "Failed Insert Externals Air"),

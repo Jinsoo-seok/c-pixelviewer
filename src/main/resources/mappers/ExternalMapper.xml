@@ -69,11 +69,11 @@
 
         INSERT INTO External_Info (screen_id, preset_id, layer_id, object_id, type
         , pos_x, pos_y, width, height, ord
-        , forecolor, font_nm, font_size, font_color, font_fl
+        , fore_color, font_nm, font_size, font_color, font_fl
         , border_size, border_color, back_color, update_date)
         VALUES (#{screenId}, #{presetId}, #{layerId}, LAST_INSERT_ID(), #{type}
         , #{posX}, #{posY}, #{width}, #{height}, #{ord}
-        , #{forecolor}, #{fontNm}, #{fontSize}, #{fontColor}, #{fontFl}
+        , #{foreColor}, #{fontNm}, #{fontSize}, #{fontColor}, #{fontFl}
         , #{borderSize}, #{borderColor}, #{backColor}, NOW());
     </insert>
     <update id="putExternalInfo" parameterType="Map">
@@ -90,7 +90,7 @@
             width = #{width},
             height = #{height},
             ord = #{ord},
-            forecolor = #{forecolor},
+            fore_color = #{foreColor},
             font_nm = #{fontNm},
             font_fl = #{fontFl},
             font_size = #{fontSize},

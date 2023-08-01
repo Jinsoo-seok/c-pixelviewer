@@ -19,6 +19,7 @@ import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -341,6 +342,7 @@ public class ViewerServiceImpl implements ViewerService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> postPreviewImgUpload(String type, String name, MultipartFile file) {
         Map<String, Object> resultMap = new HashMap<>();
         
@@ -507,7 +509,7 @@ public class ViewerServiceImpl implements ViewerService {
         tempStyleMap.put("fontColor", dataMap.get("fontColor"));
         tempStyleMap.put("borderSize", dataMap.get("borderSize"));
         tempStyleMap.put("borderColor", dataMap.get("borderColor"));
-        tempStyleMap.put("forecolor", dataMap.get("forecolor"));
+        tempStyleMap.put("forecolor", dataMap.get("foreColor"));
 
         tempPositionMap.put("posX", dataMap.get("posX"));
         tempPositionMap.put("posY", dataMap.get("posY"));
@@ -535,7 +537,7 @@ public class ViewerServiceImpl implements ViewerService {
                 return "weatherSunny";
             }
             else {
-                System.out.println("[WARN] skyStatus = " + skyStatus);
+                log.info("[WARN] skyStatus = " + skyStatus);
                 return "weatherSunny";
             }
         }
@@ -552,7 +554,7 @@ public class ViewerServiceImpl implements ViewerService {
             return "weatherShower";
         }
         else{
-            System.out.println("[WARN] rainStatus = " + rainStatus);
+            log.info("[WARN] rainStatus = " + rainStatus);
             return "weatherRain";
         }
     }
@@ -572,7 +574,7 @@ public class ViewerServiceImpl implements ViewerService {
             return "veryBad";
         }
         else{
-            System.out.println("[WARN] pm10Grade = " + pm10Grade);
+            log.info("[WARN] pm10Grade = " + pm10Grade);
             return "good";
         }
     }

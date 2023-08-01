@@ -40,7 +40,7 @@
     <select id="getLayerObjectExternalInfo" resultType="Map">
         SELECT type AS type, object_id AS objectId, ex_info_id AS exInfoId
              , pos_x AS posX, pos_y AS posY, width AS width, height AS height, ord AS ord, image_path AS imagePath
-             , forecolor AS forecolor
+             , fore_color AS foreColor
              , font_nm AS fontNm, font_size AS fontSize, font_fl  AS fontFl, font_color AS fontColor
              , border_size AS borderSize, border_color AS borderColor, back_color AS backColor
              , update_date AS updateDate

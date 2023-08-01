@@ -33,10 +33,8 @@ public class LedController {
         long startTime = System.currentTimeMillis();
         String apiInfo = "[" + request.getRequestURI() + "] [" + request.getMethod() + "]";
         log.info("{} [START] [{}]", apiInfo, startTime);
+        Map<String, Object> responseMap = ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName());
 
-        Map<String, Object> responseMap = new HashMap<>();
-
-        responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
 
         String[] keyList = {"brightness"};
 
@@ -71,10 +69,8 @@ public class LedController {
         long startTime = System.currentTimeMillis();
         String apiInfo = "[" + request.getRequestURI() + "] [" + request.getMethod() + "]";
         log.info("{} [START] [{}]", apiInfo, startTime);
+        Map<String, Object> responseMap = ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName());
 
-        Map<String, Object> responseMap = new HashMap<>();
-
-        responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
 
         String[] keyList = {"inputSource"};
 
@@ -110,10 +106,8 @@ public class LedController {
         long startTime = System.currentTimeMillis();
         String apiInfo = "[" + request.getRequestURI() + "] [" + request.getMethod() + "]";
         log.info("{} [START] [{}]", apiInfo, startTime);
+        Map<String, Object> responseMap = ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName());
 
-        Map<String, Object> responseMap = new HashMap<>();
-
-        responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
 
         String[] keyList = {"presetNumber"};
 
@@ -133,10 +127,7 @@ public class LedController {
             responseMap.put("exceptionMessage", exception.getMessage());
         }
 
-        long endTime = System.currentTimeMillis();
-        long procTime = endTime - startTime;
-        log.info("{} [END] [{}] - {}", apiInfo, procTime, responseMap.get("code"));
-
+        log.info("{} [END] [{}] - {}", apiInfo, (System.currentTimeMillis()-startTime), responseMap.get("code"));
         return responseMap;
     }
 
@@ -148,10 +139,8 @@ public class LedController {
         long startTime = System.currentTimeMillis();
         String apiInfo = "[" + request.getRequestURI() + "] [" + request.getMethod() + "]";
         log.info("{} [START] [{}]", apiInfo, startTime);
+        Map<String, Object> responseMap = ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName());
 
-        Map<String, Object> responseMap = new HashMap<>();
-
-        responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
 
         try {
             responseMap = ledService.getLedStatus();
@@ -161,10 +150,7 @@ public class LedController {
             responseMap.put("exceptionMessage", exception.getMessage());
         }
 
-        long endTime = System.currentTimeMillis();
-        long procTime = endTime - startTime;
-        log.info("{} [END] [{}] - {}", apiInfo, procTime, responseMap.get("code"));
-
+        log.info("{} [END] [{}] - {}", apiInfo, (System.currentTimeMillis()-startTime), responseMap.get("code"));
         return responseMap;
     }
 
@@ -176,10 +162,8 @@ public class LedController {
         long startTime = System.currentTimeMillis();
         String apiInfo = "[" + request.getRequestURI() + "] [" + request.getMethod() + "]";
         log.info("{} [START] [{}]", apiInfo, startTime);
+        Map<String, Object> responseMap = ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName());
 
-        Map<String, Object> responseMap = new HashMap<>();
-
-        responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
 
         try {
             responseMap = ledService.getLedPreset();
@@ -189,10 +173,7 @@ public class LedController {
             responseMap.put("exceptionMessage", exception.getMessage());
         }
 
-        long endTime = System.currentTimeMillis();
-        long procTime = endTime - startTime;
-        log.info("{} [END] [{}] - {}", apiInfo, procTime, responseMap.get("code"));
-
+        log.info("{} [END] [{}] - {}", apiInfo, (System.currentTimeMillis()-startTime), responseMap.get("code"));
         return responseMap;
     }
 
@@ -204,10 +185,8 @@ public class LedController {
         long startTime = System.currentTimeMillis();
         String apiInfo = "[" + request.getRequestURI() + "] [" + request.getMethod() + "]";
         log.info("{} [START] [{}]", apiInfo, startTime);
+        Map<String, Object> responseMap = ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName());
 
-        Map<String, Object> responseMap = new HashMap<>();
-
-        responseMap.putAll(ParameterUtils.responseOption(ResponseCode.FAIL.getCodeName()));
 
         String[] keyList = {"presetNumber", "presetName"};
 
@@ -229,10 +208,7 @@ public class LedController {
             responseMap.put("exceptionMessage", exception.getMessage());
         }
 
-        long endTime = System.currentTimeMillis();
-        long procTime = endTime - startTime;
-        log.info("{} [END] [{}] - {}", apiInfo, procTime, responseMap.get("code"));
-
+        log.info("{} [END] [{}] - {}", apiInfo, (System.currentTimeMillis()-startTime), responseMap.get("code"));
         return responseMap;
     }
 }

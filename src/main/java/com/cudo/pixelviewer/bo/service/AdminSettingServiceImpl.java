@@ -1,15 +1,22 @@
 package com.cudo.pixelviewer.bo.service;
 
 import com.cudo.pixelviewer.bo.mapper.AdminSettingMapper;
+import com.cudo.pixelviewer.externals.service.ExternalsService;
 import com.cudo.pixelviewer.operate.mapper.LedMapper;
 import com.cudo.pixelviewer.util.ParameterUtils;
 import com.cudo.pixelviewer.util.ResponseCode;
 import com.cudo.pixelviewer.vo.DisplaySettingVo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -20,6 +27,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -28,11 +36,26 @@ import java.util.regex.Pattern;
 @RequiredArgsConstructor
 public class AdminSettingServiceImpl implements AdminSettingService {
 
+    final ExternalsService externalsService;
+
     final AdminSettingMapper adminSettingMapper;
 
     final LedMapper ledMapper;
 
     final static String PRESET_NAME_PREFIX = "프리셋";
+
+    @Value("${values.apis.service.key}")
+    private String SERVICE_KEY;
+
+    @Value("${values.apis.service.type.lower}")
+    private String LOWER_TYPE;
+
+    @Value("${values.apis.url.addr-xy}")
+    private String ADDR_XY_URL;
+
+    @Value("${values.apis.url.xy-name}")
+    private String XY_NAME_URL;
+
 
     @Override
     public Map<String, Object> getAdminSettingList() {
@@ -82,6 +105,23 @@ public class AdminSettingServiceImpl implements AdminSettingService {
 
         List<Map<String, Object>> tempArray = new ArrayList<>();
 
+        Boolean addrUpdateYn = false;
+        List<Map<String, Object>> adminSettingVoList = adminSettingMapper.getAdminSettingList();
+
+        String externalinfoAreaParam = (String) param.get("externalinfoArea");
+        for (Map<String, Object> element : adminSettingVoList) {
+            String settingKey = (String) element.get("settingKey");
+
+            if (settingKey.equals("externalinfoArea")) {
+                String settingValue = (String) element.get("settingValue");
+
+                if (!externalinfoAreaParam.equals(settingValue)) {
+                    addrUpdateYn = true;
+                    break;
+                }
+            }
+        }
+
         param.put("coords", param.get("nx") + "," + param.get("ny"));
         String[] removeKey = {"nx", "ny"};
         for (String key : removeKey) {
@@ -105,16 +145,20 @@ public class AdminSettingServiceImpl implements AdminSettingService {
                 queryMap.put("settingValue", value);
             }
             else {
-                System.out.println(key + " is of an unknown type: " + value);
+                log.info(key + " is of an unknown type: " + value);
             }
             tempArray.add(queryMap);
         }
-        if(param.containsKey("externalinfoArea")){
+        if(addrUpdateYn){
             Map<String, Object> queryMap = new HashMap<>();
+            String stationName = getAirStationName(extractDistrict((String) param.get("externalinfoArea")));
             queryMap.put("settingKey", "stationName");
-            queryMap.put("settingValue", getAirStationName(extractDistrict((String) param.get("externalinfoArea"))));
+            queryMap.put("settingValue", stationName);
 
             tempArray.add(queryMap);
+
+            CompletableFuture<Void> externalAirFuture = CompletableFuture.runAsync(() -> externalsService.getExternalAir(stationName));
+            CompletableFuture<Void> externalWeatherFuture = CompletableFuture.runAsync(() -> externalsService.getExternalWeather((String) param.get("coords")));
         }
 
         if(param.containsKey("ledPresetCount")) {
@@ -129,8 +173,8 @@ public class AdminSettingServiceImpl implements AdminSettingService {
                     presetInfo.put("presetName", PRESET_NAME_PREFIX + (i + 1));
                     presetList.add(presetInfo);
                 }
-                Integer deletePresetCount = ledMapper.deleteLedPreset();
-                Integer insertPresetCount = ledMapper.postLedPreset(presetList);
+                ledMapper.deleteLedPreset();
+                ledMapper.postLedPreset(presetList);
             }
         }
 
@@ -189,13 +233,12 @@ public class AdminSettingServiceImpl implements AdminSettingService {
 
         if (patchLayerTopMostResult == 1) {
             resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
-
-        } else {
+        }
+        else {
             ResponseCode failCode = ResponseCode.FAIL_INSERT_DISPLAY_SETTING;
             resultMap.put("code", failCode.getCode());
             resultMap.put("message", failCode.getMessage());
         }
-
         return resultMap;
     }
 
@@ -211,8 +254,8 @@ public class AdminSettingServiceImpl implements AdminSettingService {
 
             if (patchLayerTopMostResult == 1) {
                 resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
-
-            } else {
+            }
+            else {
                 ResponseCode failCode = ResponseCode.FAIL_UPDATE_DISPLAY_SETTING;
                 resultMap.put("code", failCode.getCode());
                 resultMap.put("message", failCode.getMessage());
@@ -241,8 +284,8 @@ public class AdminSettingServiceImpl implements AdminSettingService {
 
                 if (patchLayerTopMostResult == 1) {
                     resultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
-
-                } else {
+                }
+                else {
                     ResponseCode failCode = ResponseCode.FAIL_DELETE_DISPLAY_SETTING;
                     resultMap.put("code", failCode.getCode());
                     resultMap.put("message", failCode.getMessage());
@@ -266,9 +309,11 @@ public class AdminSettingServiceImpl implements AdminSettingService {
     public String getAirStationName(String externalinfoArea){
 
         URI urlAddrToXY = urlAddrToXY(externalinfoArea);
+        log.info("urlAddrToXY = {}", urlAddrToXY);
         Map<String, Object> webClientResponseFirst = restTemplateFunction("addrToXY", urlAddrToXY);
 
         URI urlXYToStationName = urlXYToStationName((String) webClientResponseFirst.get("tmX"), (String) webClientResponseFirst.get("tmY"));
+        log.info("urlXYToStationName = {}", urlXYToStationName);
         Map<String, Object> webClientResponseSecond = restTemplateFunction("XYToStationName", urlXYToStationName);
 
         return (String) webClientResponseSecond.get("stationName");
@@ -277,17 +322,52 @@ public class AdminSettingServiceImpl implements AdminSettingService {
     public Map<String, Object> restTemplateFunction(String type, URI uri){
         Map<String, Object> responseMap = new HashMap<>();
         Map<String, Object> returnMap = new HashMap<>();
+
+        // 타임아웃 값 설정 (단위: 밀리초)
+        int maxRetryAttempts = 5;
+        int connectTimeout = 300;
+        int readTimeout = 1000;
+
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set("Accept", "*/*;q=0.9"); // HTTP_ERROR 방지
         HttpEntity<String> httpRequest = new HttpEntity<>(null, headers);
 
-        RestTemplate restTemplate = new RestTemplate();
+        HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
+        RequestConfig config = RequestConfig.custom()
+                .setConnectTimeout(connectTimeout)
+                .setSocketTimeout(readTimeout)
+                .build();
+        factory.setHttpClient(HttpClientBuilder.create().setDefaultRequestConfig(config).build());
+
+
+        RestTemplate restTemplate = new RestTemplate(factory);
 
         HttpStatus httpStatus = null;
         ResponseEntity<Map> httpResponse = null;
 
-        httpResponse = restTemplate.exchange(uri, HttpMethod.GET, httpRequest, Map.class);
+        int retryAttempts = 0;
+
+        while (retryAttempts < maxRetryAttempts) {
+            try {
+                log.info("retryAttempts = {}", retryAttempts);
+                httpResponse = restTemplate.exchange(uri, HttpMethod.GET, httpRequest, Map.class);
+                if (httpResponse.getStatusCode().is2xxSuccessful()) {
+                    break;
+                } else {
+                    break;
+                }
+            } catch (HttpServerErrorException | ResourceAccessException e) {
+                retryAttempts++;
+            }
+            if(retryAttempts == maxRetryAttempts){
+                try {
+                    throw new Exception("[FAIL] GET Externals Data");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
         responseMap = (Map<String, Object>) httpResponse.getBody().get("response");
         Map<String, Object> tempMap = (Map<String, Object>) responseMap.get("body");
         List<Map<String, Object>> itemsList = (List<Map<String, Object>>) tempMap.get("items");
@@ -303,73 +383,50 @@ public class AdminSettingServiceImpl implements AdminSettingService {
     }
 
     public static String extractDistrict(String address) {
-        Pattern pattern = Pattern.compile("(.*?[구동])");
-        Matcher matcher = pattern.matcher(address);
-        String district = null;
-
-        if (matcher.find()) {
-            district = matcher.group(1);
-        }
-        else{
-            String[] addressSplit = address.split(" ");
-            if (addressSplit.length >= 3) {
-                district = addressSplit[0] + " " + addressSplit[1] + addressSplit[2].substring(2);
-            }
-        }
-        return convertToFullRegionName(district);
+        String[] addressSplit = address.split(" ");
+        return convertToFullRegionName(addressSplit[0]) + " " + addressSplit[1];
     }
 
     private static String convertToFullRegionName(String district) {
-        String[] districtSplit = district.split(" ");
-        String tempRegionName = districtSplit[0];
+        if (district.equals("서울"))
+            return "서울특별시";
+        else if (district.equals("부산"))
+            return "부산광역시";
+        else if (district.equals("대구"))
+            return "대구광역시";
+        else if (district.equals("인천"))
+            return "인천광역시";
+        else if (district.equals("광주"))
+            return "광주광역시";
+        else if (district.equals("대전"))
+            return "대전광역시";
+        else if (district.equals("울산"))
+            return "울산광역시";
+        else if (district.equals("세종"))
+            return "세종특별자치시";
+        else if (district.equals("경기"))
+            return "경기도";
+        else if (district.equals("강원"))
+            return "강원도";
+        else if (district.equals("충북"))
+            return "충청북도";
+        else if (district.equals("충남"))
+            return "충청남도";
+        else if (district.equals("전북"))
+            return "전라북도";
+        else if (district.equals("전남"))
+            return "전라남도";
+        else if (district.equals("경북"))
+            return "경상북도";
+        else if (district.equals("경남"))
+            return "경상남도";
+        else if (district.equals("제주"))
+            return "제주특별자치도";
 
-        if (tempRegionName.equals("서울"))
-            tempRegionName = "서울특별시";
-        else if (tempRegionName.equals("부산"))
-            tempRegionName = "부산광역시";
-        else if (tempRegionName.equals("대구"))
-            tempRegionName = "대구광역시";
-        else if (tempRegionName.equals("인천"))
-            tempRegionName = "인천광역시";
-        else if (tempRegionName.equals("광주"))
-            tempRegionName = "광주광역시";
-        else if (tempRegionName.equals("대전"))
-            tempRegionName = "대전광역시";
-        else if (tempRegionName.equals("울산"))
-            tempRegionName = "울산광역시";
-        else if (tempRegionName.equals("세종"))
-            tempRegionName = "세종특별자치시";
-        else if (tempRegionName.equals("경기"))
-            tempRegionName = "경기도";
-        else if (tempRegionName.equals("강원"))
-            tempRegionName = "강원도";
-        else if (tempRegionName.equals("충북"))
-            tempRegionName = "충청북도";
-        else if (tempRegionName.equals("충남"))
-            tempRegionName = "충청남도";
-        else if (tempRegionName.equals("전북"))
-            tempRegionName = "전라북도";
-        else if (tempRegionName.equals("전남"))
-            tempRegionName = "전라남도";
-        else if (tempRegionName.equals("경북"))
-            tempRegionName = "경상북도";
-        else if (tempRegionName.equals("경남"))
-            tempRegionName = "경상남도";
-        else if (tempRegionName.equals("제주"))
-            tempRegionName = "제주특별자치도";
-
-        if (districtSplit.length > 1) {
-            for (int i = 1; i < districtSplit.length; i++) {
-                tempRegionName += " " + districtSplit[i];
-            }
-        }
-        return tempRegionName;
+        return district;
     }
 
     public URI urlAddrToXY(String umdName){
-        String apisDataUrl = "http://apis.data.go.kr/B552584/MsrstnInfoInqireSvc/getTMStdrCrdnt";
-        String serviceKey = "NA%2B2mZ6YHlKo2jNmEfOmsmrL2HY0ulBt9v3GUhfHtIV40HGjglABV1Zq1qCcjGJar4c1RAjcTuVI%2Blnx%2FTmkSw%3D%3D";
-        String returnType = "json";
         String numOfRows = "1";
         String pageNo = "1";
 
@@ -380,9 +437,9 @@ public class AdminSettingServiceImpl implements AdminSettingService {
             e.printStackTrace();
         }
 
-        return UriComponentsBuilder.fromHttpUrl(apisDataUrl)
-                .queryParam("ServiceKey", serviceKey)
-                .queryParam("returnType", returnType)
+        return UriComponentsBuilder.fromHttpUrl(ADDR_XY_URL)
+                .queryParam("ServiceKey", SERVICE_KEY)
+                .queryParam("returnType", LOWER_TYPE)
                 .queryParam("numOfRows", numOfRows)
                 .queryParam("pageNo", pageNo)
                 .queryParam("umdName", encodedUmdName)
@@ -391,14 +448,11 @@ public class AdminSettingServiceImpl implements AdminSettingService {
     }
 
     public URI urlXYToStationName(String tmX, String tmY){
-        String apisDataUrl = "http://apis.data.go.kr/B552584/MsrstnInfoInqireSvc/getNearbyMsrstnList";
-        String serviceKey = "NA%2B2mZ6YHlKo2jNmEfOmsmrL2HY0ulBt9v3GUhfHtIV40HGjglABV1Zq1qCcjGJar4c1RAjcTuVI%2Blnx%2FTmkSw%3D%3D";
-        String returnType = "json";
         String ver = "1.1";
 
-        return UriComponentsBuilder.fromHttpUrl(apisDataUrl)
-                .queryParam("serviceKey", serviceKey)
-                .queryParam("returnType", returnType)
+        return UriComponentsBuilder.fromHttpUrl(XY_NAME_URL)
+                .queryParam("serviceKey", SERVICE_KEY)
+                .queryParam("returnType", LOWER_TYPE)
                 .queryParam("tmX", tmX)
                 .queryParam("tmY", tmY)
                 .queryParam("ver", ver)
