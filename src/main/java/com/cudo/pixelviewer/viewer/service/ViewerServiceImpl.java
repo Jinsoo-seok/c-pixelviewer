@@ -19,6 +19,7 @@ import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -341,6 +342,7 @@ public class ViewerServiceImpl implements ViewerService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> postPreviewImgUpload(String type, String name, MultipartFile file) {
         Map<String, Object> resultMap = new HashMap<>();
         

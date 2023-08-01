@@ -383,67 +383,47 @@ public class AdminSettingServiceImpl implements AdminSettingService {
     }
 
     public static String extractDistrict(String address) {
-        Pattern pattern = Pattern.compile("(.*?[구동])");
-        Matcher matcher = pattern.matcher(address);
-        String district = null;
-
-        if (matcher.find()) {
-            district = matcher.group(1);
-        }
-        else{
-            String[] addressSplit = address.split(" ");
-            if (addressSplit.length >= 3) {
-                district = addressSplit[0] + " " + addressSplit[1] + addressSplit[2].substring(2);
-            }
-        }
-        return convertToFullRegionName(district);
+        String[] addressSplit = address.split(" ");
+        return convertToFullRegionName(addressSplit[0]) + " " + addressSplit[1];
     }
 
     private static String convertToFullRegionName(String district) {
-        String[] districtSplit = district.split(" ");
-        String tempRegionName = districtSplit[0];
+        if (district.equals("서울"))
+            return "서울특별시";
+        else if (district.equals("부산"))
+            return "부산광역시";
+        else if (district.equals("대구"))
+            return "대구광역시";
+        else if (district.equals("인천"))
+            return "인천광역시";
+        else if (district.equals("광주"))
+            return "광주광역시";
+        else if (district.equals("대전"))
+            return "대전광역시";
+        else if (district.equals("울산"))
+            return "울산광역시";
+        else if (district.equals("세종"))
+            return "세종특별자치시";
+        else if (district.equals("경기"))
+            return "경기도";
+        else if (district.equals("강원"))
+            return "강원도";
+        else if (district.equals("충북"))
+            return "충청북도";
+        else if (district.equals("충남"))
+            return "충청남도";
+        else if (district.equals("전북"))
+            return "전라북도";
+        else if (district.equals("전남"))
+            return "전라남도";
+        else if (district.equals("경북"))
+            return "경상북도";
+        else if (district.equals("경남"))
+            return "경상남도";
+        else if (district.equals("제주"))
+            return "제주특별자치도";
 
-        if (tempRegionName.equals("서울"))
-            tempRegionName = "서울특별시";
-        else if (tempRegionName.equals("부산"))
-            tempRegionName = "부산광역시";
-        else if (tempRegionName.equals("대구"))
-            tempRegionName = "대구광역시";
-        else if (tempRegionName.equals("인천"))
-            tempRegionName = "인천광역시";
-        else if (tempRegionName.equals("광주"))
-            tempRegionName = "광주광역시";
-        else if (tempRegionName.equals("대전"))
-            tempRegionName = "대전광역시";
-        else if (tempRegionName.equals("울산"))
-            tempRegionName = "울산광역시";
-        else if (tempRegionName.equals("세종"))
-            tempRegionName = "세종특별자치시";
-        else if (tempRegionName.equals("경기"))
-            tempRegionName = "경기도";
-        else if (tempRegionName.equals("강원"))
-            tempRegionName = "강원도";
-        else if (tempRegionName.equals("충북"))
-            tempRegionName = "충청북도";
-        else if (tempRegionName.equals("충남"))
-            tempRegionName = "충청남도";
-        else if (tempRegionName.equals("전북"))
-            tempRegionName = "전라북도";
-        else if (tempRegionName.equals("전남"))
-            tempRegionName = "전라남도";
-        else if (tempRegionName.equals("경북"))
-            tempRegionName = "경상북도";
-        else if (tempRegionName.equals("경남"))
-            tempRegionName = "경상남도";
-        else if (tempRegionName.equals("제주"))
-            tempRegionName = "제주특별자치도";
-
-        if (districtSplit.length > 1) {
-            for (int i = 1; i < districtSplit.length; i++) {
-                tempRegionName += " " + districtSplit[i];
-            }
-        }
-        return tempRegionName;
+        return district;
     }
 
     public URI urlAddrToXY(String umdName){
