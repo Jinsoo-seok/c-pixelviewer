@@ -1,5 +1,6 @@
 package com.cudo.pixelviewer.component.scheduler;
 
+import com.cudo.pixelviewer.component.DeviceControllerClient;
 import com.cudo.pixelviewer.component.LedControllerClient;
 import com.cudo.pixelviewer.operate.mapper.PresetMapper;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,8 @@ import static com.cudo.pixelviewer.util.TcpClientUtil.getLightByte;
 public class ScheduleJob implements Job {
     final LedControllerClient ledControllerClient;
 
+    final DeviceControllerClient deviceControllerClient;
+
     final PresetMapper presetMapper;
 
     final SchedulerFactoryBean schedulerFactoryBean;
@@ -39,11 +42,11 @@ public class ScheduleJob implements Job {
 
             if (POWER_ON.getValue().equals(type)) { // 전원 ON
                 byte[] powerOnMessage = {0x02, (byte) 0xFF, (byte) 0xB1, 0x00, 0x01, 0x01, (byte) 0x4E, 0x03};
-                ledControllerClient.sendMessage(powerOnMessage);
+                deviceControllerClient.sendMessage(powerOnMessage);
 
             } else if (POWER_OFF.getValue().equals(type)) { // 전원 OFF
                 byte[] powerOffMessage = {0x02, (byte) 0xFF, (byte) 0xB1, 0x00, 0x01, 0x00, (byte) 0x4F, 0x03};
-                ledControllerClient.sendMessage(powerOffMessage);
+                deviceControllerClient.sendMessage(powerOffMessage);
 
 
             } else if (LIGHT.getValue().equals(type)) { // 밝기 조절
