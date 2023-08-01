@@ -141,7 +141,7 @@
     <update id="patchPresetStatusRunClear">
         UPDATE Presets
         SET preset_status = "none", update_date = NOW()
-        WHERE P.preset_status IN ('play', 'pause', 'stop');
+        WHERE preset_status IN ('play', 'pause', 'stop');
     </update>
 
 
