@@ -176,8 +176,12 @@ public class ScheduleServiceImpl implements ScheduleService {
                     .build();
 
             // 스케줄 등록
-            schedulerManager.setJob(ledPlayScheduleVo, LED_PLAY_LIST_START.getValue(), false);
-            schedulerManager.setJob(ledPlayScheduleVo, LED_PLAY_LIST_END.getValue(), false);
+            try {
+                schedulerManager.setJob(ledPlayScheduleVo, LED_PLAY_LIST_START.getValue(), false);
+                schedulerManager.setJob(ledPlayScheduleVo, LED_PLAY_LIST_END.getValue(), false);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
 
             responseMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
         } else {
@@ -208,8 +212,12 @@ public class ScheduleServiceImpl implements ScheduleService {
                     .build();
 
             // 스케줄 수정
-            schedulerManager.setJob(ledPlayScheduleVo, LED_PLAY_LIST_START.getValue(), true);
-            schedulerManager.setJob(ledPlayScheduleVo, LED_PLAY_LIST_END.getValue(), true);
+            try {
+                schedulerManager.setJob(ledPlayScheduleVo, LED_PLAY_LIST_START.getValue(), true);
+                schedulerManager.setJob(ledPlayScheduleVo, LED_PLAY_LIST_END.getValue(), true);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
 
             responseMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
         } else {
@@ -259,8 +267,12 @@ public class ScheduleServiceImpl implements ScheduleService {
 
         if (insertCount > 0) {
             // 스케줄 등록
-            schedulerManager.setJob(powerSchedule, POWER_ON.getValue(), false);
-            schedulerManager.setJob(powerSchedule, POWER_OFF.getValue(), false);
+            try {
+                schedulerManager.setJob(powerSchedule, POWER_ON.getValue(), false);
+                schedulerManager.setJob(powerSchedule, POWER_OFF.getValue(), false);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
 
             responseMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
         } else {
@@ -289,8 +301,12 @@ public class ScheduleServiceImpl implements ScheduleService {
                     .build();
 
             // 스케줄 수정
-            schedulerManager.setJob(powerSchedule, POWER_ON.getValue(), true);
-            schedulerManager.setJob(powerSchedule, POWER_OFF.getValue(), true);
+            try {
+                schedulerManager.setJob(powerSchedule, POWER_ON.getValue(), true);
+                schedulerManager.setJob(powerSchedule, POWER_OFF.getValue(), true);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
 
             responseMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
         } else {
@@ -378,7 +394,11 @@ public class ScheduleServiceImpl implements ScheduleService {
                 }
 
                 // 스케줄 등록
-                schedulerManager.setJob(lightScheduleList, LIGHT.getValue(), false);
+                try {
+                    schedulerManager.setJob(lightScheduleList, LIGHT.getValue(), false);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
 
                 responseMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
             } else {
@@ -502,7 +522,11 @@ public class ScheduleServiceImpl implements ScheduleService {
                     || (insertLightList.size() > 0 && insertResultList > 0) || (updateLightList.size() > 0 && updateResultList > 0)) {
 
                 // 스케줄 등록
-                schedulerManager.setJob(lightScheduleList, LIGHT.getValue(), true);
+                try {
+                    schedulerManager.setJob(lightScheduleList, LIGHT.getValue(), true);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
 
                 responseMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
             }
