@@ -350,10 +350,12 @@ public class SchedulerManager {
         Map<String, Object> returnMap = new HashMap<>();
         List<Map<String, Object>> layerInfoList = new ArrayList<>();
 
-        PresetVo presetVo = presetMapper.getPreset((String) presetId);
+        String strPresetId = Long.toString((Long) presetId);
 
-        List<LayerVo> layerVoList = presetMapper.getPresetLayers((String) presetId);
-        List<PlaylistVo> playlistVoList = playlistMapper.getPlayListByPresetId((String) presetId);
+        PresetVo presetVo = presetMapper.getPreset(strPresetId);
+
+        List<LayerVo> layerVoList = presetMapper.getPresetLayers(strPresetId);
+        List<PlaylistVo> playlistVoList = playlistMapper.getPlayListByPresetId(strPresetId);
 
         Map<Integer, Integer> playListIdMap = playlistVoList.stream()
                 .collect(Collectors.toMap(
