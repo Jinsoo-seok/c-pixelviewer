@@ -179,4 +179,10 @@
         SET playtime = #{playtime}
         WHERE content_id = #{contentId}
     </update>
+
+    <select id="getPlayListByPresetId" resultType="com.cudo.pixelviewer.vo.PlaylistVo">
+        SELECT playlist_id, layer_id, preset_id
+        FROM Playlists
+        WHERE preset_id = #{presetId}
+    </select>
 </mapper>

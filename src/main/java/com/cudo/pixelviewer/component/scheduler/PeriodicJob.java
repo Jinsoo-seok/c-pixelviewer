@@ -23,6 +23,12 @@ public class PeriodicJob implements Job {
     final ScheduleMapper scheduleMapper;
     final Scheduler scheduler;
 
+    final static String PRESET_ID = "presetId";
+
+    final static String LAYER_ID = "layerId";
+
+    final static String PLAYLIST_ID = "playListId";
+
     @SneakyThrows
     @Override
     public void execute(JobExecutionContext context) throws JobExecutionException {
@@ -68,7 +74,7 @@ public class PeriodicJob implements Job {
                 if (powerOnTime.size() > 0) {
                     JobDataMap powerOnDataMap = new JobDataMap();
 
-                    powerOnDataMap.put(POWER_ON.getCode(), POWER_ON.getValue());
+                    powerOnDataMap.put(DATA_MAP_KEY.getCode(), POWER_ON.getValue());
                     setPowerSchedule(nowDate, powerInfo, powerOnTime, powerOnDataMap);
                 }
 
@@ -76,7 +82,7 @@ public class PeriodicJob implements Job {
                 if (powerOffTime.size() > 0) {
                     JobDataMap powerOffDataMap = new JobDataMap();
 
-                    powerOffDataMap.put(POWER_OFF.getCode(), POWER_OFF.getValue());
+                    powerOffDataMap.put(DATA_MAP_KEY.getCode(), POWER_OFF.getValue());
 
                     setPowerSchedule(nowDate, powerInfo, powerOffTime, powerOffDataMap);
                 }
@@ -126,7 +132,7 @@ public class PeriodicJob implements Job {
                 if (lightTime.size() > 0) {
                     JobDataMap lightDataMap = new JobDataMap();
 
-                    lightDataMap.put(LIGHT.getCode(), LIGHT.getValue());
+                    lightDataMap.put(DATA_MAP_KEY.getCode(), LIGHT.getValue());
                     lightDataMap.put(LIGHT.getValue(), Float.parseFloat(lightInfo.getBrightnessVal()) / 100);
 
                     setLightSchedule(nowDate, lightInfo, lightTime, lightDataMap);
@@ -147,19 +153,24 @@ public class PeriodicJob implements Job {
 
                 // 영상 시작 스케줄 등록
                 if (startTime.size() > 0) {
-                    JobDataMap powerOnDataMap = new JobDataMap();
+                    JobDataMap ledStartDataMap = new JobDataMap();
 
-                    powerOnDataMap.put(LED_PLAY_LIST_START.getCode(), LED_PLAY_LIST_START.getValue());
-                    setLedPlayListSchedule(nowDate, ledPlayScheduleInfo, startTime, powerOnDataMap);
+                    ledStartDataMap.put(DATA_MAP_KEY.getCode(), LED_PLAY_LIST_START.getValue());
+                    ledStartDataMap.put(PRESET_ID, ledPlayScheduleInfo.getPresetId());
+                    ledStartDataMap.put(LAYER_ID, ledPlayScheduleInfo.getLayerId());
+                    ledStartDataMap.put(PLAYLIST_ID, ledPlayScheduleInfo.getPlaylistId());
+
+                    setLedPlayListSchedule(nowDate, ledPlayScheduleInfo, startTime, ledStartDataMap);
                 }
 
                 // 영상 종료 스케줄 등록
                 if (endTime.size() > 0) {
-                    JobDataMap powerOffDataMap = new JobDataMap();
+                    JobDataMap ledEndDataMap = new JobDataMap();
 
-                    powerOffDataMap.put(LED_PLAY_LIST_END.getCode(), LED_PLAY_LIST_END.getValue());
+                    ledEndDataMap.put(DATA_MAP_KEY.getCode(), LED_PLAY_LIST_END.getValue());
+                    ledEndDataMap.put(PRESET_ID, ledPlayScheduleInfo.getPresetId());
 
-                    setLedPlayListSchedule(nowDate, ledPlayScheduleInfo, endTime, powerOffDataMap);
+                    setLedPlayListSchedule(nowDate, ledPlayScheduleInfo, endTime, ledEndDataMap);
                 }
             }
         }
@@ -170,23 +181,23 @@ public class PeriodicJob implements Job {
      * * Led 플레이리스트 스케줄 job, trigger 설정
      */
     private void setLedPlayListSchedule(String nowDate, LedPlayScheduleVo ledPlayInfo, List<String> ledPlayTime, JobDataMap LedPlayDataMap) throws SchedulerException {
-        LocalTime powerOnOffTime = LocalTime.of(Integer.parseInt(ledPlayTime.get(0)), Integer.parseInt(ledPlayTime.get(1)), Integer.parseInt(ledPlayTime.get(2)));
+        LocalTime playListTime = LocalTime.of(Integer.parseInt(ledPlayTime.get(0)), Integer.parseInt(ledPlayTime.get(1)), Integer.parseInt(ledPlayTime.get(2)));
         LocalTime nowTime = LocalTime.now();
 
-        if (powerOnOffTime.isAfter(nowTime)) {
-            JobDetail powerJob = JobBuilder.newJob(ScheduleJob.class)
+        if (playListTime.isAfter(nowTime)) {
+            JobDetail jobDetail = JobBuilder.newJob(ScheduleJob.class)
                     .withIdentity(String.valueOf(LedPlayDataMap.get(DATA_MAP_KEY.getCode())) + ledPlayInfo.getScheduleId())
                     .usingJobData(LedPlayDataMap)
                     .requestRecovery(true)
                     .build();
 
-            Trigger powerTrigger = TriggerBuilder.newTrigger()
+            Trigger trigger = TriggerBuilder.newTrigger()
                     .withIdentity(String.valueOf(LedPlayDataMap.get(DATA_MAP_KEY.getCode())) + ledPlayInfo.getScheduleId())
                     .withSchedule(CronScheduleBuilder
                             .cronSchedule(cronExpression(nowDate, ledPlayTime)))
                     .build();
 
-            scheduler.scheduleJob(powerJob, powerTrigger);
+            scheduler.scheduleJob(jobDetail, trigger);
 
             log.info("Led PlayList Schedule Register Id : {}", String.valueOf(LedPlayDataMap.get(DATA_MAP_KEY.getCode())) + ledPlayInfo.getScheduleId());
         } else {

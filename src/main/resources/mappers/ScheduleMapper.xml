@@ -201,7 +201,7 @@
     </select>
 
     <select id="selectLedPlayListSchedule" resultType="com.cudo.pixelviewer.vo.LedPlayScheduleVo">
-        SELECT schedule_id, preset_id, sch_start_date, sch_end_date, time_start, time_end, run_day_week
+        SELECT schedule_id, preset_id, sch_start_date, sch_end_date, time_start, time_end, run_day_week, layer_id, playlist_id
         FROM playlist_schedule
         WHERE #{nowDate} between sch_start_date AND sch_end_date
     </select>

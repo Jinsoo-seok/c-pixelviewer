@@ -1,9 +1,9 @@
 package com.cudo.pixelviewer.component.scheduler;
 
+import com.cudo.pixelviewer.operate.mapper.PlaylistMapper;
 import com.cudo.pixelviewer.operate.mapper.PresetMapper;
-import com.cudo.pixelviewer.vo.LedPlayScheduleVo;
-import com.cudo.pixelviewer.vo.LightScheduleVo;
-import com.cudo.pixelviewer.vo.PowerScheduleVo;
+import com.cudo.pixelviewer.operate.service.PresetService;
+import com.cudo.pixelviewer.vo.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.*;
@@ -17,6 +17,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.cudo.pixelviewer.component.scheduler.ScheduleCode.*;
 
@@ -32,11 +33,22 @@ public class SchedulerManager {
     }
 
     final SchedulerFactoryBean schedulerFactoryBean;
+
     final PresetMapper presetMapper;
+
+    final PlaylistMapper playlistMapper;
+
+    final PresetService presetService;
 
     final String DEFAULT = "DEFAULT";
 
     final Scheduler scheduler;
+
+    final static String PRESET_ID = "presetId";
+
+    final static String LAYER_ID = "layerId";
+
+    final static String PLAYLIST_ID = "playListId";
 
     /**
      * * 스케줄 삭제
@@ -57,7 +69,7 @@ public class SchedulerManager {
     /**
      * * 스케줄 생성/수정
      */
-    public void setJob(Object scheduleInfo, String type, boolean update) throws SchedulerException, ParseException {
+    public void setJob(Object scheduleInfo, String type, boolean update) throws SchedulerException, ParseException, InterruptedException {
         if (type.equals(POWER_ON.getValue()) || type.equals(POWER_OFF.getValue())) { // 전원 스케줄
 
             PowerScheduleVo powerSchedule = (PowerScheduleVo) scheduleInfo;
@@ -129,7 +141,9 @@ public class SchedulerManager {
                 if (!scheduleExistCheck) {
                     JobDataMap jobDataMap = new JobDataMap();
                     jobDataMap.put(DATA_MAP_KEY.getCode(), type);
-                    jobDataMap.put("presetId", ledPlayScheduleVo.getPresetId());
+                    jobDataMap.put(PRESET_ID, ledPlayScheduleVo.getPresetId());
+                    jobDataMap.put(LAYER_ID, ledPlayScheduleVo.getLayerId());
+                    jobDataMap.put(PLAYLIST_ID, ledPlayScheduleVo.getPlaylistId());
 
                     setSchedule(ledPlayScheduleVo.getScheduleId(), scheduleStartTime, jobDataMap);
                 }
@@ -138,15 +152,28 @@ public class SchedulerManager {
                     deleteJob(type + ledPlayScheduleVo.getScheduleId());
                 }
 
-                Map<String, Object> param = new HashMap<>();
+                PresetStatusRunVo usingPresetVo = presetMapper.getUsingPreset();
+                Map<String, Object> presetRunMap = new HashMap<>();
+                JobDataMap jobDataMap = new JobDataMap();
 
-                param.put("presetId", ledPlayScheduleVo.getPresetId());
-                param.put("controlType", "play");
+                jobDataMap.put(PRESET_ID, ledPlayScheduleVo.getPresetId());
+                jobDataMap.put(LAYER_ID, ledPlayScheduleVo.getLayerId());
+                jobDataMap.put(PLAYLIST_ID, ledPlayScheduleVo.getPlaylistId());
 
-                presetMapper.patchPresetStatusRunClear(); // 프리셋 start 상태 클리어
-                presetMapper.patchPresetStatusSet(param); // 프리셋 상태 값 업데이트
+                // 재생중인 프리셋 영상 재생
+                if (usingPresetVo.getPresetId().equals(Integer.parseInt(String.valueOf(ledPlayScheduleVo.getPresetId())))) {
+                    presetRunMap = setPresetRunMap("apply", jobDataMap.get(PRESET_ID), jobDataMap);
+
+                    System.out.println("재생중인 프리셋 영상 재생");
+                } else { // 재생 중이 아닌 프리셋 영상 재생
+                    presetRunMap = setPresetRunMap("play", jobDataMap.get(PRESET_ID), jobDataMap);
+
+                    System.out.println("재생 중이 아닌 프리셋 영상 재생");
+                }
+
+                presetService.patchPresetRun(presetRunMap);
+                presetMapper.patchPresetStatusSet(presetStatusMap(jobDataMap.get(PRESET_ID), "play"));
             }
-
 
         } else if (type.equals(LED_PLAY_LIST_END.getValue())) {  // LED 플레이 영상 종료 스케줄
             LedPlayScheduleVo ledPlayScheduleVo = (LedPlayScheduleVo) scheduleInfo;
@@ -169,16 +196,16 @@ public class SchedulerManager {
 
             boolean scheduleExistCheck = update && updateTrigger(scheduleId, scheduleEndTime, type);
 
-                if (!scheduleExistCheck) {
-                    JobDataMap jobDataMap = new JobDataMap();
-                    jobDataMap.put(DATA_MAP_KEY.getCode(), type);
+            if (!scheduleExistCheck) {
+                JobDataMap jobDataMap = new JobDataMap();
+                jobDataMap.put(DATA_MAP_KEY.getCode(), type);
 
-                    if (type.equals(LED_PLAY_LIST_END.getValue())) {
-                        jobDataMap.put("presetId", presetId);
-                    }
-
-                    setSchedule(scheduleId, scheduleEndTime, jobDataMap);
+                if (type.equals(LED_PLAY_LIST_END.getValue())) {
+                    jobDataMap.put(PRESET_ID, presetId);
                 }
+
+                setSchedule(scheduleId, scheduleEndTime, jobDataMap);
+            }
         }
     }
 
@@ -262,19 +289,19 @@ public class SchedulerManager {
      */
     private void setSchedule(Long scheduleId, List<String> scheduleTime, JobDataMap jobDataMap) throws SchedulerException {
 
-        JobDetail lightJob = JobBuilder.newJob(ScheduleJob.class)
+        JobDetail jobDetail = JobBuilder.newJob(ScheduleJob.class)
                 .withIdentity(jobDataMap.get(DATA_MAP_KEY.getCode()) + String.valueOf(scheduleId))
                 .usingJobData(jobDataMap)
                 .requestRecovery(true)
                 .build();
 
-        Trigger lightTrigger = TriggerBuilder.newTrigger()
+        Trigger trigger = TriggerBuilder.newTrigger()
                 .withIdentity(jobDataMap.get(DATA_MAP_KEY.getCode()) + String.valueOf(scheduleId))
                 .withSchedule(CronScheduleBuilder
                         .cronSchedule(cronExpression(scheduleTime)))
                 .build();
 
-        scheduler.scheduleJob(lightJob, lightTrigger);
+        scheduler.scheduleJob(jobDetail, trigger);
 
         log.info("{} Schedule Register Id : {}", jobDataMap.get(DATA_MAP_KEY.getCode()), jobDataMap.get(DATA_MAP_KEY.getCode()) + String.valueOf(scheduleId));
     }
@@ -317,6 +344,57 @@ public class SchedulerManager {
         }
 
         return cron;
+    }
+
+    public Map<String, Object> setPresetRunMap(String type, Object presetId, JobDataMap jobDataMap) {
+        Map<String, Object> returnMap = new HashMap<>();
+        List<Map<String, Object>> layerInfoList = new ArrayList<>();
+
+        PresetVo presetVo = presetMapper.getPreset((String) presetId);
+
+        List<LayerVo> layerVoList = presetMapper.getPresetLayers((String) presetId);
+        List<PlaylistVo> playlistVoList = playlistMapper.getPlayListByPresetId((String) presetId);
+
+        Map<Integer, Integer> playListIdMap = playlistVoList.stream()
+                .collect(Collectors.toMap(
+                        PlaylistVo::getLayerId, // layerId로 키 값
+                        PlaylistVo::getPlaylistId // playListId로 value
+                ));
+
+        for (LayerVo layerVo : layerVoList) {
+            Map<String, Object> resultLayerInfo = new HashMap<>();
+
+            Object layerId = layerVo.getLayerId();
+
+            resultLayerInfo.put("layerId", layerId);
+            resultLayerInfo.put("playlistId", playListIdMap.get(Integer.parseInt(String.valueOf(layerId))));
+
+            // layer id가 같고 playListId가 다르면 updateYn true
+            if (layerId.equals(Integer.parseInt(String.valueOf(jobDataMap.get(LAYER_ID))))
+                    && !playListIdMap.get(Integer.parseInt(String.valueOf(layerId))).equals(Integer.parseInt(String.valueOf(jobDataMap.get(PLAYLIST_ID))))) {
+                resultLayerInfo.put("updateYn", true);
+            } else {
+                resultLayerInfo.put("updateYn", false);
+            }
+
+            layerInfoList.add(resultLayerInfo);
+        }
+
+        returnMap.put("screenId", presetVo.getScreenId());
+        returnMap.put("presetId", presetId);
+        returnMap.put("layerInfoList", layerInfoList);
+
+        returnMap.put("controlType", type);
+
+        return returnMap;
+    }
+
+    public Map<String, Object> presetStatusMap(Object presetId, String targetStatus) {
+        Map<String, Object> queryMap = new HashMap<>();
+        queryMap.put("presetId", presetId);
+        queryMap.put("controlType", targetStatus);
+
+        return queryMap;
     }
 }
 

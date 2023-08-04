@@ -47,4 +47,5 @@ public interface PlaylistMapper {
 
     int setPlaylistSelectYn(Map<String, Object> param);
 
+    List<PlaylistVo> getPlayListByPresetId(String presetId);
 }

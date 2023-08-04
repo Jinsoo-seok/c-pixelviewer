@@ -17,4 +17,6 @@ public class LedPlayScheduleVo {
     String timeStart;
     String timeEnd;
     String runDayWeek;
+    Integer layerId;
+    Integer playlistId;
 }

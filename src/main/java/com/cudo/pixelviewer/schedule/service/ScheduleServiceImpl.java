@@ -171,6 +171,8 @@ public class ScheduleServiceImpl implements ScheduleService {
                     .timeEnd(String.valueOf(param.get("endTime")))
                     .runDayWeek((param.get("scheduleDay") == null || param.get("scheduleDay").equals(""))
                             ? null : String.valueOf(param.get("scheduleDay")))
+                    .layerId(Integer.parseInt(String.valueOf(param.get("layerId"))))
+                    .playlistId(Integer.parseInt(String.valueOf(param.get("playListId"))))
                     .build();
 
             // 스케줄 등록
@@ -201,6 +203,8 @@ public class ScheduleServiceImpl implements ScheduleService {
                     .timeEnd(String.valueOf(param.get("endTime")))
                     .runDayWeek((param.get("scheduleDay") == null || param.get("scheduleDay").equals(""))
                             ? null : String.valueOf(param.get("scheduleDay")))
+                    .layerId(Integer.parseInt(String.valueOf(param.get("layerId"))))
+                    .playlistId(Integer.parseInt(String.valueOf(param.get("playListId"))))
                     .build();
 
             // 스케줄 수정
