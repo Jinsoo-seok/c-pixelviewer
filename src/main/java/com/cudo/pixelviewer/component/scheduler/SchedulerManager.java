@@ -355,32 +355,26 @@ public class SchedulerManager {
         PresetVo presetVo = presetMapper.getPreset(strPresetId);
 
         List<LayerVo> layerVoList = presetMapper.getPresetLayers(strPresetId);
-        List<PlaylistVo> playlistVoList = playlistMapper.getPlayListByPresetId(strPresetId);
 
-        Map<Integer, Integer> playListIdMap = playlistVoList.stream()
-                .collect(Collectors.toMap(
-                        PlaylistVo::getLayerId, // layerId로 키 값
-                        PlaylistVo::getPlaylistId // playListId로 value
-                ));
+        Map<String, Object> resultLayerInfo = new HashMap<>();
 
-        for (LayerVo layerVo : layerVoList) {
-            Map<String, Object> resultLayerInfo = new HashMap<>();
+        if (type.equals("play")) {
+            for (LayerVo layerVo : layerVoList) {
+                if (layerVo.getLayerId() != Integer.parseInt(String.valueOf(jobDataMap.get(LAYER_ID)))) {
+                    resultLayerInfo.put("layerId", layerVo.getLayerId());
+                    resultLayerInfo.put("playlistId", 0);
+                    resultLayerInfo.put("updateYn", true);
+                }
 
-            Object layerId = layerVo.getLayerId();
-
-            resultLayerInfo.put("layerId", layerId);
-            resultLayerInfo.put("playlistId", playListIdMap.get(Integer.parseInt(String.valueOf(layerId))));
-
-            // layer id가 같고 playListId가 다르면 updateYn true
-            if (layerId.equals(Integer.parseInt(String.valueOf(jobDataMap.get(LAYER_ID))))
-                    && !playListIdMap.get(Integer.parseInt(String.valueOf(layerId))).equals(Integer.parseInt(String.valueOf(jobDataMap.get(PLAYLIST_ID))))) {
-                resultLayerInfo.put("updateYn", true);
-            } else {
-                resultLayerInfo.put("updateYn", false);
+                layerInfoList.add(resultLayerInfo);
             }
-
-            layerInfoList.add(resultLayerInfo);
         }
+
+        resultLayerInfo.put("layerId", jobDataMap.get(LAYER_ID));
+        resultLayerInfo.put("playlistId", jobDataMap.get(PLAYLIST_ID));
+        resultLayerInfo.put("updateYn", true);
+
+        layerInfoList.add(resultLayerInfo);
 
         returnMap.put("screenId", presetVo.getScreenId());
         returnMap.put("presetId", presetId);
