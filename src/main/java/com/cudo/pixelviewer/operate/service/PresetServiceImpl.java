@@ -575,7 +575,7 @@ public class PresetServiceImpl implements PresetService {
                     String removeKey = "screenNm";
                     screenInfo.remove(removeKey);
 
-                    requestBodyMap.put("presetId", usingPresetVo.getScreenId());
+                    requestBodyMap.put("presetId", usingPresetVo.getPresetId());
                     requestBodyMap.put("screenInfo", screenInfo);
                     requestBodyMap.put("layers", restoreLayers);
 

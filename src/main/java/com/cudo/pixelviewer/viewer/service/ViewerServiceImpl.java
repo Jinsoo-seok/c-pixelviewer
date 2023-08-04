@@ -193,7 +193,8 @@ public class ViewerServiceImpl implements ViewerService {
                         for(Map<String, Object> ynCheck : ynCheckList){
                             Integer tempId = (Integer) content.get("contentId");
                             Long realContentId = tempId != null ? tempId.longValue() : null;
-                            if(ynCheck.get("contentId") == realContentId ){
+
+                            if(Objects.equals(ynCheck.get("contentId"), realContentId)){
                                 content.put("weatherFl", ynCheck.get("weatherFl"));
                                 content.put("airInfoFl", ynCheck.get("airInfoFl"));
                                 content.put("stretch", ynCheck.get("stretch"));
@@ -351,7 +352,21 @@ public class ViewerServiceImpl implements ViewerService {
         if (file != null && !file.isEmpty()) {
             try {
                 String desktopPath = System.getProperty("user.home") + File.separator + "Desktop";
-                String originalFilename = file.getOriginalFilename();
+
+                String originalFilename = null;
+                if (type.equals("30") ||
+                        type.equals("40") ||
+                        type.equals("50") ||
+                        type.equals("60") ||
+                        type.equals("70") ||
+                        type.equals("80") ||
+                        type.equals("90") ||
+                        type.equals("100")) {
+                    originalFilename = name;
+                }
+                else{
+                    originalFilename = file.getOriginalFilename();
+                }
                 String filename = originalFilename.substring(0, originalFilename.lastIndexOf("."));
                 String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
                 String filePath = desktopPath + File.separator;
@@ -510,6 +525,7 @@ public class ViewerServiceImpl implements ViewerService {
         tempStyleMap.put("borderSize", dataMap.get("borderSize"));
         tempStyleMap.put("borderColor", dataMap.get("borderColor"));
         tempStyleMap.put("forecolor", dataMap.get("foreColor"));
+        tempStyleMap.put("backColor", dataMap.get("backColor"));
 
         tempPositionMap.put("posX", dataMap.get("posX"));
         tempPositionMap.put("posY", dataMap.get("posY"));
