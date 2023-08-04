@@ -308,6 +308,7 @@ public class AdminSettingServiceImpl implements AdminSettingService {
 
     public String getAirStationName(String externalinfoArea){
 
+        log.info("externalinfoArea = {}", externalinfoArea);
         URI urlAddrToXY = urlAddrToXY(externalinfoArea);
         log.info("urlAddrToXY = {}", urlAddrToXY);
         Map<String, Object> webClientResponseFirst = restTemplateFunction("addrToXY", urlAddrToXY);

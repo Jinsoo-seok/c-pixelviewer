@@ -392,8 +392,15 @@ public class PlaylistServiceImpl implements PlaylistService {
             for(Map<String, Object> realContent : realContentList){
                 Integer tempId = (Integer) realContent.get("contentId");
                 Long realContentId = tempId != null ? tempId.longValue() : null;
-                if(playlistContent.get("contentId") == realContentId ){
+
+                if(Objects.equals(playlistContent.get("contentId"), realContentId)){
+                    String removeKey = "contentId";
+                    realContent.remove(removeKey);
+
                     playlistContent.putAll(realContent);
+
+                    realContent.put("contentId", tempId);
+                    break;
                 }
             }
         }
