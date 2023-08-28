@@ -1,6 +1,7 @@
 #server config
 server:
   port: 8080
+  address: 0.0.0.0
   servlet:
     context-path: /
     encoding:
@@ -21,13 +22,14 @@ spring:
     activate:
       on-profile: default
   datasource:
-    url: jdbc:mariadb://106.245.226.42:33306/pixelviewer?serverTimezone=Asia/Seoul&characterEncoding=UTF-8&useSSL=false&allowMultiQueries=true&autoReconnect=true
+#    url: jdbc:mariadb://106.245.226.42:33306/pixelviewer?serverTimezone=Asia/Seoul&characterEncoding=UTF-8&useSSL=false&allowMultiQueries=true&autoReconnect=true
+    url: jdbc:mariadb://192.168.15.22:3306/pixelviewer?serverTimezone=Asia/Seoul&characterEncoding=UTF-8&useSSL=false&allowMultiQueries=true&autoReconnect=true
 #    username: root
 #    password: pass0001
     username: pixelviewer
     password: Pass0001!
     hikari:
-      maximum-pool-size: 10
+      maximum-pool-size: 50
 #      connection-timeout: 300000
 #      idle-timeout: 8000
 #      leakDetectionThreshold: 300000
@@ -42,11 +44,13 @@ spring:
 values:
   protocol: "http://"
   was:
-    ip: "106.245.226.42"
+#    ip: "106.245.226.42"
+    ip: "192.168.15.22"
     port: "4006"
     path: "/api-viewer/"
   agent:
-    ip: "192.168.123.12"
+#    ip: "192.168.123.12"
+    ip: "192.168.15.22"
     port: "8800"
     path: "/vieweragent/Preset/layer-placement"
     restore: "/vieweragent/Preset/layer-placement-restore"
