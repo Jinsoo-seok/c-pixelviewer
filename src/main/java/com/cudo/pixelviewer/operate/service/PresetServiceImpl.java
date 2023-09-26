@@ -518,6 +518,8 @@ public class PresetServiceImpl implements PresetService {
             String response = (String) agentResponseMap.get("data");
             if (response.contains("200")) {
                 agentResultMap.putAll(ParameterUtils.responseOption(ResponseCode.SUCCESS.getCodeName()));
+
+                log.info("agentResultMap = {}", agentResultMap);
             }
             else {
                 agentResultMap.put("code", ResponseCode.FAIL_AGENT_TO_VIEWER.getCode());

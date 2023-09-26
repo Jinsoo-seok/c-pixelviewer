@@ -533,3 +533,8 @@ INSERT INTO `Settings` (`setting_key`, `setting_value`) VALUES ('testPattern', '
 INSERT INTO `Settings` (`setting_key`, `setting_value`) VALUES ('coords', '60,125');
 INSERT INTO `Settings` (`setting_key`, `setting_value`) VALUES ('testPatternTime', '8');
 INSERT INTO `Settings` (`setting_key`, `setting_value`) VALUES ('stationName', '동작대로 중앙차로');
+
+INSERT INTO Users
+(user_id, user_name, password, auth_code, state, reg_dt, update_dt, invalid_cnt, led_key)
+VALUES
+('ADMIN', '관리자', '72ab994fa2eb426c051ef59cad617750bfe06d7cf6311285ff79c19c32afd236', 'A', '1', '2023-09-26 05:10:17.031259', '2023-09-26 05:10:17.031259', 0, 'ledKey');
