@@ -187,6 +187,7 @@ public class ViewerServiceImpl implements ViewerService {
 
                 List<Map<String, Object>> playlistContentList = playlistMapper.getPlaylistContentList(queryTemp);
                 if (playlistContentList.size() != 0) {
+                    List<Map<String, Object>> beforeSortResultContent = new ArrayList<>();
                     for(Map<String, Object> content : playlistContentList){
                         List<Map<String, Object>> ynCheckList = (List<Map<String, Object>>) playlist.get("contentIdList");
 
@@ -195,14 +196,25 @@ public class ViewerServiceImpl implements ViewerService {
                             Long realContentId = tempId != null ? tempId.longValue() : null;
 
                             if(Objects.equals(ynCheck.get("contentId"), realContentId)){
-                                content.put("weatherFl", ynCheck.get("weatherFl"));
-                                content.put("airInfoFl", ynCheck.get("airInfoFl"));
-                                content.put("stretch", ynCheck.get("stretch"));
-                                content.put("order", ynCheck.get("order"));
+                                Map<String, Object> tempContent = new HashMap<>();
+
+                                tempContent.put("contentId", tempId);
+                                tempContent.put("playtime", content.get("playtime"));
+                                tempContent.put("type", content.get("type"));
+                                tempContent.put("ctsPath", content.get("ctsPath"));
+                                tempContent.put("ctsNm", content.get("ctsNm"));
+                                tempContent.put("thumbnailPath", content.get("thumbnailPath"));
+
+                                tempContent.put("weatherFl", ynCheck.get("weatherFl"));
+                                tempContent.put("airInfoFl", ynCheck.get("airInfoFl"));
+                                tempContent.put("stretch", ynCheck.get("stretch"));
+                                tempContent.put("order", ynCheck.get("order"));
+
+                                beforeSortResultContent.add(tempContent);
                             }
                         }
                     }
-                    List<Map<String, Object>> sortedList = playlistContentList.stream()
+                    List<Map<String, Object>> sortedList = beforeSortResultContent.stream()
                             .sorted(Comparator.comparingInt(m -> Math.toIntExact((Long) m.get("order"))))
                             .collect(Collectors.toList());
 
