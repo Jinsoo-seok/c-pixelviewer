@@ -20,10 +20,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
@@ -38,6 +35,7 @@ public class LedControllerClient {
     final LedconMapper ledconMapper;
     private Map<Channel, List<byte[]>> responseFragmentMap;
     private AtomicBoolean detectSenderMessage;
+    private Set<Channel> channelCloseSet;
 
     private final static Integer EXPECTED_TOTAL_LENGTH = 260;
     private final static Integer SOCKET_RE_CONNECT_COUNT = 3;
@@ -54,6 +52,7 @@ public class LedControllerClient {
         channelFutureMap = new ConcurrentHashMap<>();
         responseFragmentMap = new ConcurrentHashMap<>();
         detectSenderMessage = new AtomicBoolean(false);
+        channelCloseSet = new HashSet<>();
 
         connect(); // 초기 연결
     }
@@ -96,6 +95,10 @@ public class LedControllerClient {
                     if (channelFuture.isSuccess()) {
                         Channel channel = channelFuture.channel();
                         channelFutureMap.put(channel, new CompletableFuture<>());
+
+                        if (channelCloseSet.contains(channel)) {
+                            channelCloseSet.remove(channel);
+                        }
                     } else {
                         log.error("Failed to Led Controller Connect. Retrying in 5 seconds... Because {}", String.valueOf(channelFuture.cause()));
 
@@ -104,6 +107,11 @@ public class LedControllerClient {
                         }
                     }
                 });
+    }
+
+    public void channelClose(Channel channel) {
+        channel.close();
+        channelCloseSet.add(channel);
     }
 
     public CompletableFuture<ResponseWithIpVo[]> sendMessage(byte[] message) {
@@ -323,7 +331,9 @@ public class LedControllerClient {
                 future.completeExceptionally(new RuntimeException("Led Channel Inactive"));
             }
 
-            connectChannel(ip, port, 0);
+            if (!channelCloseSet.contains(channel)) {
+                connectChannel(ip, port, 0);
+            }
         }
 
         /**

@@ -223,6 +223,9 @@ public class LedconServiceImpl implements LedconService {
 
             for (Channel channel : connectCheck) {
                 channelFutureMap.remove(channel);
+
+                // disconnect 시키기
+                ledControllerClient.channelClose(channel);
             }
 
             ledControllerClient.setChannelFutureMap(channelFutureMap);

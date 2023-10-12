@@ -180,6 +180,9 @@ public class PwrconServiceImpl implements PwrconService {
         if (connectCheck.size() == 1) {
             for (Channel channel : connectCheck) {
                 channelFutureMap.remove(channel);
+
+                // disconnect 시키기
+                deviceControllerClient.channelClose(channel);
             }
 
             deviceControllerClient.setChannelFutureMap(channelFutureMap);

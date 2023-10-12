@@ -16,9 +16,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
@@ -30,6 +28,8 @@ public class DeviceControllerClient {
     private EventLoopGroup group;
     private DeviceClientHandler deviceClientHandler;
     private Map<Channel, CompletableFuture<ResponseWithIpVo>> channelFutureMap;
+    private Set<Channel> channelCloseSet;
+
     final PwrconMapper pwrconMapper;
 
     private final static Integer SOCKET_RE_CONNECT_COUNT = 3;
@@ -43,6 +43,7 @@ public class DeviceControllerClient {
         group = new NioEventLoopGroup();
         deviceClientHandler = new DeviceClientHandler();
         channelFutureMap = new ConcurrentHashMap<>();
+        channelCloseSet = new HashSet<>();
 
         connect(); // 초기 연결
     }
@@ -85,6 +86,10 @@ public class DeviceControllerClient {
                     if (future.isSuccess()) {
                         Channel channel = future.channel();
                         channelFutureMap.put(channel, new CompletableFuture<>());
+
+                        if (channelCloseSet.contains(channel)) {
+                            channelCloseSet.remove(channel);
+                        }
                     } else {
                         log.error("Failed to Device Unit Controller Connect. Retrying in 5 seconds... Because {}", String.valueOf(future.cause()));
 
@@ -93,6 +98,11 @@ public class DeviceControllerClient {
                         }
                     }
                 });
+    }
+
+    public void channelClose(Channel channel) {
+        channel.close();
+        channelCloseSet.add(channel);
     }
 
     public CompletableFuture<ResponseWithIpVo[]> sendMessage(byte[] message) {
@@ -228,7 +238,9 @@ public class DeviceControllerClient {
                 future.completeExceptionally(new RuntimeException("Device Unit Channel Inactive"));
             }
 
-            connectChannel(ip, port, 0);
+            if (!channelCloseSet.contains(channel)) {
+                connectChannel(ip, port, 0);
+            }
         }
 
         /**
